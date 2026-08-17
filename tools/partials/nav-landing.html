@@ -1,0 +1,71 @@
+<nav class="ska-navbar" id="skaNavbar" aria-label="Main navigation">
+  <div class="ska-nav-inner">
+    <div class="ska-nav-left">
+      <a href="/skahotels/index.html" class="ska-logo" aria-label="SKA The Boutique — Home">
+        <img src="/skahotels/assets/images/ska_logo1.png" alt="SKA The Boutique">
+      </a>
+    </div>
+    <ul class="ska-nav-center">
+      <li><a href="/skahotels/index.html#book-search">Book</a></li>
+      <li><a href="/skahotels/offers.html">Offers</a></li>
+      <li><a href="/skahotels/index.html#properties">Properties</a></li>
+      <li><a href="/skahotels/about-us.html">About</a></li>
+      <li><a href="/skahotels/meetings-events.html">Meetings &amp; Events</a></li>
+      <li><a href="/skahotels/contact.html">Contact</a></li>
+    </ul>
+    <div class="ska-nav-right">
+      <a href="/skahotels/help.html" class="ska-hide-tablet ska-hide-mobile"><i class="fa-regular fa-circle-question"></i> Help</a>
+      <a href="/skahotels/loyalty.html" class="ska-login-btn"><i class="fa-regular fa-gem"></i> SKA Rewards</a>
+      <button class="ska-hamburger" id="skaHamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+<div class="ska-mobile-menu" id="skaMobileMenu" aria-hidden="true">
+  <div class="ska-mobile-inner">
+    <ul class="ska-mobile-nav">
+      <li><a href="/skahotels/index.html#book-search">Book</a></li>
+      <li><a href="/skahotels/offers.html">Offers</a></li>
+      <li><a href="/skahotels/index.html#properties">Properties</a></li>
+      <li><a href="/skahotels/about-us.html">About</a></li>
+      <li><a href="/skahotels/meetings-events.html">Meetings &amp; Events</a></li>
+      <li><a href="/skahotels/contact.html">Contact</a></li>
+    </ul>
+    <div class="ska-mobile-utils">
+      <a href="/skahotels/help.html"><i class="fa-regular fa-circle-question"></i> Help</a>
+      <a href="/skahotels/naguru.html"><i class="fa-solid fa-location-dot"></i> Naguru</a>
+      <a href="/skahotels/munyonyo.html"><i class="fa-solid fa-location-dot"></i> Munyonyo</a>
+    </div>
+    <a href="/skahotels/loyalty.html" class="ska-mobile-cta"><i class="fa-regular fa-gem"></i> SKA Rewards</a>
+  </div>
+</div>
+<script>
+(function () {
+  const hamburger  = document.getElementById('skaHamburger');
+  const mobileMenu = document.getElementById('skaMobileMenu');
+  const navbar     = document.getElementById('skaNavbar');
+  if (!hamburger || !mobileMenu) return;
+  function closeMenu() {
+    mobileMenu.classList.remove('open');
+    hamburger.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    mobileMenu.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+  hamburger.addEventListener('click', function () {
+    const isOpen = mobileMenu.classList.toggle('open');
+    hamburger.classList.toggle('open', isOpen);
+    hamburger.setAttribute('aria-expanded', isOpen);
+    mobileMenu.setAttribute('aria-hidden', !isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  });
+  mobileMenu.querySelectorAll('a').forEach(function (link) { link.addEventListener('click', closeMenu); });
+  document.addEventListener('click', function (e) {
+    if (!navbar.contains(e.target) && !mobileMenu.contains(e.target)) closeMenu();
+  });
+  window.addEventListener('scroll', function () {
+    navbar.classList.toggle('scrolled', window.scrollY > 20);
+  }, { passive: true });
+})();
+</script>

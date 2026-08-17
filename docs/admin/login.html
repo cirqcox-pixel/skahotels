@@ -1,38 +1,19 @@
 <!DOCTYPE html>
-<html lang="en" data-ska-static="true">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
-  <title>Admin Sign In | SKA</title>
-  <link rel="stylesheet" href="/skahotels/admin/assets/login.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
-<body class="ska-login">
-<div class="ska-login-wrap"><div class="login-card">
-  <div class="logo"><h4>SKA <span>Admin Portal</span></h4><p class="logo-sub">Supabase Auth</p></div>
-  <div id="loginError" class="error" style="display:none"></div>
-  <form id="adminLoginForm" class="ska-login-form">
-    <div class="mb-3"><label>Email</label><input type="email" id="adminEmail" class="form-control" required></div>
-    <div class="mb-3"><label>Password</label><input type="password" id="adminPass" class="form-control" required></div>
-    <button type="submit" class="btn-login">Sign In</button>
-  </form>
-  <p style="font-size:12px;color:#888;margin-top:16px">Create admin users in Supabase Auth dashboard.</p>
+<html lang="en" data-ska-static="true"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin | SKA</title><link rel="stylesheet" href="/skahotels/admin/assets/login.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"></head>
+<body class="ska-login"><div class="ska-login-wrap"><div class="login-card">
+<h4>SKA Admin</h4><div id="loginError" class="error" style="display:none"></div>
+<form id="adminLoginForm"><label>Email</label><input type="email" id="adminEmail" required><br><br>
+<label>Password</label><input type="password" id="adminPass" required><br><br>
+<button type="submit">Sign In</button></form>
+<p style="font-size:12px;color:#888">Create users in Supabase → Authentication</p>
 </div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/skahotels/assets/js/ska-config.js"></script>
 <script src="/skahotels/assets/js/ska-api.js"></script>
 <script>
-document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  var err = document.getElementById('loginError');
-  try {
-    await SkaApi.adminSignIn(document.getElementById('adminEmail').value, document.getElementById('adminPass').value);
-    location.href = 'dashboard.html';
-  } catch (ex) {
-    err.style.display = 'block';
-    err.textContent = ex.message || 'Login failed';
-  }
-});
-</script>
-</body></html>
+document.getElementById('adminLoginForm').onsubmit=async function(e){e.preventDefault();
+try{await SkaApi.adminSignIn(adminEmail.value,adminPass.value);location.href='dashboard.html';}
+catch(ex){loginError.style.display='block';loginError.textContent=ex.message;}};
+</script></body></html>

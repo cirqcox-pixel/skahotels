@@ -1,5 +1,30 @@
-
-
+<!DOCTYPE html>
+<html lang="en" data-ska-static="true">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKA Naguru | Boutique Hotel Kampala</title>
+<meta name="description" content="Book SKA Naguru.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+<link rel="stylesheet" href="/skahotels/assets/css/nav.css">
+<link rel="stylesheet" href="/skahotels/assets/css/branch.css">
+<link rel="stylesheet" href="/skahotels/assets/css/rooms-section.css">
+<link rel="icon" href="/skahotels/assets/images/favicon.png" type="image/png">
+</head>
+<body class="has-landing-nav">
+<div class="ska-property-header" id="skaPropertyHeader"><div class="container"><div class="ska-tabs">
+    <div class="ska-brand"><a href="/skahotels/index.html"><img src="/skahotels/assets/images/favicon.png" alt="SKA"></a></div>
+    <nav class="ska-tab-links" id="skaTabLinks">
+      <a href="/skahotels/naguru.html" class="active">Overview</a>
+      <a href="/skahotels/naguru.html#gallery">Photos</a>
+      <a href="/skahotels/naguru.html#rooms">Rooms</a>
+      <a href="/skahotels/naguru.html#services">Drink + Eat</a>
+      <a href="/skahotels/naguru.html#book">Book</a>
+    </nav></div></div></div>
 <style>
 /* ── Property Info Bar ──────────────────────────────────── */
 .pib-wrap {
@@ -417,7 +442,7 @@
       </div>
     </div>
     <div class="marketplace-image">
-      <img src="assets/images/ska_naguru_home.jpeg" alt="Ska Naguru"
+      <img src="/skahotels/assets/images/ska_naguru_home.jpeg" alt="Ska Naguru"
            onerror="this.parentElement.style.background='#2a2a2a';this.remove()">
     </div>
   </div>
@@ -485,7 +510,7 @@
       </div>
     
 
-    <form method="POST" action="forms/process_contact_naguru.html"
+    <form method="POST" action="#" data-ska-form="booking"
           class="booking-form" id="bookingForm" data-ska-form="booking">
       <input type="hidden" name="branch" value="Naguru">
       <div class="row g-3">
@@ -928,4 +953,67 @@ document.getElementById('lbxClose')?.addEventListener('click', () => closeModal(
 document.getElementById('dmClose')?.addEventListener('click', () => closeModal('dmBackdrop'));
 document.getElementById('ratesClose')?.addEventListener('click', () => closeModal('ratesBackdrop'));
 </script>
-
+<link rel="stylesheet" href="/skahotels/assets/css/footer.css">
+<footer class="ska-footer" role="contentinfo">
+  <div class="ska-footer__main">
+    <div class="ska-footer__brand">
+      <a href="/skahotels/index.html" class="ska-footer__logo">SKA <span>The Boutique</span></a>
+      <p class="ska-footer__tagline">Oasis in Kampala</p>
+      <p class="ska-footer__brand-desc">A distinguished collection of elegant retreats redefining hospitality in Uganda — where boutique charm meets genuine warmth.</p>
+      <div class="ska-footer__contacts">
+        <a href="mailto:info@skaboutiquebnb.com" class="ska-footer__contact-item"><i class="fa-regular fa-envelope"></i>info@skaboutiquebnb.com</a>
+        <a href="tel:+256200987770" class="ska-footer__contact-item"><i class="fa-solid fa-phone"></i>+256 200 98777</a>
+        <a href="tel:+256741186891" class="ska-footer__contact-item"><i class="fa-solid fa-phone"></i>+256 741 186 891</a>
+        <span class="ska-footer__contact-item"><i class="fa-solid fa-location-dot"></i>Naguru &amp; Munyonyo, Kampala</span>
+      </div>
+    </div>
+    <div>
+      <h4 class="ska-footer__col-title">Explore</h4>
+      <ul class="ska-footer__nav">
+        <li><a href="/skahotels/about-us.html">Overview</a></li>
+        <li><a href="/skahotels/naguru.html#rooms">Rooms &amp; Suites</a></li>
+        <li><a href="/skahotels/naguru.html#gallery">Photo Gallery</a></li>
+        <li><a href="/skahotels/meetings-events.html">Meetings &amp; Events</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="ska-footer__col-title">Our Properties</h4>
+      <ul class="ska-footer__nav">
+        <li><a href="/skahotels/munyonyo.html">SKA Munyonyo</a></li>
+        <li><a href="/skahotels/naguru.html">SKA Naguru — Hillside</a></li>
+        <li><a href="/skahotels/index.html#book-search">Book a Room</a></li>
+        <li><a href="/skahotels/offers.html">Special Offers</a></li>
+        <li><a href="/skahotels/loyalty.html">SKA Rewards</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="ska-footer__col-title">Follow Us</h4>
+      <div class="ska-footer__socials">
+        <a href="https://www.instagram.com/skanaguru/" target="_blank" rel="noopener noreferrer" class="ska-footer__social-link"><span class="ska-footer__social-icon"><i class="fab fa-instagram"></i></span>Instagram</a>
+        <a href="https://www.facebook.com/skaboutiquebnb" target="_blank" rel="noopener noreferrer" class="ska-footer__social-link"><span class="ska-footer__social-icon"><i class="fab fa-facebook-f"></i></span>Facebook</a>
+        <a href="https://wa.me/256741186891" target="_blank" rel="noopener noreferrer" class="ska-footer__social-link"><span class="ska-footer__social-icon"><i class="fab fa-whatsapp"></i></span>WhatsApp</a>
+      </div>
+    </div>
+  </div>
+  <hr class="ska-footer__divider">
+  <div class="ska-footer__bottom">
+    <p class="ska-footer__copy">&copy; <span id="skaYear"></span> <strong>SKA The Boutique</strong>. All rights reserved.</p>
+    <div class="ska-footer__legal">
+      <a href="/skahotels/privacy-policy.html">Privacy Policy</a>
+      <span class="ska-footer__legal-dot"></span>
+      <a href="/skahotels/terms-of-use.html">Terms of Use</a>
+      <span class="ska-footer__legal-dot"></span>
+      <a href="/skahotels/cookie-policy.html">Cookie Policy</a>
+    </div>
+    <p class="ska-footer__credit">Crafted by <a href="https://cirqco.com/" target="_blank" rel="noopener noreferrer">Cirqco</a> — hospitality technology &amp; digital experience</p>
+  </div>
+</footer>
+<script>document.getElementById('skaYear').textContent = new Date().getFullYear();</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/skahotels/assets/js/ska-config.js"></script>
+<script src="/skahotels/assets/js/ska-api.js"></script>
+<script src="/skahotels/assets/js/ska-forms.js"></script>
+<script src="/skahotels/assets/js/ska-live.js"></script>
+</body>
+</html>

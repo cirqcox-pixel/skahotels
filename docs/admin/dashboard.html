@@ -1,46 +1,27 @@
 <!DOCTYPE html>
-<html lang="en" data-ska-static="true">
-<head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
-  <title>Dashboard | SKA Admin</title>
-  <link rel="stylesheet" href="/skahotels/admin/assets/admin.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
-<body style="background:#f4f2ed;padding:24px;font-family:Jost,sans-serif">
-<div style="max-width:1100px;margin:0 auto">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
-    <h1 style="margin:0;font-size:24px">SKA Admin</h1>
-    <div>
-      <a href="/skahotels/" target="_blank" style="margin-right:12px">View Site</a>
-      <button id="logoutBtn" style="padding:8px 16px">Logout</button>
-    </div>
-  </div>
-  <div id="authWarn" style="display:none;padding:16px;background:#fff3cd;border-radius:8px;margin-bottom:16px">Please <a href="login.html">sign in</a> first.</div>
-  <h2>Recent Bookings</h2>
-  <div id="bookings" style="background:#fff;border-radius:8px;padding:16px;margin-bottom:24px;overflow-x:auto">Loading…</div>
-  <h2>Recent Inquiries</h2>
-  <div id="inquiries" style="background:#fff;border-radius:8px;padding:16px;overflow-x:auto">Loading…</div>
-</div>
+<html lang="en"><head><meta charset="UTF-8"><title>Dashboard | SKA Admin</title>
+<link rel="stylesheet" href="/skahotels/admin/assets/admin.css"></head>
+<body style="padding:24px;font-family:sans-serif">
+<h1>SKA Admin Dashboard</h1>
+<p><a href="/skahotels/">View site</a> | <a href="login.html" id="logout">Logout</a></p>
+<div id="authWarn" style="display:none;background:#fff3cd;padding:12px">Please <a href="login.html">sign in</a>.</div>
+<h2>Bookings</h2><div id="bookings">Loading…</div>
+<h2>Inquiries</h2><div id="inquiries">Loading…</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/skahotels/assets/js/ska-config.js"></script>
 <script src="/skahotels/assets/js/ska-api.js"></script>
 <script>
 (async function(){
-  var session = await SkaApi.adminSession();
-  if (!session) { document.getElementById('authWarn').style.display='block'; return; }
-  var sb = SkaApi.client();
-  var b = await sb.from('bookings').select('*').order('created_at',{ascending:false}).limit(20);
-  var i = await sb.from('inquiries').select('*').order('created_at',{ascending:false}).limit(20);
-  function table(rows, cols) {
-    if (!rows.length) return '<p>No records yet.</p>';
-    var h = '<table style="width:100%;border-collapse:collapse;font-size:13px"><tr>' + cols.map(function(c){return '<th style="text-align:left;padding:8px;border-bottom:1px solid #eee">'+c+'</th>';}).join('') + '</tr>';
-    rows.forEach(function(r){ h += '<tr>' + cols.map(function(c){return '<td style="padding:8px;border-bottom:1px solid #f3f3f3">'+(r[c]||'—')+'</td>';}).join('') + '</tr>'; });
-    return h + '</table>';
-  }
-  document.getElementById('bookings').innerHTML = b.error ? b.error.message : table(b.data||[], ['created_at','name','email','branch','room_type','status','total']);
-  document.getElementById('inquiries').innerHTML = i.error ? i.error.message : table(i.data||[], ['created_at','name','email','subject','message']);
-  document.getElementById('logoutBtn').onclick = async function(){ await SkaApi.adminSignOut(); location.href='login.html'; };
+  if(!await SkaApi.adminSession()){authWarn.style.display='block';return;}
+  var sb=SkaApi.client();
+  var b=await sb.from('bookings').select('*').order('created_at',{ascending:false}).limit(20);
+  var i=await sb.from('inquiries').select('*').order('created_at',{ascending:false}).limit(20);
+  function tbl(rows,cols){if(!rows||!rows.length)return'<p>None yet.</p>';
+    return'<table border="1" cellpadding="6" style="border-collapse:collapse;width:100%"><tr>'+
+    cols.map(c=>'<th>'+c+'</th>').join('')+'</tr>'+
+    rows.map(r=>'<tr>'+cols.map(c=>'<td>'+(r[c]??'')+'</td>').join('')+'</tr>').join('')+'</table>';}
+  bookings.innerHTML=b.error?b.error.message:tbl(b.data,['created_at','name','email','branch','status']);
+  inquiries.innerHTML=i.error?i.error.message:tbl(i.data,['created_at','name','email','subject']);
+  logout.onclick=async function(e){e.preventDefault();await SkaApi.adminSignOut();location.href='login.html';};
 })();
-</script>
-</body></html>
+</script></body></html>
