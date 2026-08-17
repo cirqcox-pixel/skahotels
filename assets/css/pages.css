@@ -1,0 +1,212 @@
+/* ═══════════════════════════════════════════════════════════
+   pages.css — shared styles for content / legal / offers pages
+═══════════════════════════════════════════════════════════ */
+:root {
+  --gold: #c9a96e;
+  --gold-deep: #a8814a;
+  --navy: #0d1b2e;
+  --ivory: #f9f6f0;
+  --charcoal: #1c1c1c;
+  --muted: #6b6b6b;
+  --ff-display: 'Cormorant Garamond', Georgia, serif;
+  --ff-body: 'Jost', sans-serif;
+}
+
+.ska-page-hero {
+  position: relative;
+  min-height: 48vh;
+  display: flex;
+  align-items: flex-end;
+  padding: 120px 0 64px;
+  background: var(--navy);
+  overflow: hidden;
+}
+.ska-page-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(13,27,46,0.92), rgba(26,53,88,0.75));
+}
+.ska-page-hero__bg {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.35;
+}
+.ska-page-hero .container { position: relative; z-index: 1; }
+.ska-page-hero__eyebrow {
+  font-family: var(--ff-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+.ska-page-hero__title {
+  font-family: var(--ff-display);
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-weight: 300;
+  color: #fff;
+  line-height: 1.15;
+  margin: 0 0 16px;
+  max-width: 720px;
+}
+.ska-page-hero__sub {
+  font-family: var(--ff-body);
+  font-size: 16px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.72);
+  max-width: 560px;
+  line-height: 1.75;
+  margin: 0;
+}
+
+.ska-page-body {
+  background: var(--ivory);
+  padding: 72px 0 96px;
+}
+.ska-page-body .container { max-width: 960px; }
+
+.ska-content-card {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #e8e4dc;
+  padding: 40px 44px;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+}
+.ska-content-card h2 {
+  font-family: var(--ff-display);
+  font-size: 1.75rem;
+  font-weight: 400;
+  color: var(--charcoal);
+  margin: 0 0 16px;
+}
+.ska-content-card h3 {
+  font-family: var(--ff-body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  margin: 28px 0 10px;
+}
+.ska-content-card p,
+.ska-content-card li {
+  font-family: var(--ff-body);
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--muted);
+}
+.ska-content-card ul { padding-left: 20px; margin: 0 0 16px; }
+
+/* Offer / feature grid */
+.ska-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+}
+.ska-feature-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e8e4dc;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+.ska-feature-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.1);
+}
+.ska-feature-card__img {
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+}
+.ska-feature-card__body { padding: 24px; }
+.ska-feature-card__tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  margin-bottom: 8px;
+}
+.ska-feature-card__title {
+  font-family: var(--ff-display);
+  font-size: 1.35rem;
+  color: var(--charcoal);
+  margin: 0 0 10px;
+}
+.ska-feature-card__text {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0 0 16px;
+}
+.ska-btn-gold {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--gold);
+  color: #fff;
+  font-family: var(--ff-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 12px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.25s;
+}
+.ska-btn-gold:hover { background: var(--gold-deep); color: #fff; }
+.ska-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--charcoal);
+  color: var(--charcoal);
+  font-family: var(--ff-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 11px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.25s;
+}
+.ska-btn-outline:hover { background: var(--charcoal); color: #fff; }
+
+.ska-cta-band {
+  background: var(--navy);
+  padding: 56px 0;
+  text-align: center;
+  margin-top: 48px;
+}
+.ska-cta-band h2 {
+  font-family: var(--ff-display);
+  font-size: 2rem;
+  color: #fff;
+  font-weight: 300;
+  margin: 0 0 12px;
+}
+.ska-cta-band p {
+  color: rgba(255,255,255,0.65);
+  font-size: 15px;
+  margin: 0 0 24px;
+}
+.ska-cta-band__btns {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .ska-content-card { padding: 28px 24px; }
+  .ska-grid-3 { grid-template-columns: 1fr; }
+  .ska-page-hero { padding: 100px 0 48px; }
+}

@@ -1,0 +1,397 @@
+/* ═══════════════════════════════════════════════════════════
+   ROOMS & SUITES  —  rs-* namespace
+   Matches Image 1 exactly:
+     • bg #eeecea, 80px vertical padding
+     • header: bold serif title top-left, range-bar below it
+     • top-right: season pill + Prev ——→ Next
+     • 3 cards side by side, tall image (4:3), white body panel
+     • card: name › | thin divider | price | blue pill button
+     • NO price or season shown (hidden like reference image)
+═══════════════════════════════════════════════════════════ */
+
+
+
+
+
+/* ── Outer wrapper ─────────────────────────────────────── */
+.rooms-section {
+  background: #eeecea;
+  padding: 72px 0 80px;
+}
+.rs-wrap {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 48px;
+  box-sizing: border-box;
+}
+
+/* ── Header ────────────────────────────────────────────── */
+.rs-header {
+  display: flex;
+  align-items: flex-end;          /* align bottom edges */
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 20px;
+}
+
+.rs-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rs-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2rem, 3vw, 2.8rem);
+  font-weight: 700;
+  color: #1e1e1e;
+  margin: 0;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+/* Range bar: 05 ─────●──── 06 */
+.rs-rangebar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.rs-num {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e1e1e;
+  min-width: 20px;
+  font-variant-numeric: tabular-nums;
+}
+.rs-track-wrap {
+  position: relative;
+  width: 220px;
+  height: 2px;
+}
+.rs-track-bg {
+  position: absolute;
+  inset: 0;
+  background: #bbb8b2;
+  border-radius: 2px;
+}
+.rs-track-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  background: #1e1e1e;
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.4s ease;
+}
+.rs-track-thumb {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background: #1e1e1e;
+  border-radius: 50%;
+  pointer-events: none;
+  transition: left 0.4s ease;
+}
+
+/* Right side: season pill + Prev/Next */
+.rs-header-right {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-shrink: 0;
+  padding-bottom: 2px;   /* align baseline with range bar */
+}
+
+.rs-season-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #5a5a5a;
+  background: #fff;
+  border: 1px solid #e0d8ce;
+  padding: 7px 16px;
+  border-radius: 40px;
+  white-space: nowrap;
+}
+.rs-season-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sp-color, #c9a96e);
+  flex-shrink: 0;
+}
+
+/* Prev ——→ Next */
+.rs-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.rs-nav-btn {
+  background: none;
+  border: none;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e1e1e;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+.rs-nav-btn:hover:not(:disabled) { color: #2d7ab5; }
+.rs-nav-btn:disabled { opacity: 0.28; cursor: default; }
+
+.rs-nav-line {
+  display: block;
+  width: 80px;
+  height: 1px;
+  background: #1e1e1e;
+  opacity: 0.3;
+  flex-shrink: 0;
+}
+
+
+
+/* ── Viewport & sliding track ──────────────────────────── */
+.rs-viewport {
+  width: 100%;
+  overflow: hidden;     /* clips the non-visible cards */
+}
+
+.rs-track {
+  display: flex;
+  flex-direction: row;  /* MUST be explicit */
+  flex-wrap: nowrap;    /* MUST be explicit — no wrapping */
+  gap: 20px;
+  transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+
+/* ── Individual card ───────────────────────────────────── */
+/*
+   Card width formula for 3 visible + 2 gaps of 20px:
+   (100% - 40px) / 3
+   Written as flex shorthand so it never collapses:
+*/
+.rs-card {
+  flex: 0 0 calc((100% - 40px) / 3);
+  min-width: 0;            /* prevent flex blowout */
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.rs-card:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+  transform: translateY(-4px);
+}
+
+/* ── Card image ────────────────────────────────────────── */
+.rs-card-img {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #222;
+  display: block;        /* kill any inline gap */
+}
+.rs-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.55s ease;
+}
+.rs-card:hover .rs-img { transform: scale(1.05); }
+
+/* Photo Coming Soon placeholder */
+.rs-img-ph {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: rgba(255,255,255,0.5);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  background: rgba(0,0,0,0.55);
+}
+.rs-img-ph i { font-size: 26px; }
+
+/* Expand icon top-right of image */
+.rs-expand {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  background: rgba(0,0,0,0.50);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  z-index: 2;
+}
+.rs-expand:hover { background: rgba(0,0,0,0.80); }
+
+/* ── Card body ─────────────────────────────────────────── */
+.rs-card-body {
+  padding: 20px 22px 26px;
+  background: #fff;
+}
+
+/* Room name button */
+.rs-room-name {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e1e1e;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.01em;
+  transition: color 0.2s;
+  line-height: 1.3;
+}
+.rs-room-name:hover { color: #2d7ab5; }
+
+.rs-chevron {
+  color: #5a5a5a;
+  font-size: 1.1rem;
+  line-height: 1;
+  margin-left: 1px;
+}
+
+/* Thin divider */
+.rs-divider {
+  height: 1px;
+  background: #e0d8ce;
+  margin: 14px 0;
+}
+
+/* Price row — shown but subtle (matches reference) */
+.rs-price {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e1e1e;
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.rs-ppn {
+  font-weight: 400;
+  color: #5a5a5a;
+  font-size: 12px;
+}
+.rs-season-tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+/* View Rates button — blue pill */
+.rs-vr-btn {
+  display: inline-block;
+  padding: 10px 26px;
+  background: #2d7ab5;
+  color: #fff;
+  border: none;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.rs-vr-btn:hover { background: #1f5d8a; }
+
+
+
+
+
+
+/* BACKDROP */
+.ska-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.78);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+}
+
+.ska-backdrop.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+
+
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .rs-wrap { padding: 0 32px; }
+  /* 2 cards visible */
+  .rs-card { flex: 0 0 calc((100% - 20px) / 2); }
+  .rs-track-wrap { width: 160px; }
+  /* hide second calendar */
+  #calGrid2, #calLbl2, #calNext2 { display: none; }
+}
+
+@media (max-width: 640px) {
+  .rs-wrap { padding: 0 16px; }
+  /* 1 card visible */
+  .rs-card { flex: 0 0 100%; }
+  .rs-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .rs-header-right { width: 100%; justify-content: space-between; }
+  .rs-nav-line { width: 40px; }
+  .rs-track-wrap { width: 120px; }
+  .rs-season-pill { display: none; } /* too crowded on mobile */
+  
+  
+  
+  
+  
+  
+  
+  
+}

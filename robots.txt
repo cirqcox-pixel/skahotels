@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /forms/
+Disallow: /config/
+
+Sitemap: https://www.skaboutiquebnb.com/sitemap.xml

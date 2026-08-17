@@ -1,0 +1,373 @@
+<?php
+$pageMeta = [
+    'title'       => 'SKA The Boutique | Luxury Boutique Hotel in Kampala, Uganda',
+    'description' => 'Book direct at SKA The Boutique — refined boutique bed & breakfast in Naguru and Munyonyo, Kampala. Best rates, free breakfast, Wi-Fi and flexible check-in.',
+    'path'        => '',
+    'type'        => 'website',
+    'image'       => 'assets/images/ska_naguru_home.jpeg',
+    'schema'      => [
+        '@context'    => 'https://schema.org',
+        '@type'       => 'Hotel',
+        'name'        => 'SKA The Boutique',
+        'description' => 'Luxury boutique bed & breakfast with properties in Naguru and Munyonyo, Kampala, Uganda.',
+        'url'         => 'https://www.skaboutiquebnb.com/',
+        'telephone'   => ['+256200987770', '+256741186891'],
+        'email'       => 'info@skaboutiquebnb.com',
+        'starRating'  => ['@type' => 'Rating', 'ratingValue' => '4.5', 'bestRating' => '5'],
+        'address'     => ['@type' => 'PostalAddress', 'addressLocality' => 'Kampala', 'addressCountry' => 'UG'],
+        'amenityFeature' => [
+            ['@type' => 'LocationFeatureSpecification', 'name' => 'Free WiFi', 'value' => true],
+            ['@type' => 'LocationFeatureSpecification', 'name' => 'Free Breakfast', 'value' => true],
+        ],
+    ],
+];
+$pageStyles = ['assets/css/home.css'];
+$navActive  = 'book';
+include 'includes/page-start.php';
+
+$promotions = cms_promotions();
+
+$heroSlides = [];
+for ($i = 1; $i <= 6; $i++) {
+    $img = cms_setting("hero_slide_{$i}_image");
+    if (!$img) continue;
+    $heroSlides[] = [
+        'image' => $img,
+        'alt'   => cms_setting("hero_slide_{$i}_alt", 'SKA The Boutique Kampala'),
+    ];
+}
+if (empty($heroSlides)) {
+    $heroSlides = [
+        ['image' => 'assets/images/ska_naguru_home.jpeg', 'alt' => 'SKA Naguru boutique hotel in Kampala'],
+        ['image' => 'assets/images/ska_munyonyo_home2.jpg', 'alt' => 'SKA Munyonyo lakeside boutique retreat'],
+    ];
+}
+?>
+
+<header class="lp-hero" id="book-search">
+
+  <div id="heroCarousel" class="carousel slide carousel-fade lp-carousel"
+       data-bs-ride="carousel" data-bs-interval="6000">
+    <div class="carousel-inner">
+      <?php foreach ($heroSlides as $i => $slide): ?>
+      <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
+        <img src="<?= htmlspecialchars($slide['image']) ?>" alt="<?= htmlspecialchars($slide['alt']) ?>" class="lp-hero-img" width="1920" height="1080" <?= $i === 0 ? 'fetchpriority="high"' : 'loading="lazy"' ?>>
+      </div>
+      <?php endforeach; ?>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Previous slide">
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Next slide">
+      <span class="carousel-control-next-icon"></span>
+    </button>
+  </div>
+
+  <div class="lp-hero-overlay"></div>
+
+  <form class="lp-search-bar" id="searchForm" onsubmit="return handleFindRooms(event)" role="search" aria-label="Find rooms">
+    <div class="lp-search-field lp-search-dest">
+      <label for="searchProperty" class="lp-search-label">
+        <i class="fa-solid fa-location-dot"></i> PROPERTY
+      </label>
+      <select class="lp-search-input lp-search-select" id="searchProperty" name="property" required aria-required="true">
+        <option value="">Where can we take you?</option>
+        <option value="naguru">SKA Naguru</option>
+        <option value="munyonyo">SKA Munyonyo</option>
+      </select>
+    </div>
+    <div class="lp-search-divider"></div>
+    <div class="lp-search-field lp-search-dates">
+      <span class="lp-search-label">
+        <i class="fa-regular fa-calendar"></i>
+        <span id="nightCount">1 NIGHT</span>
+      </span>
+      <div class="lp-dates-row">
+        <input type="date" id="searchCheckin" name="checkin" class="lp-date-input" aria-label="Check-in date" required>
+        <span class="lp-dates-sep">–</span>
+        <input type="date" id="searchCheckout" name="checkout" class="lp-date-input" aria-label="Check-out date" required>
+      </div>
+    </div>
+    <button type="submit" class="lp-search-btn" id="findRoomsBtn">
+      <i class="fa-solid fa-magnifying-glass"></i> Find Rooms
+    </button>
+  </form>
+
+  <div id="searchError" class="lp-search-error" role="alert" aria-live="polite">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    Please select a property first
+  </div>
+
+  <div class="lp-hero-promo">
+    <h2 class="lp-promo-heading">Direct Booking Saves More</h2>
+    <p class="lp-promo-sub">Book direct for the best rate, free Wi-Fi and flexible check-in.</p>
+    <a href="#properties" class="lp-promo-btn" id="heroBookBtn">Book Now</a>
+  </div>
+
+</header>
+
+<section class="lp-discover" id="properties">
+  <div class="lp-discover-inner">
+
+    <h2 class="lp-discover-title">Discover What's Waiting</h2>
+
+    <div class="lp-disc-tabs" id="discTabs" role="tablist">
+      <button type="button" class="lp-disc-tab active" data-tab="all" role="tab" aria-selected="true">All Properties</button>
+      <button type="button" class="lp-disc-tab" data-tab="naguru" role="tab" aria-selected="false">Naguru</button>
+      <button type="button" class="lp-disc-tab" data-tab="munyonyo" role="tab" aria-selected="false">Munyonyo</button>
+    </div>
+    <div class="lp-disc-underline"></div>
+
+    <div class="lp-disc-cards" id="discCards">
+
+      <a href="naguru.php" class="lp-disc-card" data-branch="naguru">
+        <img src="assets/images/ska_naguru_home.jpeg" alt="SKA Naguru — boutique hotel Naguru Kampala" class="lp-disc-img" loading="lazy">
+        <div class="lp-disc-card-body">
+          <span class="lp-disc-tag"><i class="fa-solid fa-location-dot"></i> NAGURU, KAMPALA</span>
+          <h3 class="lp-disc-name">SKA Naguru <i class="fa-solid fa-chevron-right"></i></h3>
+          <span class="lp-disc-meta">Hillside retreat · From USD 150/night</span>
+        </div>
+      </a>
+
+      <a href="munyonyo.php" class="lp-disc-card" data-branch="munyonyo">
+        <img src="assets/images/ska_munyonyo_home2.jpg" alt="SKA Munyonyo — lakeside boutique hotel Kampala" class="lp-disc-img" loading="lazy">
+        <div class="lp-disc-card-body">
+          <span class="lp-disc-tag"><i class="fa-solid fa-location-dot"></i> MUNYONYO, KAMPALA</span>
+          <h3 class="lp-disc-name">SKA Munyonyo <i class="fa-solid fa-chevron-right"></i></h3>
+          <span class="lp-disc-meta">Lakeside serenity · From USD 180/night</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<section class="lp-getaway">
+  <div class="container">
+    <div class="lp-getaway-header">
+      <div>
+        <h2 class="lp-getaway-title">Get Away, Get More</h2>
+        <p class="lp-getaway-sub">Celebrate longer stays with savings on rooms, experiences, and more.</p>
+      </div>
+      <a href="offers.php" class="lp-viewmore-link">View All Offers <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+
+    <div class="lp-promo-slider-wrap">
+      <div class="lp-promo-track" id="promoTrack">
+        <?php foreach ($promotions as $promo): ?>
+        <a href="<?= htmlspecialchars($promo['booking_url'] ?: 'offers.php') ?>" class="lp-promo-card">
+          <img src="<?= htmlspecialchars($promo['image']) ?>" alt="<?= htmlspecialchars($promo['title']) ?>" class="lp-promo-img" loading="lazy">
+          <div class="lp-promo-card-label">
+            <span><?= htmlspecialchars($promo['title']) ?></span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+        </a>
+        <?php endforeach; ?>
+        <?php if (empty($promotions)): ?>
+        <a href="offers.php" class="lp-promo-card">
+          <img src="assets/images/ska_naguru_home.jpeg" alt="Book direct for the best rate" class="lp-promo-img">
+          <div class="lp-promo-card-label">
+            <span>Book Direct for the Best Rate</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+        </a>
+        <?php endif; ?>
+      </div>
+      <button class="lp-promo-next" id="promoNext" aria-label="Next offers"><i class="fa-solid fa-chevron-right"></i></button>
+      <div class="lp-promo-dots" id="promoDots">
+        <?php foreach ($promotions as $i => $promo): ?>
+        <span class="lp-promo-dot <?= $i === 0 ? 'active' : '' ?>"></span>
+        <?php endforeach; ?>
+        <?php if (empty($promotions)): ?><span class="lp-promo-dot active"></span><?php endif; ?>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="lp-bestrates">
+  <div class="container">
+    <div class="lp-bestrates-card">
+      <div class="lp-br-left">
+        <h2 class="lp-br-title">The Best Rates<br>Are Always Here</h2>
+        <p class="lp-br-body">Get the lowest prices plus free Wi-Fi, flexible cancellation and breakfast when you book directly with us.</p>
+        <div class="lp-br-btns">
+          <a href="index.php#book-search" class="lp-br-btn-dark">Book Direct</a>
+          <a href="about-us.php" class="lp-br-btn-outline">Learn More</a>
+        </div>
+      </div>
+      <div class="lp-br-divider"></div>
+      <div class="lp-br-right">
+        <div class="lp-br-perk"><i class="fa-solid fa-shield-halved lp-perk-icon"></i><span>BEST RATE<br>GUARANTEE</span></div>
+        <div class="lp-br-perk"><i class="fa-solid fa-bed lp-perk-icon"></i><span>FREE<br>BREAKFAST</span></div>
+        <div class="lp-br-perk"><i class="fa-solid fa-wifi lp-perk-icon"></i><span>FREE<br>WI-FI</span></div>
+        <div class="lp-br-perk"><i class="fa-solid fa-tag lp-perk-icon"></i><span><a href="loyalty.php" style="color:inherit;text-decoration:none">MEMBER<br>RATES</a></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="lp-banners">
+  <div class="container">
+    <a href="about-us.php" class="lp-banner-row">
+      <div class="lp-banner-logo"><span class="lp-brand-mark">SKA<br><small>B&amp;B</small></span></div>
+      <div class="lp-banner-text">
+        <strong>Unlock extraordinary experiences at SKA The Boutique.</strong>
+        <span>Wherever you go, our team gives you easy access to everything you need for your trip.</span>
+      </div>
+      <i class="fa-solid fa-chevron-right lp-banner-arrow"></i>
+    </a>
+    <a href="careers.php" class="lp-banner-row">
+      <div class="lp-banner-thumb">
+        <img src="assets/images/ska_art_home.jpg" alt="Careers at SKA The Boutique" loading="lazy">
+      </div>
+      <div class="lp-banner-text">
+        <strong>Discover Career Opportunities at SKA</strong>
+        <span>Hospitality / Front Office / Kitchen &amp; Housekeeping</span>
+      </div>
+      <i class="fa-solid fa-chevron-right lp-banner-arrow"></i>
+    </a>
+  </div>
+</section>
+
+<section class="lp-sitemap">
+  <div class="container">
+    <div class="lp-sitemap-grid">
+      <div class="lp-sitemap-col">
+        <h4 class="lp-sm-heading">Our Properties</h4>
+        <ul class="lp-sm-list">
+          <li><a href="naguru.php">SKA Naguru Overview <i class="fa-solid fa-chevron-right"></i></a></li>
+          <li><a href="naguru.php#rooms">Rooms &amp; Suites <i class="fa-solid fa-chevron-right"></i></a></li>
+          <li><a href="naguru.php#services">Facilities &amp; Amenities <i class="fa-solid fa-chevron-right"></i></a></li>
+          <li><a href="naguru.php#gallery">Gallery <i class="fa-solid fa-chevron-right"></i></a></li>
+          <li><a href="munyonyo.php">SKA Munyonyo <i class="fa-solid fa-chevron-right"></i></a></li>
+          <li><a href="about-us.php">About SKA <i class="fa-solid fa-chevron-right"></i></a></li>
+        </ul>
+      </div>
+      <div class="lp-sitemap-col">
+        <h4 class="lp-sm-heading">Events &amp; Meetings</h4>
+        <ul class="lp-sm-list">
+          <li><a href="meetings-events.php">Events Overview <i class="fa-solid fa-chevron-right"></i></a></li>
+          <li><a href="meetings-events.php#business">Business Meetings <i class="fa-solid fa-chevron-right"></i></a></li>
+          <li><a href="meetings-events.php#weddings">Weddings <i class="fa-solid fa-chevron-right"></i></a></li>
+          <li><a href="meetings-events.php#social">Social Events <i class="fa-solid fa-chevron-right"></i></a></li>
+          <li><a href="meetings-events.php#groups">Group Bookings <i class="fa-solid fa-chevron-right"></i></a></li>
+        </ul>
+      </div>
+      <div class="lp-sitemap-col">
+        <h4 class="lp-sm-heading">Deals &amp; Packages</h4>
+        <ul class="lp-sm-list">
+          <li><a href="offers.php">Current Deals <i class="fa-solid fa-chevron-right"></i></a></li>
+          <li><a href="offers.php">Early Bird Packages <i class="fa-solid fa-chevron-right"></i></a></li>
+          <li><a href="offers.php">Extended Stay Rates <i class="fa-solid fa-chevron-right"></i></a></li>
+          <li><a href="offers.php">Weekend Specials <i class="fa-solid fa-chevron-right"></i></a></li>
+          <li><a href="contact.php?subject=Corporate+Rates">Corporate Rates <i class="fa-solid fa-chevron-right"></i></a></li>
+          <li><a href="contact.php?subject=Gift+Voucher">Gift Vouchers <i class="fa-solid fa-chevron-right"></i></a></li>
+          <li><a href="loyalty.php">Loyalty Programme <i class="fa-solid fa-chevron-right"></i></a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+function updateNights() {
+  const ci = document.getElementById('searchCheckin').value;
+  const co = document.getElementById('searchCheckout').value;
+  const el = document.getElementById('nightCount');
+  if (ci && co) {
+    const n = Math.max(1, Math.round((new Date(co) - new Date(ci)) / 86400000));
+    el.textContent = n + (n === 1 ? ' NIGHT' : ' NIGHTS');
+    document.getElementById('searchCheckout').min = ci;
+  }
+}
+document.getElementById('searchCheckin').addEventListener('change', updateNights);
+document.getElementById('searchCheckout').addEventListener('change', updateNights);
+
+(function() {
+  const today = new Date();
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
+  const fmt = d => d.toISOString().split('T')[0];
+  document.getElementById('searchCheckin').value = fmt(today);
+  document.getElementById('searchCheckout').value = fmt(tomorrow);
+  document.getElementById('searchCheckin').min = fmt(today);
+  updateNights();
+})();
+
+/* Discover tab filter */
+document.querySelectorAll('.lp-disc-tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    const filter = this.dataset.tab;
+    document.querySelectorAll('.lp-disc-tab').forEach(function(t) {
+      t.classList.toggle('active', t === tab);
+      t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+    });
+    document.querySelectorAll('.lp-disc-card').forEach(function(card) {
+      const show = filter === 'all' || card.dataset.branch === filter;
+      card.style.display = show ? '' : 'none';
+      card.style.opacity = show ? '1' : '0';
+    });
+  });
+});
+
+function handleFindRooms(e) {
+  if (e) e.preventDefault();
+  const property = document.getElementById('searchProperty').value;
+  const checkin  = document.getElementById('searchCheckin').value;
+  const checkout = document.getElementById('searchCheckout').value;
+  const errorEl  = document.getElementById('searchError');
+  const btnEl    = document.getElementById('findRoomsBtn');
+
+  if (!property) {
+    const rect = btnEl.getBoundingClientRect();
+    errorEl.style.display = 'flex';
+    errorEl.style.top  = (rect.bottom + 8) + 'px';
+    errorEl.style.left = rect.left + 'px';
+    document.getElementById('searchProperty').focus();
+    setTimeout(function() { errorEl.style.display = 'none'; }, 3500);
+    return false;
+  }
+
+  if (checkin && checkout && new Date(checkout) <= new Date(checkin)) {
+    errorEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Check-out must be after check-in';
+    errorEl.style.display = 'flex';
+    return false;
+  }
+
+  const pages = { naguru: 'naguru.php', munyonyo: 'munyonyo.php' };
+  let url = pages[property] + '?checkin=' + encodeURIComponent(checkin) + '&checkout=' + encodeURIComponent(checkout) + '#rooms';
+  window.location.href = url;
+  return false;
+}
+
+document.getElementById('heroBookBtn').addEventListener('click', function(e) {
+  e.preventDefault();
+  document.getElementById('properties').scrollIntoView({ behavior: 'smooth' });
+});
+
+(function() {
+  const track = document.getElementById('promoTrack');
+  if (!track) return;
+  const dots  = document.querySelectorAll('.lp-promo-dot');
+  const cards = track.querySelectorAll('.lp-promo-card');
+  if (!cards.length) return;
+  let idx = 0;
+  const VIS = window.innerWidth < 768 ? 1 : 3;
+  const MAX = Math.max(0, cards.length - VIS);
+
+  function step() {
+    const cardW = cards[0].offsetWidth + 24;
+    track.style.transform = 'translateX(-' + (idx * cardW) + 'px)';
+    dots.forEach(function(d, i) { d.classList.toggle('active', i === idx); });
+  }
+
+  document.getElementById('promoNext').addEventListener('click', function() {
+    idx = idx >= MAX ? 0 : idx + 1;
+    step();
+  });
+  dots.forEach(function(d, i) { d.addEventListener('click', function() { idx = i; step(); }); });
+  setInterval(function() { idx = idx >= MAX ? 0 : idx + 1; step(); }, 6000);
+  window.addEventListener('resize', step);
+})();
+</script>
+
+<?php include 'includes/page-end.php'; ?>

@@ -1,0 +1,1023 @@
+<?php
+require_once 'config/site.php';
+require_once 'config/cms.php';
+$propertyBranch = 'naguru';
+$branch = ska_branch('naguru');
+$naguruDining = cms_block('naguru', 'dining');
+$naguruGarden = cms_block('naguru', 'garden');
+$naguruVideo  = cms_block('naguru', 'hero_video');
+$pageMeta = [
+    'title'       => 'SKA Naguru | Boutique Hotel Hillside Kampala',
+    'description' => 'Book SKA Naguru — an elegant boutique B&B in Naguru, Kampala. Seasonal rates, direct booking benefits, free breakfast and Wi-Fi. Reserve your room today.',
+    'path'        => 'naguru',
+    'type'        => 'hotel',
+    'image'       => $branch['image'],
+    'schema'      => [
+        '@context'  => 'https://schema.org',
+        '@type'     => 'Hotel',
+        'name'      => $branch['full'],
+        'url'       => ska_url('naguru'),
+        'telephone' => $branch['phoneHref'],
+        'email'     => $branch['email'],
+        'address'   => ['@type' => 'PostalAddress', 'addressLocality' => 'Naguru, Kampala', 'addressCountry' => 'UG'],
+        'starRating'=> ['@type' => 'Rating', 'ratingValue' => $branch['rating'], 'bestRating' => '5'],
+    ],
+];
+$pageStyles = ['assets/css/branch.css', 'assets/css/rooms-section.css'];
+$hideLandingNav = true;
+$bodyClass = '';
+include 'includes/page-start.php';
+include 'includes/navbar-property.php';
+?>
+
+<style>
+/* ── Property Info Bar ──────────────────────────────────── */
+.pib-wrap {
+  width: 100%;
+  background: #fff;
+  border-bottom: 1px solid #e4e2de;
+  border-top:    1px solid #e4e2de;
+}
+ 
+.pib-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 40px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+ 
+/* ── LEFT side ── */
+.pib-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+  min-width: 0;
+}
+ 
+.pib-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+ 
+/* Rating row */
+.pib-rating {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+ 
+/* Dot circles — teal/blue like the reference */
+.pib-dots {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+ 
+.pib-dot {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #2a7fa8;          /* teal filled dot */
+  flex-shrink: 0;
+}
+ 
+/* Half dot: left half filled, right half outline */
+.pib-dot--half {
+  background: linear-gradient(90deg, #2a7fa8 50%, transparent 50%);
+  border: 1.5px solid #2a7fa8;
+  box-sizing: border-box;
+}
+ 
+/* Empty dot (use when needed) */
+.pib-dot--empty {
+  background: transparent;
+  border: 1.5px solid #2a7fa8;
+}
+ 
+.pib-score {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
+}
+ 
+.pib-bull {
+  font-size: 13px;
+  color: #999;
+  line-height: 1;
+}
+ 
+.pib-reviews {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: #2a7fa8;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+.pib-reviews:hover { color: #1a5f80; }
+ 
+/* ── RIGHT side ── */
+.pib-right {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-shrink: 0;
+}
+ 
+.pib-action {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2a7fa8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.pib-action:hover { color: #1a5f80; }
+ 
+.pib-action-icon {
+  font-size: 14px;
+  color: #2a7fa8;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+.pib-action:hover .pib-action-icon { color: #1a5f80; }
+ 
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .pib-container {
+    padding: 0 16px;
+    height: auto;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    gap: 8px;
+  }
+  .pib-left  { flex-wrap: wrap; gap: 10px; }
+  .pib-right { gap: 18px; }
+  .pib-name  { font-size: 14px; }
+}
+</style>
+
+<!-- ══════════════════════════════════════
+     PROPERTY INFO BAR
+     Matches reference: bold name · dot-rating · score · reviews
+     right-aligned: VIEW MAP · phone
+══════════════════════════════════════ -->
+<div class="pib-wrap">
+  <div class="pib-container">
+
+    <!-- LEFT: Name + Rating -->
+    <div class="pib-left">
+      <h1 class="pib-name">SKA The Boutique Naguru</h1>
+
+      <div class="pib-rating">
+        <!-- 5 filled / half / empty dot circles -->
+        <div class="pib-dots" aria-label="Rating: 4.2 out of 5">
+          <span class="pib-dot pib-dot--full"></span>
+          <span class="pib-dot pib-dot--full"></span>
+          <span class="pib-dot pib-dot--full"></span>
+          <span class="pib-dot pib-dot--full"></span>
+          <span class="pib-dot pib-dot--half"></span>
+        </div>
+        <span class="pib-score">4.2</span>
+        <span class="pib-bull">&bull;</span>
+        <a href="https://maps.app.goo.gl/v7MTcy8fwFjPbHF8A"
+           target="_blank" rel="noopener"
+           class="pib-reviews">5 Reviews</a>
+      </div>
+    </div>
+
+    <!-- RIGHT: Map + Phone -->
+    <div class="pib-right">
+      <a href="<?= htmlspecialchars($branch['mapUrl']) ?>" target="_blank" rel="noopener noreferrer" class="pib-action">
+        <i class="fa-solid fa-location-dot pib-action-icon"></i>
+        <span>VIEW MAP</span>
+      </a>
+      <a href="tel:<?= $branch['phoneHref'] ?>" class="pib-action">
+        <i class="fa-solid fa-phone pib-action-icon"></i>
+        <span><?= htmlspecialchars($branch['phone']) ?></span>
+      </a>
+    </div>
+
+  </div>
+</div>
+    
+    
+<!-- ══════════════════════════════════════════
+     HERO — VIDEO LOOP (unchanged)
+══════════════════════════════════════════ -->
+<header class="hero">
+  <video autoplay muted loop playsinline>
+    <source src="<?= htmlspecialchars($naguruVideo['image'] ?: 'assets/video/ska_naguru.mp4') ?>" type="video/mp4">
+  </video>
+  <div class="overlay"></div>
+  <div class="hero-content">
+    <span class="hero-eyebrow">WELCOME TO SKA THE BOUTIQUE B&B — NAGURU</span>
+    <h1>Your Boutique Escape<br>in the Heart of Kampala</h1>
+    <div class="hero-cta-group">
+      <a href="#book"  class="btn-hero-primary">Reserve a Room</a>
+      <a href="#rooms" class="btn-hero-outline">Explore Rooms</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <span>Scroll</span>
+    <div class="hero-scroll-line"></div>
+  </div>
+  <div class="hero-gallery-pill" onclick="document.getElementById('gallery').scrollIntoView({behavior:'smooth'})">
+    <i class="fa-solid fa-images"></i><span>Gallery</span>
+  </div>
+</header>
+
+
+
+
+<?php
+include 'config/db.php';
+
+/* ── Season logic ── */
+function getSeason(int $month): string {
+    return match(true) {
+        in_array($month, [6,7,8,12,1])    => 'high',
+        in_array($month, [3,4,5,9,10,11]) => 'shoulder',
+        default                           => 'low',
+    };
+}
+
+const SEASON_META = [
+    'high'     => ['label'=>'High Season',     'color'=>'#c9a96e'],
+    'shoulder' => ['label'=>'Shoulder Season', 'color'=>'#6a8faf'],
+    'low'      => ['label'=>'Low Season',      'color'=>'#7bb87b'],
+];
+
+$currentMonth  = (int) date('n');
+$currentSeason = getSeason($currentMonth);
+$currentMeta   = SEASON_META[$currentSeason];
+
+/* ── Fetch Naguru rooms ── */
+$branch = 'Naguru';
+$stmt = $conn->prepare("SELECT * FROM rooms WHERE branch=?");
+$stmt->bind_param('s', $branch);
+$stmt->execute();
+$allRooms = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+$totalRooms = count($allRooms);
+
+
+/* ── Fetch images and amenities, compute price_now ── */
+foreach ($allRooms as &$room) {
+    // Images
+    $sI = $conn->prepare("SELECT image_path FROM room_images WHERE room_id=? ORDER BY id");
+    $sI->bind_param('i', $room['id']); $sI->execute();
+    $room['images'] = array_column($sI->get_result()->fetch_all(MYSQLI_ASSOC), 'image_path');
+
+    // Amenities
+    $sA = $conn->prepare("SELECT icon_class, name FROM room_amenities WHERE room_id=?");
+    $sA->bind_param('i', $room['id']); $sA->execute();
+    $room['amenities'] = $sA->get_result()->fetch_all(MYSQLI_ASSOC);
+
+    // Current price based on season
+    $colMap = [
+        'low'      => 'price_low',
+        'shoulder' => 'price_shoulder',
+        'high'     => 'price_high'
+    ];
+    $col = $colMap[$currentSeason] ?? 'price';
+    $room['price_now'] = isset($room[$col]) && $room[$col] !== null
+        ? (float)$room[$col]
+        : (float)$room['price'];
+}
+unset($room);
+
+// ✅ THIS LINE WAS MISSING
+$roomsJson = json_encode($allRooms, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+?>
+
+
+
+<!-- ══════════════════════════════════════════
+     INTRO BANNER
+══════════════════════════════════════════ -->
+<section class="intro-banner">
+  <div class="container text-center">
+    <p class="intro-eyebrow">SKA THE BOUTIQUE B&B — NAGURU, KAMPALA</p>
+    <h2 class="intro-heading">Discover Our Boutique Retreat in Naguru</h2>
+    <p class="intro-body">Whether you're in Kampala for business or leisure, SKA Naguru offers a warm and invigorating escape.
+      Elegantly designed rooms, curated amenities, and signature hospitality — we've thought of it all.
+      Wake up refreshed and ready to experience all that Kampala has to offer.</p>
+  </div>
+</section>
+
+
+
+<!-- ══════════════════════════════════════
+     ROOMS & SUITES
+══════════════════════════════════════ -->
+<section class="rooms-section" id="rooms">
+  <div class="rs-wrap">
+
+    <!-- ── Header row ── -->
+    <div class="rs-header">
+
+      <div class="rs-header-left">
+        <h2 class="rs-title">Rooms &amp; Suites</h2>
+        <div class="rs-rangebar">
+          <span class="rs-num" id="rrCurrent">01</span>
+          <div class="rs-track-wrap">
+            <div class="rs-track-bg"></div>
+            <div class="rs-track-fill" id="rrFill"></div>
+            <div class="rs-track-thumb" id="rrThumb"></div>
+          </div>
+          <span class="rs-num" id="rrTotal"><?= str_pad($totalRooms, 2, '0', STR_PAD_LEFT) ?></span>
+        </div>
+      </div>
+
+      <div class="rs-header-right">
+        <div class="rs-season-pill" style="--sp-color:<?= $currentMeta['color'] ?>">
+          <span class="rs-season-dot"></span>
+          <span class="rs-season-label"><?= $currentMeta['label'] ?> — <?= date('F') ?></span>
+        </div>
+        <div class="rs-nav">
+          <button class="rs-nav-btn" id="roomsPrev" disabled>
+            <i class="fa-solid fa-arrow-left"></i> Prev
+          </button>
+          <span class="rs-nav-line"></span>
+          <button class="rs-nav-btn" id="roomsNext">
+            Next <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /.rs-header -->
+
+    <!-- ── Cards viewport ── -->
+    <div class="rs-viewport" id="roomsViewport">
+      <div class="rs-track" id="roomsTrack">
+
+        <?php foreach ($allRooms as $i => $room): ?>
+        <div class="rs-card" data-idx="<?= $i ?>">
+
+          <!-- Image area -->
+          <div class="rs-card-img">
+            <?php if (!empty($room['images'])): ?>
+              <img src="<?= htmlspecialchars($room['images'][0]) ?>"
+                   alt="<?= htmlspecialchars($room['name']) ?>"
+                   class="rs-img" loading="lazy">
+            <?php else: ?>
+              <div class="rs-img-ph">
+                <i class="fa-regular fa-image"></i>
+                <span>Photo Coming Soon</span>
+              </div>
+            <?php endif; ?>
+            <button class="rs-expand" data-idx="<?= $i ?>" title="View all photos">
+              <i class="fa-solid fa-expand"></i>
+            </button>
+          </div>
+
+          <!-- Card body -->
+          <div class="rs-card-body">
+            <button class="rs-room-name" data-idx="<?= $i ?>">
+              <?= htmlspecialchars($room['name']) ?>
+              <span class="rs-chevron">›</span>
+            </button>
+            <div class="rs-divider"></div>
+            <p class="rs-price">
+              USD <?= number_format($room['price_now'], 0) ?>
+              <span class="rs-ppn">/ night</span>
+              <span class="rs-season-tag"
+                    style="background:<?= $currentMeta['color'] ?>22;color:<?= $currentMeta['color'] ?>">
+                <?= $currentMeta['label'] ?>
+              </span>
+            </p>
+            <button class="rs-vr-btn btn-vr" data-idx="<?= $i ?>">View Rates</button>
+          </div>
+
+        </div><!-- /.rs-card -->
+        <?php endforeach; ?>
+
+        <?php if ($totalRooms === 0): ?>
+          <p style="padding:20px;color:#999;">No rooms available at Naguru right now.</p>
+        <?php endif; ?>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+
+<!-- ══════════════════════════════════════════
+     AMENITIES
+══════════════════════════════════════════ -->
+<section class="section amenities-section" id="services">
+  <div class="container">
+    <h2 class="amenities-main-title text-center">FEATURED AMENITIES ON-SITE</h2>
+    <div class="amenities-tabs">
+      <button class="am-tab active" data-tab="property">Property Amenities (11)</button>
+      <button class="am-tab"        data-tab="room">Room Amenities (6)</button>
+      <button class="am-tab"        data-tab="hotel">Property Services (4)</button>
+    </div>
+    <div class="am-panel active" id="tab-property">
+      <h4 class="am-panel-title">Property Amenities On-Site</h4>
+      <div class="am-grid">
+        <div class="am-item"><i class="fa-solid fa-wifi"></i><span>Wi-Fi Access</span></div>
+        <div class="am-item"><i class="fa-solid fa-utensils"></i><span>Restaurant On-Site</span></div>
+        <div class="am-item"><i class="fa-solid fa-martini-glass"></i><span>On-Site Bar</span></div>
+        <div class="am-item"><i class="fa-solid fa-shirt"></i><span>Fresh Linen Provided</span></div>
+        <div class="am-item"><i class="fa-solid fa-shirt"></i><span>On-Site Laundry</span></div>
+        <div class="am-item"><i class="fa-solid fa-tree"></i><span>Serene Garden</span></div>
+      </div>
+    </div>
+    <div class="am-panel" id="tab-room">
+      <h4 class="am-panel-title">Room Amenities</h4>
+      <div class="am-grid">
+        <div class="am-item"><i class="fa-solid fa-snowflake"></i><span>Air Conditioning</span></div>
+        <div class="am-item"><i class="fa-solid fa-tv"></i><span>Smart TV</span></div>
+        <div class="am-item"><i class="fa-solid fa-wifi"></i><span>In-Room Wi-Fi</span></div>
+        <div class="am-item"><i class="fa-solid fa-bath"></i><span>En-Suite Bathroom</span></div>
+        <div class="am-item"><i class="fa-solid fa-desktop"></i><span>Work Desk</span></div>
+        <div class="am-item"><i class="fa-solid fa-lock"></i><span>In-Room Safe</span></div>
+      </div>
+    </div>
+    <div class="am-panel" id="tab-hotel">
+      <h4 class="am-panel-title">Property Services</h4>
+      <div class="am-grid">
+        <div class="am-item"><i class="fa-solid fa-concierge-bell"></i><span>24hr Concierge</span></div>
+        <div class="am-item"><i class="fa-solid fa-shuttle-van"></i><span>Airport Transfers</span></div>
+        <div class="am-item"><i class="fa-solid fa-broom"></i><span>Daily Housekeeping</span></div>
+        <div class="am-item"><i class="fa-solid fa-car-side"></i><span>Car Hire &amp; Transport</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     HOTEL INFORMATION
+══════════════════════════════════════════ -->
+<section class="hotel-info-strip">
+  <div class="container">
+    <h4 class="hotel-info-title">HOTEL INFORMATION</h4>
+    <div class="hotel-info-grid">
+      <div class="hi-item"><i class="fa-regular fa-clock"></i><div><p>Check in: 2:00 pm</p><p>Check out: 12:00 pm</p></div></div>
+      <div class="hi-item"><i class="fa-solid fa-door-open"></i><div><p>Front Desk</p><p>Staffed</p></div></div>
+      <div class="hi-item"><i class="fa-solid fa-paw"></i><div><p>Pet Policy</p><p>Pets Not Allowed</p><p>Guide dogs allowed.</p></div></div>
+      <div class="hi-item"><i class="fa-solid fa-square-parking"></i><div><p>Parking</p><p>Complimentary On-Site Parking</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     SKA NAGURU
+══════════════════════════════════════════ -->
+<section class="marketplace-section">
+  <div class="marketplace-inner">
+    <div class="marketplace-text">
+      <h2>SKA Naguru</h2>
+      <p>Experience refined comfort and warm hospitality at SKA The Boutique in Naguru, Uganda.
+         Tantalise your tastebuds with our scrumptious breakfast, comforting soups, salads, pastas, pizzas, Asian stir-fries and curries.</p>
+      <a href="#contact" class="btn-explore">Explore</a>
+      <div class="marketplace-nav">
+        <span>Prev <span class="mnav-line"></span></span>
+        <span class="mnav-count">01 / 04</span>
+        <span><span class="mnav-line"></span> Next</span>
+      </div>
+    </div>
+    <div class="marketplace-image">
+      <img src="assets/images/ska_naguru_home.jpeg" alt="Ska Naguru"
+           onerror="this.parentElement.style.background='#2a2a2a';this.remove()">
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     MORE WAYS
+══════════════════════════════════════════ -->
+<section class="section more-ways-section">
+  <div class="container">
+    <h2 class="more-ways-title text-center">More Ways to Enjoy Your Stay</h2>
+    <div class="more-ways-grid">
+      <div class="mw-card">
+        <div class="mw-img-side">
+          <img src="<?= htmlspecialchars($naguruDining['image'] ?: 'assets/images/naguru/restaurant.jpg') ?>" alt="<?= htmlspecialchars($naguruDining['title'] ?: 'Restaurant') ?>"
+               onerror="this.parentElement.style.background='#c8c4bc';this.remove()">
+        </div>
+        <div class="mw-text-side">
+          <?php if ($naguruDining['tag']): ?><span class="mw-eyebrow"><?= htmlspecialchars($naguruDining['tag']) ?></span><?php endif; ?>
+          <h3 class="mw-title"><?= htmlspecialchars($naguruDining['title'] ?: 'Fine Dining') ?></h3>
+          <p class="mw-body"><?= htmlspecialchars($naguruDining['body'] ?: '') ?></p>
+          <?php if ($naguruDining['link_url']): ?><a href="<?= htmlspecialchars($naguruDining['link_url']) ?>" class="mw-link"><?= htmlspecialchars($naguruDining['link_label'] ?: 'Learn More') ?> →</a><?php endif; ?>
+        </div>
+      </div>
+      <div class="mw-card mw-card-reverse">
+        <div class="mw-text-side">
+          <?php if ($naguruGarden['tag']): ?><span class="mw-eyebrow"><?= htmlspecialchars($naguruGarden['tag']) ?></span><?php endif; ?>
+          <h3 class="mw-title"><?= htmlspecialchars($naguruGarden['title'] ?: 'Serene Settings') ?></h3>
+          <p class="mw-body"><?= htmlspecialchars($naguruGarden['body'] ?: '') ?></p>
+          <?php if ($naguruGarden['link_url']): ?><a href="<?= htmlspecialchars($naguruGarden['link_url']) ?>" class="mw-link"><?= htmlspecialchars($naguruGarden['link_label'] ?: 'Learn More') ?> →</a><?php endif; ?>
+        </div>
+        <div class="mw-img-side">
+          <img src="<?= htmlspecialchars($naguruGarden['image'] ?: 'assets/images/naguru/garden.jpg') ?>" alt="<?= htmlspecialchars($naguruGarden['title'] ?: 'Gardens') ?>"
+               onerror="this.parentElement.style.background='#d5d0c8';this.remove()">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<?php $galleryBranch = 'Naguru'; include 'includes/gallery-section.php'; ?>
+
+<!-- ══════════════════════════════════════════
+     BOOKING FORM
+══════════════════════════════════════════ -->
+<section class="section booking-section" id="book">
+  <div class="container">
+    <h2 class="text-center booking-title">Book Your Stay</h2>
+    <p class="text-center booking-sub">Fill in your details and we'll confirm your reservation.</p>
+
+    <?php
+    /* ── Booking result notice ── */
+    $bk = $_GET['booking'] ?? '';
+    if ($bk === 'success'): ?>
+      <div class="booking-notice booking-notice--success">
+        <i class="fa-solid fa-circle-check"></i>
+        Thank you! Your booking request has been sent successfully. We'll be in touch shortly.
+      </div>
+    <?php elseif ($bk === 'saved'): ?>
+      <div class="booking-notice booking-notice--warn">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        Your booking was recorded but our email system had a hiccup. We'll contact you shortly.
+      </div>
+    <?php elseif (!empty($_GET['error'])): ?>
+      <div class="booking-notice booking-notice--error">
+        <i class="fa-solid fa-circle-xmark"></i>
+        <?= htmlspecialchars(urldecode($_GET['error'])) ?>
+      </div>
+    <?php endif; ?>
+
+    <form method="POST" action="forms/process_contact_naguru.php"
+          class="booking-form" id="bookingForm" data-ska-form="booking">
+      <input type="hidden" name="branch" value="Naguru">
+      <div class="row g-3">
+
+        <div class="col-md-6">
+          <label class="form-label-ska">Full Name</label>
+          <input type="text" name="name" class="form-control ska-input"
+                 placeholder="e.g. Jane Doe" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label-ska">Email Address</label>
+          <input type="email" name="email" class="form-control ska-input"
+                 placeholder="you@example.com" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label-ska">WhatsApp <small>(optional)</small></label>
+          <input type="text" name="whatsapp" class="form-control ska-input"
+                 placeholder="+256 …">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label-ska">Phone Number</label>
+          <input type="text" name="phone" class="form-control ska-input"
+                 placeholder="+256 …" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label-ska">Check-in</label>
+          <input type="date" name="checkin" id="checkin"
+                 class="form-control ska-input" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label-ska">Check-out</label>
+          <input type="date" name="checkout" id="checkout"
+                 class="form-control ska-input" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label-ska">Room Type</label>
+          <select name="room_type" id="room_type" class="form-select ska-input" required>
+            <option value="">Select Room Type</option>
+            <?php foreach ($allRooms as $r): ?>
+              <option value="<?= htmlspecialchars($r['name']) ?>">
+                <?= htmlspecialchars($r['name']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <p id="totalPrice" class="total-price-display mb-0">
+            Total: <strong>USD 0</strong>
+          </p>
+        </div>
+
+        <input type="hidden" name="price"  id="formPrice"  value="">
+        <input type="hidden" name="season" id="formSeason" value="<?= $currentSeason ?>">
+
+        <div class="col-12">
+          <label class="form-label-ska">Special Requests</label>
+          <textarea name="message" class="form-control ska-input" rows="4"
+                    placeholder="Dietary needs, special occasions, room preferences…"></textarea>
+        </div>
+        <div class="col-12 text-center">
+          <button type="submit" class="btn-book-submit">Send Reservation Request</button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</section>
+
+<style>
+/* Booking notices */
+.booking-notice {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 16px 20px; border-radius: 8px; margin-bottom: 24px;
+  font-family: 'Montserrat', sans-serif; font-size: 14px; line-height: 1.6;
+  max-width: 860px; margin-left: auto; margin-right: auto;
+}
+.booking-notice i { font-size: 18px; margin-top: 1px; flex-shrink: 0; }
+.booking-notice--success { background: #edf7ed; color: #2e7d32; border: 1px solid #a5d6a7; }
+.booking-notice--warn    { background: #fff8e1; color: #7d5c00; border: 1px solid #ffe082; }
+.booking-notice--error   { background: #fdecea; color: #c62828; border: 1px solid #ef9a9a; }
+</style>
+
+<script>
+const ROOMS = <?= json_encode($allRooms) ?>;
+const PROMOTIONS = <?= json_encode($promotions ?? []) ?>;
+
+
+
+/* ══════════════════════════════════════
+   SEASON LOGIC (MATCH BACKEND)
+══════════════════════════════════════ */
+function getSeasonKey(month) {
+  if ([6,7,8,12,1].includes(month)) return 'high';
+  if ([3,4,5,9,10,11].includes(month)) return 'shoulder';
+  return 'low';
+}
+
+/* ══════════════════════════════════════
+   GET NIGHTS
+══════════════════════════════════════ */
+function getNights(ci, co) {
+  return Math.max(0, (new Date(co) - new Date(ci)) / 86400000);
+}
+
+/* ══════════════════════════════════════
+   MAIN PRICE ENGINE (ROOM + SEASON + PROMO)
+══════════════════════════════════════ */
+function calculateBooking() {
+  const ci = document.getElementById('checkin')?.value;
+  const co = document.getElementById('checkout')?.value;
+  const roomName = document.getElementById('room_type')?.value;
+
+  if (!ci || !co || !roomName || typeof ROOMS === 'undefined') return;
+
+  const nights = getNights(ci, co);
+  if (nights <= 0) return;
+
+  const room = ROOMS.find(r => r.name === roomName);
+  if (!room) return;
+
+  const month = new Date(ci).getMonth() + 1;
+  const season = getSeasonKey(month);
+
+  let basePrice = 0;
+
+  if (season === 'high') basePrice = room.price_high;
+  else if (season === 'shoulder') basePrice = room.price_shoulder;
+  else basePrice = room.price_low;
+
+  basePrice = parseFloat(basePrice || 0);
+
+  let total = basePrice * nights;
+  let discount = 0;
+
+  /* ══════════════════════════════════════
+     APPLY PROMOTIONS (if available globally)
+  ══════════════════════════════════════ */
+  if (typeof PROMOTIONS !== 'undefined') {
+    PROMOTIONS.forEach(promo => {
+
+      if (promo.min_nights && nights < promo.min_nights) return;
+
+      if (promo.discount_type === 'percent') {
+        discount += total * (promo.discount_value / 100);
+      }
+
+      if (promo.discount_type === 'fixed') {
+        discount += promo.discount_value;
+      }
+
+      if (promo.discount_type === 'free_night') {
+        discount += basePrice * promo.discount_value;
+      }
+
+    });
+  }
+
+  total = Math.max(0, total - discount);
+
+  /* Update UI */
+  document.getElementById('totalPrice').innerHTML =
+    `Total: <strong>USD ${total.toLocaleString()}</strong>`;
+
+  document.getElementById('formPrice').value  = basePrice;
+  document.getElementById('formSeason').value = season;
+
+  /* 🔥 ADD THIS (missing before) */
+  let totalField = document.getElementById('formTotal');
+  if (!totalField) {
+    totalField = document.createElement('input');
+    totalField.type = 'hidden';
+    totalField.name = 'total';
+    totalField.id   = 'formTotal';
+    document.getElementById('bookingForm').appendChild(totalField);
+  }
+  totalField.value = total;
+}
+
+/* Events */
+['checkin','checkout','room_type'].forEach(id => {
+  document.getElementById(id)?.addEventListener('change', calculateBooking);
+});
+
+/* Run after autofill */
+setTimeout(calculateBooking, 300);
+</script>
+
+
+
+
+
+<!-- ══════════════════════════════════════════
+     GETTING HERE
+══════════════════════════════════════════ -->
+<section class="getting-here-section" id="contact">
+  <div class="container">
+    <div class="getting-here-inner">
+      <div class="gh-text">
+        <span class="gh-eyebrow">OUR LOCATION</span>
+        <h2 class="gh-title">GETTING HERE</h2>
+        <address class="gh-address">SKA The Boutique B&B — Naguru<br>Naguru, Kampala, Uganda</address>
+        <p class="gh-phone"><i class="fa-solid fa-phone"></i> +256 741 186 891</p>
+        <p class="gh-email"><i class="fa-solid fa-envelope"></i><a href="mailto:bookings.naguru@skaboutiquebnb.com">bookings.naguru@skaboutiquebnb.com</a></p>
+        <p class="gh-email"><i class="fa-solid fa-envelope"></i><a href="mailto:skatheboutiquenaguru@gmail.com">skatheboutiquenaguru@gmail.com</a></p>
+        <div class="gh-airport">
+          <i class="fa-solid fa-plane-arrival"></i>
+          <div><strong>Entebbe International Airport</strong> <span class="gh-chevron">›</span></div>
+        </div>
+      </div>
+      <div class="gh-map">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.7474914464715!2d32.604376874723435!3d0.34140269965525194!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x177dbb00112dc205%3A0xb5497e995a83a3c9!2sSKA%20The%20Boutique%20Naguru!5e0!3m2!1sen!2sug!4v1774681497576!5m2!1sen!2sug"
+          width="100%" height="350px" style="border:0;" allowfullscreen loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<?php include 'partials/modals.php'; ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  /* Pre-fill dates from homepage search */
+  const params = new URLSearchParams(window.location.search);
+  const ciEl = document.getElementById('checkin');
+  const coEl = document.getElementById('checkout');
+  if (params.get('checkin') && ciEl) ciEl.value = params.get('checkin');
+  if (params.get('checkout') && coEl) coEl.value = params.get('checkout');
+
+  /* ───────── ROOM DATA ───────── */
+  const ROOMS = <?= $roomsJson ?> || [];
+  let currentIndex = 0;
+
+  const HIGH_MONTHS     = [6,7,8,12,1];
+  const SHOULDER_MONTHS = [3,4,5,9,10,11];
+
+  function getSeasonKey(month) {
+    if (HIGH_MONTHS.includes(month)) return 'high';
+    if (SHOULDER_MONTHS.includes(month)) return 'shoulder';
+    return 'low';
+  }
+
+  function priceFor(room, month) {
+    const map = { high:'price_high', shoulder:'price_shoulder', low:'price_low' };
+    const key = getSeasonKey(month);
+    const val = parseFloat(room[map[key]]);
+    return (val && val > 0) ? val : parseFloat(room.price || 0);
+  }
+
+  /* ───────── SLIDER ───────── */
+  const track   = document.getElementById('roomsTrack');
+  const fill    = document.getElementById('rrFill');
+  const thumb   = document.getElementById('rrThumb');
+  const current = document.getElementById('rrCurrent');
+  const prevBtn = document.getElementById('roomsPrev');
+  const nextBtn = document.getElementById('roomsNext');
+
+  if (track) {
+
+    function visibleCards() {
+      const w = window.innerWidth;
+      if (w <= 640) return 1;
+      if (w <= 1024) return 2;
+      return 3;
+    }
+
+    function stepSize() {
+      const card = track.querySelector('.rs-card');
+      if (!card) return 0;
+      return card.offsetWidth + 20;
+    }
+
+    function updateSlider() {
+      const vis = visibleCards();
+      const max = Math.max(0, ROOMS.length - vis);
+
+      if (currentIndex > max) currentIndex = max;
+
+      track.style.transform = `translateX(-${currentIndex * stepSize()}px)`;
+
+      const pct = max === 0 ? 100 : (currentIndex / max) * 100;
+      fill.style.width = pct + '%';
+      thumb.style.left = pct + '%';
+      current.textContent = String(currentIndex + 1).padStart(2, '0');
+
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex >= max;
+    }
+
+    nextBtn?.addEventListener('click', () => {
+      currentIndex++;
+      updateSlider();
+    });
+
+    prevBtn?.addEventListener('click', () => {
+      currentIndex--;
+      updateSlider();
+    });
+
+    window.addEventListener('resize', () => {
+      clearTimeout(window.__rsTimer);
+      window.__rsTimer = setTimeout(updateSlider, 100);
+    });
+
+    requestAnimationFrame(updateSlider);
+  }
+
+  /* ───────── MODALS ───────── */
+  function openModal(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('visible');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('visible');
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('.ska-backdrop').forEach(el => {
+    el.addEventListener('click', e => {
+      if (e.target === el) closeModal(el.id);
+    });
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.ska-backdrop.visible')
+        .forEach(m => m.classList.remove('visible'));
+      document.body.style.overflow = '';
+    }
+  });
+
+  /* ───────── LIGHTBOX ───────── */
+  let lbRoom = 0, lbImg = 0;
+
+  window.openLbx = function(i, img = 0) {
+    lbRoom = i;
+    lbImg = img;
+    renderLbx();
+    openModal('lbxBackdrop');
+  };
+
+  function renderLbx() {
+    const r = ROOMS[lbRoom];
+    if (!r) return;
+
+    const img = document.getElementById('lbxImg');
+    img.src = r.images[lbImg] || '';
+    document.getElementById('lbxName').textContent = r.name;
+    document.getElementById('lbxCount').textContent =
+      `${lbImg + 1} of ${r.images.length}`;
+  }
+
+  /* ───────── DETAIL MODAL ───────── */
+  window.openDetail = function(i) {
+    const r = ROOMS[i];
+    if (!r) return;
+
+    document.getElementById('dmTitle').textContent = r.name;
+    document.getElementById('dmDesc').textContent = r.description || '';
+
+    openModal('dmBackdrop');
+  };
+
+  /* ───────── RATES MODAL ───────── */
+  let activeRoom = 0;
+
+  window.openRates = function(i) {
+    activeRoom = i;
+    const r = ROOMS[i];
+    if (!r) return;
+
+    document.getElementById('ratesTitle').textContent = r.name;
+    openModal('ratesBackdrop');
+  };
+
+  /* ───────── BOOKING CALC ───────── */
+  function calcTotal() {
+    const ci = document.getElementById('checkin')?.value;
+    const co = document.getElementById('checkout')?.value;
+    const price = parseFloat(document.getElementById('formPrice')?.value || 0);
+
+    if (!ci || !co) return;
+
+    const nights = (new Date(co) - new Date(ci)) / 86400000;
+    document.getElementById('totalPrice').innerHTML =
+      `Total: <strong>USD ${(nights * price).toLocaleString()}</strong>`;
+  }
+
+  document.getElementById('checkin')?.addEventListener('change', calcTotal);
+  document.getElementById('checkout')?.addEventListener('change', calcTotal);
+
+  /* ───────── AMENITY TABS ───────── */
+  document.querySelectorAll('.am-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.am-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.am-panel').forEach(p => p.classList.remove('active'));
+
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab)?.classList.add('active');
+    });
+  });
+
+});
+
+
+
+
+
+/* ───────── ATTACH BUTTONS TO MODALS ───────── */
+document.querySelectorAll('.rs-expand').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const idx = parseInt(btn.dataset.idx);
+    openLbx(idx, 0); // open lightbox, first image
+  });
+});
+
+document.querySelectorAll('.rs-room-name').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const idx = parseInt(btn.dataset.idx);
+    openDetail(idx); // open detail modal
+  });
+});
+
+document.querySelectorAll('.rs-vr-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const idx = parseInt(btn.dataset.idx);
+    openRates(idx); // open rates modal
+  });
+});
+
+/* ───────── MODAL CLOSE BUTTONS ───────── */
+document.getElementById('lbxClose')?.addEventListener('click', () => closeModal('lbxBackdrop'));
+document.getElementById('dmClose')?.addEventListener('click', () => closeModal('dmBackdrop'));
+document.getElementById('ratesClose')?.addEventListener('click', () => closeModal('ratesBackdrop'));
+</script>
+
+<?php include 'includes/page-end.php'; ?>

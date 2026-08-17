@@ -1,0 +1,9 @@
+.env
+error_log
+**/error_log
+uploads/
+.DS_Store
+Thumbs.db
+config/db.local.php
+*.rar
+*.RAR

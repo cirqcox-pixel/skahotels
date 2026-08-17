@@ -1,0 +1,798 @@
+/* =============================
+   GENERAL RESET & BASE
+============================= */
+body {
+  font-family: "Poppins", Arial, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+a:hover {
+  color: #ffc107; /* golden accent */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+}
+
+/* =============================
+   NAVBAR STYLES
+============================= */
+.navbar {
+  padding: 1rem 0;
+  transition: background 0.3s ease, padding 0.3s ease;
+}
+
+.navbar-brand {
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link.active {
+  color: #ffc107 !important; /* highlight */
+}
+
+/* =============================
+   NAVBAR BOOKING BUTTON
+============================= */
+.navbar .nav-link.btn {
+  background-color: #996633;  /* golden button */
+  color: #212529;             /* dark text for contrast */
+  font-weight: 600;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.navbar .nav-link.btn:hover {
+  background-color: #fff;  /* slightly darker gold on hover */
+  color: #fff;                 /* text turns white on hover */
+}
+
+
+
+/* =============================
+   HERO / IMAGE SLIDER SECTION
+============================= */
+.hero {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  padding-top: 70px; /* adjust to your navbar height */
+}
+
+.hero .carousel-inner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.hero .carousel-inner img:hover {
+  transform: scale(1.05);
+}
+
+.hero video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+
+.hero .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5); /* fade overlay */
+  z-index: 1;
+}
+
+/* Hero Content */
+.hero-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3; /* above overlay & images */
+  text-align: center;
+  color: #fff;
+  padding: 0 15px;
+}
+
+.hero-content h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.hero-content p {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+/* Discover More Button */
+.btn-discover {
+  display: inline-block;
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  background: #996633; /* golden accent */
+  border: none;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.btn-discover:hover {
+  background: #fff;
+  color: #212529;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+}
+
+/* Carousel Controls */
+.hero .carousel-control-prev-icon,
+.hero .carousel-control-next-icon {
+  background-color: rgba(0,0,0,0.4);
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+}
+
+.hero .carousel-control-prev-icon:hover,
+.hero .carousel-control-next-icon:hover {
+  background-color: rgba(0,0,0,0.7);
+}
+
+/* Overlay fade effect during slide transition */
+.hero .carousel-item::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.3); /* subtle dark fade */
+  transition: background 0.5s ease;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Ensure carousel images sit below overlay */
+.hero .carousel-inner img {
+  position: relative;
+  z-index: 0;
+}
+
+/* =============================
+   RESPONSIVE STYLES
+============================= */
+@media (max-width: 576px) {
+  .hero {
+    height: 60vh;
+    padding-top: 60px;
+  }
+
+  .hero-content h1 {
+    font-size: 1.8rem;
+    padding-top: 50px;
+  }
+
+  .hero-content p {
+    font-size: 0.95rem;
+  }
+
+  .btn-discover {
+    padding: 10px 25px;
+    font-size: 1rem;
+  }
+}
+
+
+/* =============================
+   BOOKING FORM / SLEEK UPDATE
+============================= */
+#book form {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#book form:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+}
+
+#book h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #212529;
+}
+
+#book input,
+#book select,
+#book textarea {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 12px 15px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+#book input:focus,
+#book select:focus,
+#book textarea:focus {
+  border-color: #996633;
+  box-shadow: 0 0 8px rgba(153,102,51,0.3);
+  outline: none;
+}
+
+#book textarea {
+  resize: none;
+}
+
+#book button {
+  background-color: #996633; /* golden accent */
+  color: #fff;
+  border: none;
+  padding: 12px 35px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+#book button:hover {
+  background-color: #fff; /* white on hover */
+  color: #212529;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+}
+
+@media (max-width: 991px) {
+  #book form {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  #book form {
+    padding: 1.5rem 1rem;
+  }
+
+  #book h2 {
+    font-size: 1.8rem;
+  }
+
+  #book button {
+    width: 100%;
+  }
+}
+
+
+/* =============================
+   ROOMS SECTION
+============================= */
+#rooms {
+  padding: 80px 0;
+  background: #f9f9f9; /* consistent with body background */
+}
+
+#rooms h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #212529;
+}
+
+#rooms p {
+  font-size: 1rem;
+  color: #555;
+}
+
+#rooms .card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+#rooms .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+}
+
+/* Gradient overlay on carousel images */
+/*#rooms .carousel-inner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.4));
+  z-index: 1;
+  pointer-events: none;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}*/
+
+#rooms .carousel-inner img {
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  height: 250px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  position: relative;
+  z-index: 0;
+}
+
+#rooms .carousel-inner img:hover {
+  transform: scale(1.05);
+}
+
+#rooms .card-body {
+  position: relative;
+  z-index: 2; /* above overlay */
+  text-align: center;
+  padding: 20px;
+}
+
+#rooms .card-body h4 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 10px;
+}
+
+#rooms .card-body p {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+#rooms .card-body .amenities i {
+  color: #ffc107; /* golden accent for icons */
+  font-size: 1.1rem;
+}
+
+#rooms .card-body .btn {
+  background-color: #996633; /* golden accent */
+  color: #fff;
+  border-radius: 50px;
+  padding: 10px 25px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+#rooms .card-body .btn:hover {
+  background-color: #fff; /* white on hover */
+  color: #212529;          /* dark text */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+}
+
+/* Carousel Controls */
+#rooms .carousel-control-prev-icon,
+#rooms .carousel-control-next-icon {
+  background-color: rgba(0,0,0,0.4);
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+}
+
+#rooms .carousel-control-prev-icon:hover,
+#rooms .carousel-control-next-icon:hover {
+  background-color: rgba(0,0,0,0.7);
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  #rooms .carousel-inner img {
+    height: 200px;
+  }
+}
+
+@media (max-width: 576px) {
+  #rooms .carousel-inner img {
+    height: 150px;
+  }
+
+  #rooms h2 {
+    font-size: 2rem;
+  }
+
+  #rooms .card-body h4 {
+    font-size: 1.2rem;
+  }
+}
+
+
+
+
+/* =============================
+   ABOUT SECTION
+============================= */
+.about-section {
+  padding: 80px 0;
+  background: #fff;
+}
+
+.about-text h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  letter-spacing: 3px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  line-height: 1.3;
+}
+
+.about-text p {
+  font-size: 1rem;
+  color: #333;
+  line-height: 1.8;
+  margin-bottom: 15px;
+}
+
+.about-images img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 6px;
+  transition: transform 0.3s ease;
+}
+
+.about-images img:hover {
+  transform: scale(1.03);
+}
+
+
+/* =============================
+   ABOUT US SECTION
+============================= */
+.about-banner {
+  position: relative;
+  text-align: center;
+}
+
+.about-banner .banner-img {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+}
+
+.about-banner .banner-title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #000;
+  letter-spacing: 3px;
+}
+
+.about-content {
+  padding: 60px 15px;
+  background: #fff;
+}
+
+.about-content p {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.about-content img {
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+  max-width: 100%;
+  height: auto;
+}
+
+.about-content img:hover {
+  transform: scale(1.03);
+}
+
+/* =============================
+   RESPONSIVE STYLES
+============================= */
+@media (max-width: 991px) {
+  .about-banner .banner-img {
+    height: 250px;
+  }
+
+  .about-banner .banner-title {
+    font-size: 2rem;
+    letter-spacing: 2px;
+  }
+
+  .about-content {
+    padding: 40px 10px;
+  }
+
+  .about-content p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  /* Ensure text and images stack nicely */
+  .about-content .row {
+    margin-bottom: 30px;
+  }
+
+  .about-content .col-lg-6 {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .about-banner .banner-img {
+    height: 200px;
+  }
+
+  .about-banner .banner-title {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+  }
+
+  .about-content {
+    padding: 30px 5px;
+  }
+
+  .about-content p {
+    font-size: 0.9rem;
+  }
+}
+
+
+
+
+/* =============================
+   Tripadvisor Review Section
+============================= */
+.reviews-section {
+  background: #fff;
+}
+
+.tripadvisor-card {
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 6px;
+  background: #fff;
+  height: 100%;
+}
+
+.tripadvisor-card h4 {
+  font-weight: 400;
+  margin-bottom: 5px;
+}
+
+.tripadvisor-card .rating {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.tripadvisor-card .stars {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #006400; /* green like TripAdvisor */
+}
+
+.tripadvisor-card .ranking {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+.tripadvisor-card h6 {
+  font-weight: 400;
+  margin-bottom: 2px;
+}
+
+.reviews-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 15px 0;
+}
+
+.reviews-list li {
+  font-size: 0.6rem;
+  margin-bottom: 2px;
+  color: #444;
+}
+
+.tripadvisor-card .links a {
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: #006400;
+  font-weight: 600;
+}
+
+.tripadvisor-card .links a:hover {
+  text-decoration: underline;
+}
+
+.review-card {
+  background: #f9f7f0;
+  padding: 20px;
+  border-radius: 6px;
+  height: 100%;
+  position: relative;
+}
+
+.review-card p {
+  font-size: 0.95rem;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.review-card .quote {
+  font-size: 2rem;
+  color: #006400;
+  vertical-align: top;
+  margin-right: 5px;
+}
+
+.review-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.review-footer .avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+
+
+
+
+
+
+
+
+
+/* Gallery Grid */
+.gallery-grid {
+  margin-top: 20px;
+  margin-bottom: 60px; /* space below before next section */
+}
+
+#gallery {
+  padding-bottom: 60px;  /* adds bottom space */
+}
+
+.gallery-item {
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.1);
+}
+
+.gallery-item:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+
+
+
+
+/* =============================
+   CONTACT SECTION (Light Style)
+============================= */
+#contact {
+  padding: 80px 0;
+  background: linear-gradient(to right, #f8f9fa, #e9ecef); /* light gray gradient */
+  color: #212529;
+  text-align: center;
+  border-radius: 0; /* remove rounded edges */
+  box-shadow: none; /* remove heavy shadow */
+}
+
+#contact h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #343a40; /* darker gray for contrast */
+}
+
+#contact p {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  color: #495057; /* neutral text */
+}
+
+#contact p i {
+  margin-right: 8px;
+  color: #996633; /* subtle golden accent for icons */
+}
+
+#contact a {
+  color: #996633;
+  font-weight: 500;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+#contact a:hover {
+  color: #212529;
+  text-decoration: underline;
+}
+
+
+
+/* =============================
+   FOOTER
+============================= */
+footer {
+  background: #212529;
+  color: #bbb;
+  padding: 2rem 0;
+  text-align: center;
+}
+
+footer a {
+  color: #bbb;
+}
+
+footer a:hover {
+  color: #ffc107;
+}
+
+
+
+/* =============================
+   ALERTS
+============================= */
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
