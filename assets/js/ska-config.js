@@ -9,6 +9,26 @@ window.SKA_CONFIG = {
   siteName: 'SKA The Boutique',
   siteEmail: 'info@skaboutiquebnb.com',
 
+  /**
+   * Formspree — email alerts for GitHub Pages forms
+   * 1. Sign up at https://formspree.io
+   * 2. Create two forms (or one) → copy the form ID (e.g. xyzeabcd)
+   * 3. Paste IDs below. Same ID for both is fine if you prefer one inbox.
+   */
+  formspree: {
+    booking: '',   // e.g. 'xyzeabcd'
+    inquiry: ''    // e.g. 'wqazplmn'
+  },
+
+  /**
+   * Optional Resend via Supabase Edge Function (see supabase/functions/notify-email)
+   * Leave empty if using Formspree only.
+   */
+  notify: {
+    webhookUrl: '',  // e.g. 'https://aoofgjyhwbxasdvhdwoe.supabase.co/functions/v1/notify-email'
+    to: 'info@skaboutiquebnb.com'
+  },
+
   /** GitHub Pages project site base path (repo: cirqcox-pixel/skahotels) */
   githubPagesBase: '/skahotels',
 

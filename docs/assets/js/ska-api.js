@@ -188,6 +188,9 @@
         is_read: false
       }]);
       if (res.error) throw new Error(apiError(res.error));
+      if (global.SkaNotify) {
+        try { await SkaNotify.notify('inquiry', data); } catch (e) { /* already saved */ }
+      }
       return true;
     },
 
@@ -200,7 +203,10 @@
         if (co > ci) nights = Math.round((co - ci) / 86400000);
       } catch (e) {}
       var price = parseFloat(data.price || 0);
-      var res = await sb.from('bookings').insert([{
+      var total = data.total != null && data.total !== ''
+        ? parseFloat(data.total)
+        : price * nights;
+      var payload = {
         name: data.name,
         email: data.email,
         phone: data.phone || null,
@@ -209,13 +215,19 @@
         price: price,
         checkin: data.checkin,
         checkout: data.checkout,
-        total: price * nights,
+        total: total,
         message: data.message || null,
         season: data.season || 'low',
         branch: data.branch,
         status: 'pending'
-      }]);
+      };
+      var res = await sb.from('bookings').insert([payload]);
       if (res.error) throw new Error(apiError(res.error));
+      if (global.SkaNotify) {
+        try {
+          await SkaNotify.notify('booking', Object.assign({}, data, { total: total, price: price }));
+        } catch (e) { /* already saved */ }
+      }
       return true;
     },
 

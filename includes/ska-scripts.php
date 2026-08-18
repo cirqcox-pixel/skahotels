@@ -6,5 +6,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="<?= htmlspecialchars(($basePath ?? '') . 'assets/js/ska-config.js') ?>"></script>
 <script src="<?= htmlspecialchars(($basePath ?? '') . 'assets/js/ska-api.js') ?>"></script>
+<script src="<?= htmlspecialchars(($basePath ?? '') . 'assets/js/ska-notify.js') ?>"></script>
 <script src="<?= htmlspecialchars(($basePath ?? '') . 'assets/js/ska-forms.js') ?>"></script>
 <script src="<?= htmlspecialchars(($basePath ?? '') . 'assets/js/ska-live.js') ?>"></script>

@@ -95,9 +95,10 @@ PHP admin: `http://localhost:8080/admin/login.php`
 
 | File | Purpose |
 |---|---|
-| `assets/js/ska-config.js` | Supabase URL + publishable anon key (safe for public repo) |
+| `assets/js/ska-config.js` | Supabase URL + publishable anon key + Formspree/Resend notify settings |
 | `.env` | MySQL credentials + Supabase service role (never commit) |
 | `config/db.php` | Auto-selects MySQL or Supabase based on `DB_CONNECTION` |
+| `EMAIL_SETUP.md` | How to enable Formspree or Resend email alerts on GitHub Pages |
 
 ---
 
