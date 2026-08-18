@@ -350,26 +350,15 @@ function buildPage(name, meta) {
 
 function buildAdmin() {
   const adminOut = path.join(OUT, 'admin');
+  const adminStatic = path.join(__dirname, 'admin-static');
   fs.mkdirSync(path.join(adminOut, 'assets'), { recursive: true });
 
-  fs.writeFileSync(path.join(adminOut, 'login.html'), `<!DOCTYPE html>
-<html lang="en" data-ska-static="true"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin | SKA</title><link rel="stylesheet" href="../admin/assets/login.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"></head>
-<body class="ska-login"><div class="ska-login-wrap"><div class="login-card">
-<h4>SKA Admin</h4><div id="loginError" class="error" style="display:none"></div>
-<form id="adminLoginForm"><label>Email</label><input type="email" id="adminEmail" required><br><br>
-<label>Password</label><input type="password" id="adminPass" required><br><br>
-<button type="submit">Sign In</button></form>
-</div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../assets/js/ska-config.js"></script>
-<script src="../assets/js/ska-api.js"></script>
-<script>
-document.getElementById('adminLoginForm').onsubmit=async function(e){e.preventDefault();
-try{await SkaApi.adminSignIn(adminEmail.value,adminPass.value);location.href='dashboard.html';}
-catch(ex){loginError.style.display='block';loginError.textContent=ex.message;}};
-</script></body></html>`);
+  for (const file of ['login.html', 'dashboard.html']) {
+    const src = path.join(adminStatic, file);
+    if (fs.existsSync(src)) {
+      fs.copyFileSync(src, path.join(adminOut, file));
+    }
+  }
 
   console.log('Built admin pages');
 }

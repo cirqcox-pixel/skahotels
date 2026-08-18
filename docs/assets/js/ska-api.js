@@ -206,6 +206,27 @@
       var sb = getClient();
       var res = await sb.auth.getSession();
       return res.data && res.data.session;
+    },
+
+    adminFetchRooms: async function () {
+      var sb = getClient();
+      var res = await sb.from('rooms').select('id,name,branch').order('id');
+      if (res.error) throw new Error(apiError(res.error));
+      return res.data || [];
+    },
+
+    adminFetchBookings: async function () {
+      var sb = getClient();
+      var res = await sb.from('bookings').select('*').order('created_at', { ascending: false });
+      if (res.error) throw new Error(apiError(res.error));
+      return res.data || [];
+    },
+
+    adminFetchInquiries: async function () {
+      var sb = getClient();
+      var res = await sb.from('inquiries').select('*').order('created_at', { ascending: false });
+      if (res.error) throw new Error(apiError(res.error));
+      return res.data || [];
     }
   };
 

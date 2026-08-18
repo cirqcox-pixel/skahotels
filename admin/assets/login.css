@@ -261,6 +261,22 @@ body.ska-login::before {
   gap: 8px;
 }
 
+.mb-3 { margin-bottom: 16px; }
+
+.ska-table-empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 28px 16px !important;
+  font-size: 14px;
+}
+
+.ska-sidebar__logout {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
 .login-footer {
   display: flex;
   align-items: center;

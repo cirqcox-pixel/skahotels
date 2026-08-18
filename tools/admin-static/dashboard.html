@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" data-ska-static="true">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Dashboard | SKA Admin</title>
+  <link rel="icon" href="../assets/images/favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+</head>
+<body>
+
+<aside class="ska-sidebar" id="skaSidebar">
+  <div class="ska-sidebar__brand">
+    <div class="ska-sidebar__brand-name">SKA <span>Admin</span></div>
+    <div class="ska-sidebar__brand-sub">GitHub Pages CMS</div>
+  </div>
+  <nav class="ska-sidebar__nav">
+    <div class="ska-nav-label">Main</div>
+    <a href="dashboard.html" class="ska-nav-link active"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    <a href="../index.html" class="ska-nav-link" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Website</a>
+  </nav>
+  <div class="ska-sidebar__footer">
+    <div class="ska-sidebar__avatar"><i class="fa-solid fa-user"></i></div>
+    <div>
+      <div class="ska-sidebar__user-name" id="adminUserEmail">Admin</div>
+      <div class="ska-sidebar__user-role">Supabase Auth</div>
+    </div>
+    <button type="button" class="ska-sidebar__logout" id="adminLogout" title="Sign out">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i>
+    </button>
+  </div>
+</aside>
+
+<div class="ska-main">
+  <header class="ska-topbar">
+    <div class="ska-topbar__left">
+      <div class="ska-topbar__title">Dashboard</div>
+      <div class="ska-topbar__breadcrumb">Bookings and inquiries from your live site</div>
+    </div>
+  </header>
+
+  <main class="ska-content">
+    <div class="ska-stats-grid">
+      <div class="ska-stat-card ska-stat-card--gold">
+        <div class="ska-stat-card__header">
+          <div class="ska-stat-card__label">Rooms</div>
+          <div class="ska-stat-card__icon"><i class="fa-solid fa-bed"></i></div>
+        </div>
+        <div class="ska-stat-card__value" id="statRooms">—</div>
+        <div class="ska-stat-card__sub">In Supabase</div>
+      </div>
+      <div class="ska-stat-card ska-stat-card--navy">
+        <div class="ska-stat-card__header">
+          <div class="ska-stat-card__label">Bookings</div>
+          <div class="ska-stat-card__icon"><i class="fa-solid fa-calendar-check"></i></div>
+        </div>
+        <div class="ska-stat-card__value" id="statBookings">—</div>
+        <div class="ska-stat-card__sub">All reservations</div>
+      </div>
+      <div class="ska-stat-card ska-stat-card--warning">
+        <div class="ska-stat-card__header">
+          <div class="ska-stat-card__label">Pending</div>
+          <div class="ska-stat-card__icon"><i class="fa-solid fa-clock"></i></div>
+        </div>
+        <div class="ska-stat-card__value" id="statPending">—</div>
+        <div class="ska-stat-card__sub">Awaiting review</div>
+      </div>
+      <div class="ska-stat-card ska-stat-card--success">
+        <div class="ska-stat-card__header">
+          <div class="ska-stat-card__label">Inquiries</div>
+          <div class="ska-stat-card__icon"><i class="fa-solid fa-envelope"></i></div>
+        </div>
+        <div class="ska-stat-card__value" id="statInquiries">—</div>
+        <div class="ska-stat-card__sub">Contact messages</div>
+      </div>
+    </div>
+
+    <div class="ska-card" style="margin-bottom:24px;">
+      <div class="ska-card__header">
+        <h2 class="ska-card__title">Recent <span>Bookings</span></h2>
+      </div>
+      <div class="ska-card__body">
+        <table class="ska-table">
+          <thead>
+            <tr>
+              <th>Guest</th>
+              <th>Property</th>
+              <th>Room</th>
+              <th>Dates</th>
+              <th>Total</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="bookingsBody">
+            <tr><td colspan="6" class="ska-table-empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="ska-card">
+      <div class="ska-card__header">
+        <h2 class="ska-card__title">Recent <span>Inquiries</span></h2>
+      </div>
+      <div class="ska-card__body">
+        <table class="ska-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Subject</th>
+              <th>Message</th>
+              <th>Read</th>
+            </tr>
+          </thead>
+          <tbody id="inquiriesBody">
+            <tr><td colspan="5" class="ska-table-empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="ska-hint" style="margin-top:24px;text-align:center;">
+      Full room &amp; CMS editing: use PHP admin on your web host (<code>admin/login.php</code>).
+    </p>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/ska-config.js"></script>
+<script src="../assets/js/ska-api.js"></script>
+<script src="../assets/js/ska-admin.js"></script>
+</body>
+</html>
