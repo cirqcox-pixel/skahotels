@@ -65,6 +65,8 @@ if (empty($heroSlides)) {
 
   <div class="lp-hero-overlay"></div>
 
+  <p class="lp-hero-eyebrow">Oasis in Kampala</p>
+
   <form class="lp-search-bar" id="searchForm" onsubmit="return handleFindRooms(event)" role="search" aria-label="Find rooms">
     <div class="lp-search-field lp-search-dest">
       <label for="searchProperty" class="lp-search-label">
@@ -106,10 +108,21 @@ if (empty($heroSlides)) {
 
 </header>
 
+<section class="lp-trust-strip" aria-label="Booking benefits">
+  <div class="lp-trust-inner">
+    <div class="lp-trust-item"><i class="fa-solid fa-shield-halved"></i> Best Rate Guarantee</div>
+    <div class="lp-trust-item"><i class="fa-solid fa-mug-saucer"></i> Free Breakfast</div>
+    <div class="lp-trust-item"><i class="fa-solid fa-wifi"></i> Free Wi-Fi</div>
+    <div class="lp-trust-item"><i class="fa-solid fa-hotel"></i> 2 Boutique Properties</div>
+  </div>
+</section>
+
 <section class="lp-discover" id="properties">
   <div class="lp-discover-inner">
 
+    <span class="ska-section-eyebrow ska-section-eyebrow--light">Our Collection</span>
     <h2 class="lp-discover-title">Discover What's Waiting</h2>
+    <p class="lp-discover-sub">Two distinctive retreats in Kampala — hillside elegance in Naguru and lakeside serenity in Munyonyo.</p>
 
     <div class="lp-disc-tabs" id="discTabs" role="tablist">
       <button type="button" class="lp-disc-tab active" data-tab="all" role="tab" aria-selected="true">All Properties</button>
@@ -126,6 +139,7 @@ if (empty($heroSlides)) {
           <span class="lp-disc-tag"><i class="fa-solid fa-location-dot"></i> NAGURU, KAMPALA</span>
           <h3 class="lp-disc-name">SKA Naguru <i class="fa-solid fa-chevron-right"></i></h3>
           <span class="lp-disc-meta">Hillside retreat · From USD 150/night</span>
+          <span class="lp-disc-price">From USD 150 / night</span>
         </div>
       </a>
 
@@ -135,6 +149,7 @@ if (empty($heroSlides)) {
           <span class="lp-disc-tag"><i class="fa-solid fa-location-dot"></i> MUNYONYO, KAMPALA</span>
           <h3 class="lp-disc-name">SKA Munyonyo <i class="fa-solid fa-chevron-right"></i></h3>
           <span class="lp-disc-meta">Lakeside serenity · From USD 180/night</span>
+          <span class="lp-disc-price">From USD 180 / night</span>
         </div>
       </a>
 
@@ -146,6 +161,7 @@ if (empty($heroSlides)) {
   <div class="container">
     <div class="lp-getaway-header">
       <div>
+        <span class="ska-section-eyebrow">Exclusive Offers</span>
         <h2 class="lp-getaway-title">Get Away, Get More</h2>
         <p class="lp-getaway-sub">Celebrate longer stays with savings on rooms, experiences, and more.</p>
       </div>
@@ -188,6 +204,7 @@ if (empty($heroSlides)) {
   <div class="container">
     <div class="lp-bestrates-card">
       <div class="lp-br-left">
+        <span class="ska-section-eyebrow">Book Direct</span>
         <h2 class="lp-br-title">The Best Rates<br>Are Always Here</h2>
         <p class="lp-br-body">Get the lowest prices plus free Wi-Fi, flexible cancellation and breakfast when you book directly with us.</p>
         <div class="lp-br-btns">

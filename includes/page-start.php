@@ -15,7 +15,9 @@ $pageStyles = $pageStyles ?? [];
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+<link rel="stylesheet" href="assets/css/ska-tokens.css">
 <link rel="stylesheet" href="assets/css/nav.css">
+<link rel="stylesheet" href="assets/css/ska-enhancements.css">
 <?php foreach ($pageStyles as $css): ?>
 <link rel="stylesheet" href="<?= htmlspecialchars($css) ?>">
 <?php endforeach; ?>

@@ -2,12 +2,12 @@
    nav.css — SKA public navigation (landing + property)
 ═══════════════════════════════════════════════════════════ */
 :root {
-  --gold: #c9a96e;
+  --gold: var(--ska-gold, #c4a574);
   --white: #ffffff;
-  --nav-bg: rgba(0, 0, 0, 0.55);
-  --nav-height: 64px;
-  --transition: 0.3s ease;
-  --accent: #1e5b84;
+  --nav-bg: rgba(18, 17, 16, 0.55);
+  --nav-height: 72px;
+  --transition: 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  --accent: var(--ska-teal, #1a6b8a);
 }
 
 body.has-landing-nav { padding-top: var(--nav-height); }
@@ -38,7 +38,8 @@ body.has-landing-nav { padding-top: var(--nav-height); }
   margin: 0 auto;
 }
 
-.ska-logo img { height: 36px; display: block; transition: opacity var(--transition); }
+.ska-logo img { height: 40px; display: block; transition: opacity var(--transition), transform var(--transition); }
+.ska-logo:hover img { transform: scale(1.02); }
 .ska-logo:hover img { opacity: 0.85; }
 
 .ska-nav-center {

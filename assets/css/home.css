@@ -706,4 +706,4 @@ a { text-decoration: none; }
 }
 .lp-search-error i { color: var(--gold); }
 
-body.has-landing-nav .lp-hero { margin-top: 0; }
+body.has-landing-nav .lp-hero { margin-top: calc(var(--nav-height, 72px) * -1); padding-top: var(--nav-height, 72px); }

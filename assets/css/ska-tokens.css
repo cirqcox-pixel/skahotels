@@ -1,0 +1,51 @@
+/* SKA The Boutique — design tokens */
+:root {
+  /* Brand palette */
+  --ska-gold:        #c4a574;
+  --ska-gold-light:  #e2cfa3;
+  --ska-gold-dark:   #9a7b4f;
+  --ska-ink:         #121110;
+  --ska-ink-soft:    #1e1c1a;
+  --ska-charcoal:    #2a2826;
+  --ska-cream:       #f8f5f0;
+  --ska-cream-deep:  #f0ebe3;
+  --ska-white:       #ffffff;
+  --ska-teal:        #1a6b8a;
+  --ska-teal-dark:   #134f66;
+
+  /* Semantic aliases (legacy compat) */
+  --gold:        var(--ska-gold);
+  --gold-lt:     var(--ska-gold-light);
+  --dark:        var(--ska-ink);
+  --dark-2:      var(--ska-ink-soft);
+  --charcoal:    var(--ska-charcoal);
+  --warm-white:  var(--ska-cream);
+  --off-white:   var(--ska-cream-deep);
+  --border:      rgba(196, 165, 116, 0.22);
+  --text-dark:   var(--ska-ink);
+  --text-body:   #5c5854;
+
+  /* Typography */
+  --ff-display:  'Cormorant Garamond', Georgia, serif;
+  --ff-body:     'Montserrat', sans-serif;
+  --ff-ui:       'Jost', sans-serif;
+
+  /* Layout */
+  --nav-height:  72px;
+  --container:   1240px;
+  --radius-sm:   6px;
+  --radius-md:   12px;
+  --radius-lg:   20px;
+  --radius-pill: 999px;
+
+  /* Elevation */
+  --shadow-sm:   0 2px 12px rgba(18, 17, 16, 0.06);
+  --shadow-md:   0 8px 32px rgba(18, 17, 16, 0.10);
+  --shadow-lg:   0 20px 60px rgba(18, 17, 16, 0.18);
+  --shadow-gold: 0 8px 28px rgba(196, 165, 116, 0.25);
+
+  /* Motion */
+  --ease:        cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --dur:         0.35s;
+}
