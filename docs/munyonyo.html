@@ -10,20 +10,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
-<link rel="stylesheet" href="/skahotels/assets/css/nav.css">
-<link rel="stylesheet" href="/skahotels/assets/css/branch.css">
-<link rel="stylesheet" href="/skahotels/assets/css/rooms-section.css">
-<link rel="icon" href="/skahotels/assets/images/favicon.png" type="image/png">
+<link rel="stylesheet" href="assets/css/nav.css">
+<link rel="stylesheet" href="assets/css/branch.css">
+<link rel="stylesheet" href="assets/css/rooms-section.css">
+<link rel="icon" href="assets/images/favicon.png" type="image/png">
 </head>
-<body class="has-landing-nav">
+<body class="">
 <div class="ska-property-header" id="skaPropertyHeader"><div class="container"><div class="ska-tabs">
-    <div class="ska-brand"><a href="/skahotels/index.html"><img src="/skahotels/assets/images/favicon.png" alt="SKA"></a></div>
+    <div class="ska-brand"><a href="index.html"><img src="assets/images/favicon.png" alt="SKA"></a></div>
     <nav class="ska-tab-links" id="skaTabLinks">
-      <a href="/skahotels/munyonyo.html" class="active">Overview</a>
-      <a href="/skahotels/munyonyo.html#gallery">Photos</a>
-      <a href="/skahotels/munyonyo.html#rooms">Rooms</a>
-      <a href="/skahotels/munyonyo.html#services">Drink + Eat</a>
-      <a href="/skahotels/munyonyo.html#book">Book</a>
+      <a href="munyonyo.html" class="active">Overview</a>
+      <a href="munyonyo.html#gallery">Photos</a>
+      <a href="munyonyo.html#rooms">Rooms</a>
+      <a href="munyonyo.html#services">Drink + Eat</a>
+      <a href="munyonyo.html#book">Book</a>
     </nav></div></div></div>
 <style>
 /* ── Property Info Bar ──────────────────────────────────── */
@@ -228,7 +228,7 @@
 ══════════════════════════════════════════ -->
 <header class="hero">
   <video autoplay muted loop playsinline>
-    <source src="" type="video/mp4">
+    <source src="assets/video/ska_munyonyo.mp4" type="video/mp4">
   </video>
   <div class="overlay"></div>
   <div class="hero-content">
@@ -293,9 +293,9 @@
       </div>
 
       <div class="rs-header-right">
-        <div class="rs-season-pill" style="--sp-color:">
-          <span class="rs-season-dot"></span>
-          <span class="rs-season-label"> — </span>
+        <div class="rs-season-pill" style="--sp-color:#c9a96e">
+          <span class="rs-season-dot" style="background:#c9a96e"></span>
+          <span class="rs-season-label">High Season</span>
         </div>
         <div class="rs-nav">
           <button class="rs-nav-btn" id="roomsPrev" disabled>
@@ -312,54 +312,7 @@
 
     <!-- ── Cards viewport ── -->
     <div class="rs-viewport" id="roomsViewport">
-      <div class="rs-track" id="roomsTrack">
-
-        
-        <div class="rs-card" data-idx="">
-
-          <!-- Image area -->
-          <div class="rs-card-img">
-            
-              <img src=""
-                   alt=""
-                   class="rs-img" loading="lazy">
-            
-              <div class="rs-img-ph">
-                <i class="fa-regular fa-image"></i>
-                <span>Photo Coming Soon</span>
-              </div>
-            
-            <button class="rs-expand" data-idx="" title="View all photos">
-              <i class="fa-solid fa-expand"></i>
-            </button>
-          </div>
-
-          <!-- Card body -->
-          <div class="rs-card-body">
-            <button class="rs-room-name" data-idx="">
-              
-              <span class="rs-chevron">›</span>
-            </button>
-            <div class="rs-divider"></div>
-            <p class="rs-price">
-              USD 
-              <span class="rs-ppn">/ night</span>
-              <span class="rs-season-tag"
-                    style="background:22;color:">
-                
-              </span>
-            </p>
-            <button class="rs-vr-btn btn-vr" data-idx="">View Rates</button>
-          </div>
-
-        </div><!-- /.rs-card -->
-        
-
-        
-          <p style="padding:20px;color:#999;">No rooms available at Naguru right now.</p>
-        
-
-      </div>
+      <div class="rs-track" id="roomsTrack" data-ska-branch="Munyonyo"><p style="padding:24px;color:#888">Loading rooms…</p></div>
     </div>
 
   </div>
@@ -444,7 +397,7 @@
       </div>
     </div>
     <div class="marketplace-image">
-      <img src="/skahotels/assets/images/ska_munyonyo_home.jpg" alt="Ska Munyonyo"
+      <img src="assets/images/ska_munyonyo_home.jpg" alt="Ska Munyonyo"
            onerror="this.parentElement.style.background='#2a2a2a';this.remove()">
     </div>
   </div>
@@ -459,26 +412,24 @@
     <div class="more-ways-grid">
       <div class="mw-card">
         <div class="mw-img-side">
-          <img src="" alt=""
-               onerror="this.parentElement.style.background='#c8c4bc';this.remove()">
+          <img src="assets/images/naguru/restaurant.jpg" alt="Fine Dining" loading="lazy">
         </div>
         <div class="mw-text-side">
-          <span class="mw-eyebrow"></span>
-          <h3 class="mw-title"></h3>
-          <p class="mw-body"></p>
-          <a href="" class="mw-link"> →</a>
+          <span class="mw-eyebrow">RESTAURANT</span>
+          <h3 class="mw-title">Fine Dining</h3>
+          <p class="mw-body">Exceptional dining experiences with lake-view ambiance.</p>
+          <a href="#contact" class="mw-link">Learn More →</a>
         </div>
       </div>
       <div class="mw-card mw-card-reverse">
         <div class="mw-text-side">
-          <span class="mw-eyebrow"></span>
-          <h3 class="mw-title"></h3>
-          <p class="mw-body"></p>
-          <a href="" class="mw-link"> →</a>
+          <span class="mw-eyebrow">GARDENS</span>
+          <h3 class="mw-title">Serene Settings</h3>
+          <p class="mw-body">Lakeside gardens perfect for relaxation and events.</p>
+          <a href="#contact" class="mw-link">Learn More →</a>
         </div>
         <div class="mw-img-side">
-          <img src="" alt=""
-               onerror="this.parentElement.style.background='#d5d0c8';this.remove()">
+          <img src="assets/images/naguru/garden.jpg" alt="Serene Settings" loading="lazy">
         </div>
       </div>
     </div>
@@ -486,6 +437,48 @@
 </section>
 
 
+
+
+<section class="ska-gallery-section" id="gallery" data-branch="Munyonyo">
+  <div class="container">
+    <div class="ska-gallery-header">
+      <p class="ska-gallery-eyebrow">PHOTO GALLERY</p>
+      <h2 class="ska-gallery-title">Explore Munyonyo</h2>
+    </div>
+    <div class="ska-gallery-grid">
+      <a href="assets/images/munyonyo/IMG_0879.jpg" class="ska-gallery-item" data-gallery-index="0">
+        <img src="assets/images/munyonyo/IMG_0879.jpg" alt="SKA Munyonyo" loading="lazy">
+      </a>
+      <a href="assets/images/munyonyo/IMG_0883.jpg" class="ska-gallery-item" data-gallery-index="1">
+        <img src="assets/images/munyonyo/IMG_0883.jpg" alt="SKA Munyonyo" loading="lazy">
+      </a>
+      <a href="assets/images/munyonyo/IMG_0912.jpg" class="ska-gallery-item" data-gallery-index="2">
+        <img src="assets/images/munyonyo/IMG_0912.jpg" alt="SKA Munyonyo" loading="lazy">
+      </a>
+      <a href="assets/images/munyonyo/IMG_0973.jpg" class="ska-gallery-item" data-gallery-index="3">
+        <img src="assets/images/munyonyo/IMG_0973.jpg" alt="SKA Munyonyo" loading="lazy">
+      </a>
+      <a href="assets/images/munyonyo/Armenities-4.jpg" class="ska-gallery-item" data-gallery-index="4">
+        <img src="assets/images/munyonyo/Armenities-4.jpg" alt="SKA Munyonyo" loading="lazy">
+      </a>
+      <a href="assets/images/munyonyo/ska_about.jpg" class="ska-gallery-item" data-gallery-index="5">
+        <img src="assets/images/munyonyo/ska_about.jpg" alt="SKA Munyonyo" loading="lazy">
+      </a>
+    </div>
+  </div>
+</section>
+<style>
+.ska-gallery-section { padding: 72px 0; background: #f9f7f3; }
+.ska-gallery-header { text-align: center; margin-bottom: 40px; }
+.ska-gallery-eyebrow { font-size: 11px; letter-spacing: 0.2em; color: #c9a96e; font-weight: 600; margin-bottom: 8px; }
+.ska-gallery-title { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 300; color: #1a1a1a; margin: 0; }
+.ska-gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.ska-gallery-item { position: relative; aspect-ratio: 4/3; overflow: hidden; border-radius: 8px; display: block; }
+.ska-gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+.ska-gallery-item:hover img { transform: scale(1.06); }
+@media (max-width: 992px) { .ska-gallery-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 576px) { .ska-gallery-grid { grid-template-columns: 1fr; } }
+</style>
 
 <!-- ══════════════════════════════════════════
      BOOKING FORM
@@ -496,20 +489,7 @@
     <p class="text-center booking-sub">Fill in your details and we'll confirm your reservation.</p>
 
     
-      <div class="booking-notice booking-notice--success">
-        <i class="fa-solid fa-circle-check"></i>
-        Thank you! Your booking request has been sent successfully. We'll be in touch shortly.
-      </div>
-    
-      <div class="booking-notice booking-notice--warn">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-        Your booking was recorded but our email system had a hiccup. We'll contact you shortly.
-      </div>
-    
-      <div class="booking-notice booking-notice--error">
-        <i class="fa-solid fa-circle-xmark"></i>
-        
-      </div>
+      
     
 
     <form method="POST" action="#" data-ska-form="booking"
@@ -649,7 +629,7 @@ document.getElementById('checkout')?.addEventListener('change', calcFormTotal);
 document.getElementById('room_type')?.addEventListener('change', function() {
   if (typeof ROOMS === 'undefined') return;
   const roomName = this.value;
-  const room     = ROOMS.find(r => r.name === roomName);
+  const room     = (window.SKA_ROOMS||[]).find(r => r.name === roomName);
   if (!room) return;
   const month  = new Date().getMonth() + 1;
   /* use getSeasonKey defined in modals.html */
@@ -712,7 +692,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (params.get('checkout') && coEl) coEl.value = params.get('checkout');
 
   /* ───────── ROOM DATA ───────── */
-  const ROOMS =  || [];
+  /* rooms via ska-rooms.js */
   let currentIndex = 0;
 
   const HIGH_MONTHS     = [6,7,8,12,1];
@@ -756,7 +736,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateSlider() {
       const vis = visibleCards();
-      const max = Math.max(0, ROOMS.length - vis);
+      const max = Math.max(0, (window.SKA_ROOMS||[]).length - vis);
 
       if (currentIndex > max) currentIndex = max;
 
@@ -787,6 +767,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     requestAnimationFrame(updateSlider);
+    window.__skaUpdateSlider = updateSlider;
   }
 
   /* ───────── MODALS ───────── */
@@ -829,7 +810,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   function renderLbx() {
-    const r = ROOMS[lbRoom];
+    const r = (window.SKA_ROOMS||[])[lbRoom];
     if (!r) return;
 
     const img = document.getElementById('lbxImg');
@@ -841,7 +822,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ───────── DETAIL MODAL ───────── */
   window.openDetail = function(i) {
-    const r = ROOMS[i];
+    const r = (window.SKA_ROOMS||[])[i];
     if (!r) return;
 
     document.getElementById('dmTitle').textContent = r.name;
@@ -855,7 +836,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.openRates = function(i) {
     activeRoom = i;
-    const r = ROOMS[i];
+    const r = (window.SKA_ROOMS||[])[i];
     if (!r) return;
 
     document.getElementById('ratesTitle').textContent = r.name;
@@ -922,11 +903,11 @@ document.getElementById('lbxClose')?.addEventListener('click', () => closeModal(
 document.getElementById('dmClose')?.addEventListener('click', () => closeModal('dmBackdrop'));
 document.getElementById('ratesClose')?.addEventListener('click', () => closeModal('ratesBackdrop'));
 </script>
-<link rel="stylesheet" href="/skahotels/assets/css/footer.css">
+<link rel="stylesheet" href="assets/css/footer.css">
 <footer class="ska-footer" role="contentinfo">
   <div class="ska-footer__main">
     <div class="ska-footer__brand">
-      <a href="/skahotels/index.html" class="ska-footer__logo">SKA <span>The Boutique</span></a>
+      <a href="index.html" class="ska-footer__logo">SKA <span>The Boutique</span></a>
       <p class="ska-footer__tagline">Oasis in Kampala</p>
       <p class="ska-footer__brand-desc">A distinguished collection of elegant retreats redefining hospitality in Uganda — where boutique charm meets genuine warmth.</p>
       <div class="ska-footer__contacts">
@@ -939,20 +920,20 @@ document.getElementById('ratesClose')?.addEventListener('click', () => closeModa
     <div>
       <h4 class="ska-footer__col-title">Explore</h4>
       <ul class="ska-footer__nav">
-        <li><a href="/skahotels/about-us.html">Overview</a></li>
-        <li><a href="/skahotels/naguru.html#rooms">Rooms &amp; Suites</a></li>
-        <li><a href="/skahotels/naguru.html#gallery">Photo Gallery</a></li>
-        <li><a href="/skahotels/meetings-events.html">Meetings &amp; Events</a></li>
+        <li><a href="about-us.html">Overview</a></li>
+        <li><a href="naguru.html#rooms">Rooms &amp; Suites</a></li>
+        <li><a href="naguru.html#gallery">Photo Gallery</a></li>
+        <li><a href="meetings-events.html">Meetings &amp; Events</a></li>
       </ul>
     </div>
     <div>
       <h4 class="ska-footer__col-title">Our Properties</h4>
       <ul class="ska-footer__nav">
-        <li><a href="/skahotels/munyonyo.html">SKA Munyonyo</a></li>
-        <li><a href="/skahotels/naguru.html">SKA Naguru — Hillside</a></li>
-        <li><a href="/skahotels/index.html#book-search">Book a Room</a></li>
-        <li><a href="/skahotels/offers.html">Special Offers</a></li>
-        <li><a href="/skahotels/loyalty.html">SKA Rewards</a></li>
+        <li><a href="munyonyo.html">SKA Munyonyo</a></li>
+        <li><a href="naguru.html">SKA Naguru — Hillside</a></li>
+        <li><a href="index.html#book-search">Book a Room</a></li>
+        <li><a href="offers.html">Special Offers</a></li>
+        <li><a href="loyalty.html">SKA Rewards</a></li>
       </ul>
     </div>
     <div>
@@ -968,11 +949,11 @@ document.getElementById('ratesClose')?.addEventListener('click', () => closeModa
   <div class="ska-footer__bottom">
     <p class="ska-footer__copy">&copy; <span id="skaYear"></span> <strong>SKA The Boutique</strong>. All rights reserved.</p>
     <div class="ska-footer__legal">
-      <a href="/skahotels/privacy-policy.html">Privacy Policy</a>
+      <a href="privacy-policy.html">Privacy Policy</a>
       <span class="ska-footer__legal-dot"></span>
-      <a href="/skahotels/terms-of-use.html">Terms of Use</a>
+      <a href="terms-of-use.html">Terms of Use</a>
       <span class="ska-footer__legal-dot"></span>
-      <a href="/skahotels/cookie-policy.html">Cookie Policy</a>
+      <a href="cookie-policy.html">Cookie Policy</a>
     </div>
     <p class="ska-footer__credit">Crafted by <a href="https://cirqco.com/" target="_blank" rel="noopener noreferrer">Cirqco</a> — hospitality technology &amp; digital experience</p>
   </div>
@@ -980,9 +961,10 @@ document.getElementById('ratesClose')?.addEventListener('click', () => closeModa
 <script>document.getElementById('skaYear').textContent = new Date().getFullYear();</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/skahotels/assets/js/ska-config.js"></script>
-<script src="/skahotels/assets/js/ska-api.js"></script>
-<script src="/skahotels/assets/js/ska-forms.js"></script>
-<script src="/skahotels/assets/js/ska-live.js"></script>
+<script src="assets/js/ska-config.js"></script>
+<script src="assets/js/ska-api.js"></script>
+<script src="assets/js/ska-forms.js"></script>
+<script src="assets/js/ska-live.js"></script>
+<script src="assets/js/ska-rooms.js"></script>
 </body>
 </html>

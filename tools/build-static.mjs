@@ -10,7 +10,93 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const OUT = path.join(ROOT, 'docs');
 const PARTIALS = path.join(__dirname, 'partials');
-const BASE = '/skahotels';
+
+const HERO_SLIDES = `
+      <div class="carousel-item active">
+        <img src="assets/images/ska_naguru_home.jpeg" alt="SKA Naguru boutique hotel in Kampala" class="lp-hero-img" width="1920" height="1080" fetchpriority="high">
+      </div>
+      <div class="carousel-item">
+        <img src="assets/images/ska_munyonyo_home2.jpg" alt="SKA Munyonyo lakeside boutique retreat" class="lp-hero-img" width="1920" height="1080" loading="lazy">
+      </div>`;
+
+const PROMO_CARDS = `
+        <a href="offers.html" class="lp-promo-card">
+          <img src="assets/images/ska_naguru_home.jpeg" alt="Book Direct and Save" class="lp-promo-img" loading="lazy">
+          <div class="lp-promo-card-label"><span>Book Direct &amp; Save</span><i class="fa-solid fa-chevron-right"></i></div>
+        </a>
+        <a href="offers.html" class="lp-promo-card">
+          <img src="assets/images/ska_art_home.jpg" alt="Book 7 Days Early" class="lp-promo-img" loading="lazy">
+          <div class="lp-promo-card-label"><span>Book 7 Days Early</span><i class="fa-solid fa-chevron-right"></i></div>
+        </a>
+        <a href="offers.html" class="lp-promo-card">
+          <img src="assets/images/ska_furniture_home.jpg" alt="Stay 3 Nights Pay for 2" class="lp-promo-img" loading="lazy">
+          <div class="lp-promo-card-label"><span>Stay 3 Nights, Pay for 2</span><i class="fa-solid fa-chevron-right"></i></div>
+        </a>
+        <a href="munyonyo.html#book" class="lp-promo-card">
+          <img src="assets/images/ska_munyonyo_home2.jpg" alt="Munyonyo Lakeside Weekend" class="lp-promo-img" loading="lazy">
+          <div class="lp-promo-card-label"><span>Munyonyo Lakeside Weekend</span><i class="fa-solid fa-chevron-right"></i></div>
+        </a>`;
+
+const PROPERTY_DEFAULTS = {
+  naguru: {
+    branch: 'Naguru',
+    video: 'assets/video/ska_naguru.mp4',
+    heroImage: 'assets/images/ska_naguru_home.jpeg',
+    dining: {
+      tag: 'RESTAURANT',
+      title: 'Fine Dining',
+      body: 'Savor refined cuisine crafted with precision and artistry throughout your stay.',
+      image: 'assets/images/naguru/restaurant.jpg',
+      link: '#contact',
+      label: 'Learn More',
+    },
+    garden: {
+      tag: 'GARDENS',
+      title: 'Serene Settings',
+      body: 'Wander through lush gardens and unwind in tranquil greenery.',
+      image: 'assets/images/naguru/garden.jpg',
+      link: '#contact',
+      label: 'Learn More',
+    },
+    gallery: [
+      'assets/images/naguru/IMG_1044.jpg',
+      'assets/images/naguru/IMG_1066.jpg',
+      'assets/images/naguru/IMG_1069.jpg',
+      'assets/images/naguru/IMG_1093.jpg',
+      'assets/images/naguru/IMG_1120.jpg',
+      'assets/images/naguru/IMG_1157.jpg',
+    ],
+  },
+  munyonyo: {
+    branch: 'Munyonyo',
+    video: 'assets/video/ska_munyonyo.mp4',
+    heroImage: 'assets/images/ska_munyonyo_home2.jpg',
+    dining: {
+      tag: 'RESTAURANT',
+      title: 'Fine Dining',
+      body: 'Exceptional dining experiences with lake-view ambiance.',
+      image: 'assets/images/naguru/restaurant.jpg',
+      link: '#contact',
+      label: 'Learn More',
+    },
+    garden: {
+      tag: 'GARDENS',
+      title: 'Serene Settings',
+      body: 'Lakeside gardens perfect for relaxation and events.',
+      image: 'assets/images/naguru/garden.jpg',
+      link: '#contact',
+      label: 'Learn More',
+    },
+    gallery: [
+      'assets/images/munyonyo/IMG_0879.jpg',
+      'assets/images/munyonyo/IMG_0883.jpg',
+      'assets/images/munyonyo/IMG_0912.jpg',
+      'assets/images/munyonyo/IMG_0973.jpg',
+      'assets/images/munyonyo/Armenities-4.jpg',
+      'assets/images/munyonyo/ska_about.jpg',
+    ],
+  },
+};
 
 const PAGES = {
   index: {
@@ -36,7 +122,9 @@ const PAGES = {
     css: ['assets/css/branch.css', 'assets/css/rooms-section.css'],
     nav: 'property',
     property: 'naguru',
+    branch: 'Naguru',
     bodyClass: '',
+    extraScripts: '<script src="assets/js/ska-rooms.js"></script>',
   },
   munyonyo: {
     title: 'SKA Munyonyo | Lakeside Boutique Hotel',
@@ -44,7 +132,9 @@ const PAGES = {
     css: ['assets/css/branch.css', 'assets/css/rooms-section.css'],
     nav: 'property',
     property: 'munyonyo',
+    branch: 'Munyonyo',
     bodyClass: '',
+    extraScripts: '<script src="assets/js/ska-rooms.js"></script>',
   },
 };
 
@@ -71,25 +161,156 @@ function copyDir(src, dest) {
 }
 
 function stripPhp(content) {
-  return content
-    .replace(/<\?php[\s\S]*?\?>/g, '')
-    .replace(/<\?=[\s\S]*?\?>/g, '');
+  return content.replace(/<\?php[\s\S]*?\?>/g, '').replace(/<\?=[\s\S]*?\?>/g, '');
 }
 
 function fixPaths(html) {
   html = html.replace(/\.php/g, '.html');
-  html = html.replace(/(?:src|href)="assets\//g, (m) => m.replace('assets/', `${BASE}/assets/`));
-  html = html.replace(/(?:src|href)='assets\//g, (m) => m.replace('assets/', `${BASE}/assets/`));
-  html = html.replace(/url\(['"]?assets\//g, (m) => m.replace('assets/', `${BASE}/assets/`));
   html = html.replace(/action="forms\/process_[^"]+"/g, 'action="#" data-ska-form="booking"');
   html = html.replace(/action="forms\/process_inquiry\.php"/g, 'action="#" data-ska-form="inquiry"');
   return html;
 }
 
+function fixIndex(body) {
+  body = body.replace(
+    /<div class="carousel-inner">[\s\S]*?<\/div>\s*\n\s*<button class="carousel-control-prev"/,
+    `<div class="carousel-inner">\n${HERO_SLIDES}\n    </div>\n    <button class="carousel-control-prev"`
+  );
+  body = body.replace(
+    /<div class="lp-promo-track" id="promoTrack">[\s\S]*?<\/div>\s*\n\s*<button class="lp-promo-next"/,
+    `<div class="lp-promo-track" id="promoTrack">\n${PROMO_CARDS}\n      </div>\n      <button class="lp-promo-next"`
+  );
+  body = body.replace(
+    /<div class="lp-promo-dots" id="promoDots">[\s\S]*?<\/div>/,
+    `<div class="lp-promo-dots" id="promoDots"><span class="lp-promo-dot active"></span><span class="lp-promo-dot"></span><span class="lp-promo-dot"></span><span class="lp-promo-dot"></span></div>`
+  );
+  return body;
+}
+
+function gallerySection(branch, images) {
+  const items = images.map((src, i) =>
+    `      <a href="${src}" class="ska-gallery-item" data-gallery-index="${i}">
+        <img src="${src}" alt="SKA ${branch}" loading="lazy">
+      </a>`
+  ).join('\n');
+  return `
+<section class="ska-gallery-section" id="gallery" data-branch="${branch}">
+  <div class="container">
+    <div class="ska-gallery-header">
+      <p class="ska-gallery-eyebrow">PHOTO GALLERY</p>
+      <h2 class="ska-gallery-title">Explore ${branch}</h2>
+    </div>
+    <div class="ska-gallery-grid">
+${items}
+    </div>
+  </div>
+</section>
+<style>
+.ska-gallery-section { padding: 72px 0; background: #f9f7f3; }
+.ska-gallery-header { text-align: center; margin-bottom: 40px; }
+.ska-gallery-eyebrow { font-size: 11px; letter-spacing: 0.2em; color: #c9a96e; font-weight: 600; margin-bottom: 8px; }
+.ska-gallery-title { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 300; color: #1a1a1a; margin: 0; }
+.ska-gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.ska-gallery-item { position: relative; aspect-ratio: 4/3; overflow: hidden; border-radius: 8px; display: block; }
+.ska-gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+.ska-gallery-item:hover img { transform: scale(1.06); }
+@media (max-width: 992px) { .ska-gallery-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 576px) { .ska-gallery-grid { grid-template-columns: 1fr; } }
+</style>`;
+}
+
+function moreWaysSection(dining, garden) {
+  return `<section class="section more-ways-section">
+  <div class="container">
+    <h2 class="more-ways-title text-center">More Ways to Enjoy Your Stay</h2>
+    <div class="more-ways-grid">
+      <div class="mw-card">
+        <div class="mw-img-side">
+          <img src="${dining.image}" alt="${dining.title}" loading="lazy">
+        </div>
+        <div class="mw-text-side">
+          <span class="mw-eyebrow">${dining.tag}</span>
+          <h3 class="mw-title">${dining.title}</h3>
+          <p class="mw-body">${dining.body}</p>
+          <a href="${dining.link}" class="mw-link">${dining.label} →</a>
+        </div>
+      </div>
+      <div class="mw-card mw-card-reverse">
+        <div class="mw-text-side">
+          <span class="mw-eyebrow">${garden.tag}</span>
+          <h3 class="mw-title">${garden.title}</h3>
+          <p class="mw-body">${garden.body}</p>
+          <a href="${garden.link}" class="mw-link">${garden.label} →</a>
+        </div>
+        <div class="mw-img-side">
+          <img src="${garden.image}" alt="${garden.title}" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>`;
+}
+
+function fixProperty(body, propertyKey) {
+  const cfg = PROPERTY_DEFAULTS[propertyKey];
+  if (!cfg) return body;
+
+  body = body.replace(
+    /<source src="" type="video\/mp4">/,
+    `<source src="${cfg.video}" type="video/mp4">`
+  );
+
+  body = body.replace(
+    /<div class="rs-season-pill" style="--sp-color:">[\s\S]*?<\/div>/,
+    `<div class="rs-season-pill" style="--sp-color:#c9a96e">
+          <span class="rs-season-dot" style="background:#c9a96e"></span>
+          <span class="rs-season-label">High Season</span>
+        </div>`
+  );
+
+  body = body.replace(
+    /<div class="rs-track" id="roomsTrack">[\s\S]*?<\/div>\s*\n\s*<\/div>\s*\n\s*<\/div>\s*\n<\/section>/,
+    `<div class="rs-track" id="roomsTrack" data-ska-branch="${cfg.branch}"><p style="padding:24px;color:#888">Loading rooms…</p></div>\n    </div>\n\n  </div>\n</section>`
+  );
+
+  body = body.replace(
+    /<section class="section more-ways-section">[\s\S]*?<\/section>/,
+    moreWaysSection(cfg.dining, cfg.garden)
+  );
+
+  if (!body.includes('id="gallery"')) {
+    body = body.replace(
+      /<!-- ═+\s*\n\s*BOOKING FORM/,
+      `${gallerySection(cfg.branch, cfg.gallery)}\n\n<!-- ══════════════════════════════════════════\n     BOOKING FORM`
+    );
+  }
+
+  body = body.replace(/const ROOMS = ;/g, 'const ROOMS = window.SKA_ROOMS || [];');
+  body = body.replace(/const PROMOTIONS = ;/g, 'const PROMOTIONS = window.SKA_PROMOTIONS || [];');
+  body = body.replace(/const ROOMS = \s*\|\| \[\]/g, 'const ROOMS = window.SKA_ROOMS || []');
+  body = body.replace(/const ROOMS = window\.SKA_ROOMS \|\| \[\];/g, '/* rooms via ska-rooms.js */');
+
+  body = body.replace(
+    /<div class="booking-notice booking-notice--success">[\s\S]*?<\/div>\s*\n\s*<div class="booking-notice booking-notice--warn">[\s\S]*?<\/div>\s*\n\s*<div class="booking-notice booking-notice--error">[\s\S]*?<\/div>/,
+    ''
+  );
+
+  body = body.replace(/\bROOMS\.length\b/g, '(window.SKA_ROOMS||[]).length');
+  body = body.replace(/\bROOMS\.find\b/g, '(window.SKA_ROOMS||[]).find');
+  body = body.replace(/\bROOMS\[/g, '(window.SKA_ROOMS||[])[');
+
+  body = body.replace(
+    /requestAnimationFrame\(updateSlider\);/,
+    'requestAnimationFrame(updateSlider);\n    window.__skaUpdateSlider = updateSlider;'
+  );
+
+  return body;
+}
+
 function propertyNav(slug) {
-  const base = `${BASE}/${slug}.html`;
+  const base = `${slug}.html`;
   return `<div class="ska-property-header" id="skaPropertyHeader"><div class="container"><div class="ska-tabs">
-    <div class="ska-brand"><a href="${BASE}/index.html"><img src="${BASE}/assets/images/favicon.png" alt="SKA"></a></div>
+    <div class="ska-brand"><a href="index.html"><img src="assets/images/favicon.png" alt="SKA"></a></div>
     <nav class="ska-tab-links" id="skaTabLinks">
       <a href="${base}" class="active">Overview</a>
       <a href="${base}#gallery">Photos</a>
@@ -105,83 +326,51 @@ function buildPage(name, meta) {
 
   let body = stripPhp(fs.readFileSync(src, 'utf8')).trim();
   body = fixPaths(body);
+  if (name === 'index') body = fixIndex(body);
+  if (meta.property) body = fixProperty(body, meta.property);
 
   const extraCss = (meta.css || [])
-    .map((c) => `<link rel="stylesheet" href="${BASE}/${c.replace(/^assets\//, 'assets/')}">`)
+    .map((c) => `<link rel="stylesheet" href="${c}">`)
     .join('\n');
 
-  let head = readPartial('head.html')
+  const head = readPartial('head.html')
     .replace('{{TITLE}}', meta.title)
     .replace('{{DESCRIPTION}}', meta.description || meta.title)
     .replace('{{EXTRA_CSS}}', extraCss)
-    .replace('{{BODY_CLASS}}', meta.bodyClass || 'has-landing-nav');
+    .replace('{{BODY_CLASS}}', meta.bodyClass != null ? meta.bodyClass : 'has-landing-nav');
 
   let nav = '';
   if (meta.nav === 'landing') nav = readPartial('nav-landing.html');
   if (meta.nav === 'property') nav = propertyNav(meta.property || name);
 
-  const footer = readPartial('footer.html');
-  const html = head + nav + '\n' + body + '\n' + footer;
-
-  fs.writeFileSync(path.join(OUT, `${name}.html`), html);
+  const footer = readPartial('footer.html').replace('{{EXTRA_SCRIPTS}}', meta.extraScripts || '');
+  fs.writeFileSync(path.join(OUT, `${name}.html`), head + nav + '\n' + body + '\n' + footer);
   console.log(`Built ${name}.html`);
 }
 
 function buildAdmin() {
   const adminOut = path.join(OUT, 'admin');
-  const adminAssets = path.join(adminOut, 'assets');
-  fs.mkdirSync(adminAssets, { recursive: true });
+  fs.mkdirSync(path.join(adminOut, 'assets'), { recursive: true });
 
-  const login = `<!DOCTYPE html>
+  fs.writeFileSync(path.join(adminOut, 'login.html'), `<!DOCTYPE html>
 <html lang="en" data-ska-static="true"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin | SKA</title><link rel="stylesheet" href="${BASE}/admin/assets/login.css">
+<title>Admin | SKA</title><link rel="stylesheet" href="../admin/assets/login.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"></head>
 <body class="ska-login"><div class="ska-login-wrap"><div class="login-card">
 <h4>SKA Admin</h4><div id="loginError" class="error" style="display:none"></div>
 <form id="adminLoginForm"><label>Email</label><input type="email" id="adminEmail" required><br><br>
 <label>Password</label><input type="password" id="adminPass" required><br><br>
 <button type="submit">Sign In</button></form>
-<p style="font-size:12px;color:#888">Create users in Supabase → Authentication</p>
 </div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="${BASE}/assets/js/ska-config.js"></script>
-<script src="${BASE}/assets/js/ska-api.js"></script>
+<script src="../assets/js/ska-config.js"></script>
+<script src="../assets/js/ska-api.js"></script>
 <script>
 document.getElementById('adminLoginForm').onsubmit=async function(e){e.preventDefault();
 try{await SkaApi.adminSignIn(adminEmail.value,adminPass.value);location.href='dashboard.html';}
 catch(ex){loginError.style.display='block';loginError.textContent=ex.message;}};
-</script></body></html>`;
+</script></body></html>`);
 
-  fs.writeFileSync(path.join(adminOut, 'login.html'), login);
-
-  const dash = `<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><title>Dashboard | SKA Admin</title>
-<link rel="stylesheet" href="${BASE}/admin/assets/admin.css"></head>
-<body style="padding:24px;font-family:sans-serif">
-<h1>SKA Admin Dashboard</h1>
-<p><a href="${BASE}/">View site</a> | <a href="login.html" id="logout">Logout</a></p>
-<div id="authWarn" style="display:none;background:#fff3cd;padding:12px">Please <a href="login.html">sign in</a>.</div>
-<h2>Bookings</h2><div id="bookings">Loading…</div>
-<h2>Inquiries</h2><div id="inquiries">Loading…</div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="${BASE}/assets/js/ska-config.js"></script>
-<script src="${BASE}/assets/js/ska-api.js"></script>
-<script>
-(async function(){
-  if(!await SkaApi.adminSession()){authWarn.style.display='block';return;}
-  var sb=SkaApi.client();
-  var b=await sb.from('bookings').select('*').order('created_at',{ascending:false}).limit(20);
-  var i=await sb.from('inquiries').select('*').order('created_at',{ascending:false}).limit(20);
-  function tbl(rows,cols){if(!rows||!rows.length)return'<p>None yet.</p>';
-    return'<table border="1" cellpadding="6" style="border-collapse:collapse;width:100%"><tr>'+
-    cols.map(c=>'<th>'+c+'</th>').join('')+'</tr>'+
-    rows.map(r=>'<tr>'+cols.map(c=>'<td>'+(r[c]??'')+'</td>').join('')+'</tr>').join('')+'</table>';}
-  bookings.innerHTML=b.error?b.error.message:tbl(b.data,['created_at','name','email','branch','status']);
-  inquiries.innerHTML=i.error?i.error.message:tbl(i.data,['created_at','name','email','subject']);
-  logout.onclick=async function(e){e.preventDefault();await SkaApi.adminSignOut();location.href='login.html';};
-})();
-</script></body></html>`;
-  fs.writeFileSync(path.join(adminOut, 'dashboard.html'), dash);
   console.log('Built admin pages');
 }
 

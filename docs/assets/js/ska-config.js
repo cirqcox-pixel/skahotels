@@ -19,17 +19,13 @@ window.SKA_CONFIG = {
       document.documentElement.dataset.skaStatic === 'true';
   },
 
-  /** Resolve asset/page URLs for current host */
+  /** Resolve asset/page URLs — relative paths work on GitHub Pages */
   asset: function (path) {
-    path = (path || '').replace(/^\//, '');
-    if (this.isStaticHost()) {
-      return this.githubPagesBase + '/' + path;
-    }
-    return path;
+    return (path || '').replace(/^\//, '');
   },
 
   page: function (name) {
     var ext = this.isStaticHost() ? '.html' : '.php';
-    return this.asset(name + ext);
+    return name + ext;
   }
 };
