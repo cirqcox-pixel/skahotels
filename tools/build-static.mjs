@@ -182,13 +182,13 @@ const PAGES = {
     nav: 'landing',
     bodyClass: 'has-landing-nav',
   },
-  offers: { title: 'Special Offers | SKA The Boutique', description: 'Exclusive offers at SKA.', css: ['assets/css/pages.css'], nav: 'landing' },
-  'about-us': { title: 'About Us | SKA The Boutique', description: 'Our story.', css: ['assets/css/style.css', 'assets/css/pages.css'], nav: 'landing' },
-  'meetings-events': { title: 'Meetings & Events | SKA', description: 'Events at SKA.', css: ['assets/css/pages.css'], nav: 'landing' },
-  contact: { title: 'Contact Us | SKA', description: 'Get in touch.', css: ['assets/css/pages.css'], nav: 'landing' },
-  help: { title: 'Help Centre | SKA', description: 'Help and FAQs.', css: ['assets/css/pages.css'], nav: 'landing' },
+  offers: { title: 'Special Offers | SKA The Boutique', description: 'Exclusive direct-booking offers at SKA Naguru and Munyonyo.', css: ['assets/css/pages.css'], nav: 'landing' },
+  'about-us': { title: 'About Us | SKA The Boutique Kampala', description: 'Discover SKA The Boutique — Naguru hillside and Munyonyo lakeside boutique stays in Kampala.', css: ['assets/css/pages.css'], nav: 'landing' },
+  'meetings-events': { title: 'Meetings & Events | SKA The Boutique', description: 'Intimate meetings, weddings and social events at SKA.', css: ['assets/css/pages.css'], nav: 'landing', staticBody: 'meetings-events' },
+  contact: { title: 'Contact Us | SKA The Boutique', description: 'Contact SKA Naguru and Munyonyo for reservations and events.', css: ['assets/css/pages.css'], nav: 'landing', staticBody: 'contact' },
+  help: { title: 'Help Centre | SKA The Boutique', description: 'How to book, get from Entebbe Airport, weather, roads, and attractions near SKA.', css: ['assets/css/pages.css'], nav: 'landing', staticBody: 'help' },
   careers: { title: 'Careers | SKA', description: 'Join our team.', css: ['assets/css/pages.css'], nav: 'landing' },
-  loyalty: { title: 'SKA Rewards', description: 'Loyalty programme.', css: ['assets/css/pages.css'], nav: 'landing' },
+  loyalty: { title: 'SKA Rewards | Loyalty Programme', description: 'Member rates and exclusive offers for direct bookers.', css: ['assets/css/pages.css'], nav: 'landing', staticBody: 'loyalty' },
   'privacy-policy': { title: 'Privacy Policy | SKA', description: 'Privacy policy.', css: ['assets/css/pages.css'], nav: 'landing' },
   'terms-of-use': { title: 'Terms of Use | SKA', description: 'Terms of use.', css: ['assets/css/pages.css'], nav: 'landing' },
   'cookie-policy': { title: 'Cookie Policy | SKA', description: 'Cookie policy.', css: ['assets/css/pages.css'], nav: 'landing' },
@@ -409,7 +409,23 @@ function buildPage(name, meta) {
   body = fixPaths(body);
   if (name === 'index') body = fixIndex(body);
   if (name === 'offers') body = OFFERS_PAGE_BODY;
+  if (meta.staticBody) {
+    const pagePartial = path.join(PARTIALS, 'pages', `${meta.staticBody}.html`);
+    if (fs.existsSync(pagePartial)) body = fs.readFileSync(pagePartial, 'utf8');
+  }
   if (meta.property) body = fixProperty(body, meta.property);
+
+  // About page: ensure hero image + copy survive PHP stripping
+  if (name === 'about-us') {
+    body = body.replace(/background-image:\s*url\(''\);/g, "background-image: url('assets/images/dube_munyonyo.jpg');");
+    body = body.replace(
+      /<p class="ska-hero__eyebrow"><\/p>\s*<h1 class="ska-hero__title"><\/h1>\s*<p class="ska-hero__subtitle"><\/p>/,
+      `<p class="ska-hero__eyebrow">Our Story</p>
+      <h1 class="ska-hero__title">Where Every<br><em>Detail</em> Matters</h1>
+      <p class="ska-hero__subtitle">Boutique charm, homely comfort, and genuine care — in the heart of Kampala.</p>`
+    );
+    body = body.replace(/href="\/"/g, 'href="index.html"');
+  }
 
   const extraCss = (meta.css || [])
     .map((c) => `<link rel="stylesheet" href="${c}">`)

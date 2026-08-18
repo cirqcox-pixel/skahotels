@@ -60,7 +60,7 @@ include 'includes/page-start.php';
     .ska-hero__bg {
       position: absolute;
       inset: 0;
-      background-image: url('<?= htmlspecialchars($cmsAbout['hero_image'] ?? 'assets/images/dube_munyonyo.jpg') ?>');
+      background-image: url('assets/images/dube_munyonyo.jpg');
       background-size: cover;
       background-position: center 30%;
       transform: scale(1.06);
@@ -796,9 +796,9 @@ include 'includes/page-start.php';
     <div class="ska-hero__bg"></div>
     <div class="ska-hero__overlay"></div>
     <div class="ska-hero__content">
-      <p class="ska-hero__eyebrow"><?= htmlspecialchars($cmsAbout['hero_eyebrow'] ?? 'Our Story') ?></p>
-      <h1 class="ska-hero__title"><?= nl2br(htmlspecialchars($cmsAbout['hero_title'] ?? 'Where Every Detail Matters')) ?></h1>
-      <p class="ska-hero__subtitle"><?= htmlspecialchars($cmsAbout['hero_subtitle'] ?? 'Boutique charm, homely comfort, and genuine care — in the heart of Kampala.') ?></p>
+      <p class="ska-hero__eyebrow">Our Story</p>
+      <h1 class="ska-hero__title">Where Every<br><em>Detail</em> Matters</h1>
+      <p class="ska-hero__subtitle">Boutique charm, homely comfort, and genuine care — in the heart of Kampala.</p>
     </div>
     <div class="ska-hero__scroll">
       <div class="ska-hero__scroll-line"></div>
@@ -847,7 +847,7 @@ include 'includes/page-start.php';
         <p class="ska-intro__body ska-reveal ska-reveal-delay-2">
           SKA Boutique Hotels redefines hospitality in Kampala. Rooted in Munyonyo's tranquil lakeside charm and expanding with our latest addition — Hillside Escape in Naguru — SKA offers a seamless blend of contemporary sophistication, timeless comfort, and authentic Ugandan warmth.
         </p>
-        <a href="/" class="ska-intro__cta ska-reveal ska-reveal-delay-3">
+        <a href="index.html" class="ska-intro__cta ska-reveal ska-reveal-delay-3">
           Explore Our Properties <i class="fa-solid fa-arrow-right fa-xs"></i>
         </a>
       </div>
