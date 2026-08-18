@@ -6,17 +6,17 @@
       </a>
     </div>
     <ul class="ska-nav-center">
-      <li><a href="index.html#book-search">Book</a></li>
-      <li><a href="offers.html">Offers</a></li>
-      <li><a href="index.html#properties">Properties</a></li>
-      <li><a href="about-us.html">About</a></li>
-      <li><a href="meetings-events.html">Meetings &amp; Events</a></li>
-      <li><a href="contact.html">Contact</a></li>
+      <li><a href="index.html#book-search" data-nav="book">Book</a></li>
+      <li><a href="offers.html" data-nav="offers">Offers</a></li>
+      <li><a href="index.html#properties" data-nav="properties">Properties</a></li>
+      <li><a href="about-us.html" data-nav="about">About</a></li>
+      <li><a href="meetings-events.html" data-nav="meetings">Meetings &amp; Events</a></li>
+      <li><a href="contact.html" data-nav="contact">Contact</a></li>
     </ul>
     <div class="ska-nav-right">
-      <a href="help.html" class="ska-hide-tablet ska-hide-mobile"><i class="fa-regular fa-circle-question"></i> Help</a>
+      <a href="help.html" class="ska-hide-tablet ska-hide-mobile" data-nav="help"><i class="fa-regular fa-circle-question"></i> Help</a>
       <a href="index.html#book-search" class="ska-book-btn ska-hide-mobile"><i class="fa-solid fa-calendar-check"></i> Book Now</a>
-      <a href="loyalty.html" class="ska-login-btn"><i class="fa-regular fa-gem"></i> SKA Rewards</a>
+      <a href="loyalty.html" class="ska-login-btn" data-nav="rewards"><i class="fa-regular fa-gem"></i> SKA Rewards</a>
       <button class="ska-hamburger" id="skaHamburger" aria-label="Toggle menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -26,19 +26,19 @@
 <div class="ska-mobile-menu" id="skaMobileMenu" aria-hidden="true">
   <div class="ska-mobile-inner">
     <ul class="ska-mobile-nav">
-      <li><a href="index.html#book-search">Book</a></li>
-      <li><a href="offers.html">Offers</a></li>
-      <li><a href="index.html#properties">Properties</a></li>
-      <li><a href="about-us.html">About</a></li>
-      <li><a href="meetings-events.html">Meetings &amp; Events</a></li>
-      <li><a href="contact.html">Contact</a></li>
+      <li><a href="index.html#book-search" data-nav="book">Book</a></li>
+      <li><a href="offers.html" data-nav="offers">Offers</a></li>
+      <li><a href="index.html#properties" data-nav="properties">Properties</a></li>
+      <li><a href="about-us.html" data-nav="about">About</a></li>
+      <li><a href="meetings-events.html" data-nav="meetings">Meetings &amp; Events</a></li>
+      <li><a href="contact.html" data-nav="contact">Contact</a></li>
     </ul>
     <div class="ska-mobile-utils">
-      <a href="help.html"><i class="fa-regular fa-circle-question"></i> Help</a>
+      <a href="help.html" data-nav="help"><i class="fa-regular fa-circle-question"></i> Help</a>
       <a href="naguru.html"><i class="fa-solid fa-location-dot"></i> Naguru</a>
       <a href="munyonyo.html"><i class="fa-solid fa-location-dot"></i> Munyonyo</a>
     </div>
-    <a href="loyalty.html" class="ska-mobile-cta"><i class="fa-regular fa-gem"></i> SKA Rewards</a>
+    <a href="loyalty.html" class="ska-mobile-cta" data-nav="rewards"><i class="fa-regular fa-gem"></i> SKA Rewards</a>
   </div>
 </div>
 <script>
@@ -68,5 +68,28 @@
   window.addEventListener('scroll', function () {
     navbar.classList.toggle('scrolled', window.scrollY > 20);
   }, { passive: true });
+
+  /* Active page tracker */
+  (function markActiveNav() {
+    var path = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    var map = {
+      'index.html': ['book', 'properties'],
+      '': ['book', 'properties'],
+      'offers.html': ['offers'],
+      'about-us.html': ['about'],
+      'meetings-events.html': ['meetings'],
+      'contact.html': ['contact'],
+      'help.html': ['help'],
+      'loyalty.html': ['rewards']
+    };
+    var keys = map[path] || [];
+    document.querySelectorAll('[data-nav]').forEach(function (a) {
+      var key = a.getAttribute('data-nav');
+      if (keys.indexOf(key) >= 0) {
+        a.classList.add('active');
+        a.setAttribute('aria-current', 'page');
+      }
+    });
+  })();
 })();
 </script>

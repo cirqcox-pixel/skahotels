@@ -92,7 +92,23 @@ body.has-landing-nav { padding-top: var(--nav-height); }
   gap: 5px;
   transition: color var(--transition);
 }
-.ska-nav-right a:hover { color: var(--gold); }
+.ska-nav-right a:hover,
+.ska-nav-right a.active { color: var(--gold); }
+
+.ska-nav-right a.active {
+  position: relative;
+}
+
+.ska-login-btn.active {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.ska-mobile-nav a.active,
+.ska-mobile-utils a.active,
+.ska-mobile-cta.active {
+  color: var(--gold) !important;
+}
 
 .ska-login-btn {
   border: 1px solid rgba(255,255,255,0.7);

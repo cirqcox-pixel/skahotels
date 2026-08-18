@@ -24,6 +24,7 @@
   --border:      rgba(196, 165, 116, 0.22);
   --text-dark:   var(--ska-ink);
   --text-body:   #5c5854;
+  --muted:       #5c5854;
 
   /* Typography */
   --ff-display:  'Cormorant Garamond', Georgia, serif;

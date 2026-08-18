@@ -1,5 +1,5 @@
-/* footer.css — extracted from inline footer styles */
-:root {
+/* footer.css — scoped tokens so they don't wipe page body text */
+.ska-footer {
   --gold: #c9a96e;
   --charcoal: #141414;
   --border: rgba(255,255,255,0.07);
@@ -9,9 +9,7 @@
   --ff-display: 'Cormorant Garamond', Georgia, serif;
   --ff-body: 'Jost', sans-serif;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
-}
 
-.ska-footer {
   background: var(--charcoal);
   font-family: var(--ff-body);
   color: var(--soft);

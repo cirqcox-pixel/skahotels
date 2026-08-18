@@ -97,7 +97,17 @@
   font-size: 15px;
   font-weight: 300;
   line-height: 1.85;
-  color: var(--muted);
+  color: #4a4642;
+}
+.ska-content-card p strong,
+.ska-content-card li strong {
+  color: #1c1c1c;
+  font-weight: 600;
+}
+.ska-content-card a:not(.ska-btn-gold):not(.ska-btn-outline) {
+  color: #1e5b84;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 .ska-content-card ul { padding-left: 20px; margin: 0 0 16px; }
 
@@ -141,7 +151,7 @@
 }
 .ska-feature-card__text {
   font-size: 14px;
-  color: var(--muted);
+  color: #4a4642;
   line-height: 1.7;
   margin: 0 0 16px;
 }
@@ -249,7 +259,7 @@
 .ska-help-steps li {
   margin-bottom: 12px;
   line-height: 1.65;
-  color: var(--muted);
+  color: #4a4642;
 }
 .ska-help-steps strong { color: var(--charcoal); }
 .ska-help-grid {
@@ -310,7 +320,7 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: #6b6b6b;
   margin-bottom: 6px;
 }
 .ska-contact-form input,
