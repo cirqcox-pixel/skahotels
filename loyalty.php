@@ -12,6 +12,7 @@ $pageMeta = [
 ];
 $pageStyles = ['assets/css/pages.css'];
 $cmsSlug    = 'loyalty';
+$navActive  = 'loyalty';
 include 'includes/page-start.php';
 ?>
 

@@ -16,6 +16,7 @@ $cmsSlug    = 'meetings-events';
 include 'includes/page-start.php';
 ?>
 
+<?php /* Static-friendly content is also built into docs via tools/partials/pages */ ?>
 <?php include 'includes/cms-hero.php'; ?>
 
 <section class="ska-page-body">

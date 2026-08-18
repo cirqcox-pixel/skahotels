@@ -23,9 +23,9 @@ $navActive = $navActive ?? '';
     </ul>
 
     <div class="ska-nav-right">
-      <a href="help.php" class="ska-hide-tablet ska-hide-mobile"><i class="fa-regular fa-circle-question"></i> Help</a>
+      <a href="help.php" class="ska-hide-tablet ska-hide-mobile <?= $navActive === 'help' ? 'active' : '' ?>"><i class="fa-regular fa-circle-question"></i> Help</a>
       <a href="index.php#book-search" class="ska-book-btn ska-hide-mobile"><i class="fa-solid fa-calendar-check"></i> Book Now</a>
-      <a href="loyalty.php" class="ska-login-btn"><i class="fa-regular fa-gem"></i> SKA Rewards</a>
+      <a href="loyalty.php" class="ska-login-btn <?= $navActive === 'loyalty' ? 'active' : '' ?>"><i class="fa-regular fa-gem"></i> SKA Rewards</a>
       <button class="ska-hamburger" id="skaHamburger" aria-label="Toggle menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>

@@ -11,6 +11,7 @@ $pageMeta = [
 ];
 $pageStyles = ['assets/css/pages.css'];
 $cmsSlug    = 'help';
+$navActive  = 'help';
 include 'includes/page-start.php';
 ?>
 
