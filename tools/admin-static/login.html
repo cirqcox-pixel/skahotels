@@ -27,6 +27,10 @@
       <i class="fa-solid fa-circle-xmark"></i>
       <span id="loginErrorText"></span>
     </div>
+    <div id="loginNotice" class="error" style="display:none;background:#fff8e1;border-color:#ffe082;color:#7d5c00;" role="status">
+      <i class="fa-solid fa-circle-info"></i>
+      <span id="loginNoticeText"></span>
+    </div>
 
     <form id="adminLoginForm" class="ska-login-form" autocomplete="on">
       <div class="mb-3">
@@ -92,6 +96,16 @@ document.getElementById('adminLoginForm').addEventListener('submit', async funct
 SkaApi.adminSession().then(function (s) {
   if (s) location.href = 'dashboard.html';
 });
+
+(function () {
+  var p = new URLSearchParams(location.search);
+  if (p.get('reason') === 'session' || p.get('reason') === 'auth') {
+    var notice = document.getElementById('loginNotice');
+    var noticeTxt = document.getElementById('loginNoticeText');
+    noticeTxt.textContent = 'Your session expired. Please sign in again.';
+    notice.style.display = 'flex';
+  }
+})();
 </script>
 </body>
 </html>
