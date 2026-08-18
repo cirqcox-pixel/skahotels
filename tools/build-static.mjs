@@ -119,7 +119,7 @@ const PAGES = {
   naguru: {
     title: 'SKA Naguru | Boutique Hotel Kampala',
     description: 'Book SKA Naguru.',
-    css: ['assets/css/branch.css', 'assets/css/rooms-section.css'],
+    css: ['assets/css/branch.css', 'assets/css/rooms-section.css', 'assets/css/booking-form.css'],
     nav: 'property',
     property: 'naguru',
     branch: 'Naguru',
@@ -129,7 +129,7 @@ const PAGES = {
   munyonyo: {
     title: 'SKA Munyonyo | Lakeside Boutique Hotel',
     description: 'Book SKA Munyonyo.',
-    css: ['assets/css/branch.css', 'assets/css/rooms-section.css'],
+    css: ['assets/css/branch.css', 'assets/css/rooms-section.css', 'assets/css/booking-form.css'],
     nav: 'property',
     property: 'munyonyo',
     branch: 'Munyonyo',
@@ -300,6 +300,11 @@ function fixProperty(body, propertyKey) {
   body = body.replace(/\bROOMS\[/g, '(window.SKA_ROOMS||[])[');
 
   body = body.replace(
+    /if \(!ci \|\| !co \|\| !roomName \|\| typeof ROOMS === 'undefined'\) return;/g,
+    'if (!ci || !co || !roomName) return;'
+  );
+
+  body = body.replace(
     /requestAnimationFrame\(updateSlider\);/,
     'requestAnimationFrame(updateSlider);\n    window.__skaUpdateSlider = updateSlider;'
   );
@@ -351,13 +356,50 @@ function buildPage(name, meta) {
 function buildAdmin() {
   const adminOut = path.join(OUT, 'admin');
   const adminStatic = path.join(__dirname, 'admin-static');
+  const partialsDir = path.join(adminStatic, 'partials');
+  const pagesDir = path.join(adminStatic, 'pages');
+
   fs.mkdirSync(path.join(adminOut, 'assets'), { recursive: true });
 
-  for (const file of ['login.html', 'dashboard.html']) {
-    const src = path.join(adminStatic, file);
-    if (fs.existsSync(src)) {
-      fs.copyFileSync(src, path.join(adminOut, file));
-    }
+  const loginSrc = path.join(adminStatic, 'login.html');
+  if (fs.existsSync(loginSrc)) {
+    fs.copyFileSync(loginSrc, path.join(adminOut, 'login.html'));
+  }
+
+  const headTpl = fs.readFileSync(path.join(partialsDir, 'head.html'), 'utf8');
+  const sidebarTpl = fs.readFileSync(path.join(partialsDir, 'sidebar.html'), 'utf8');
+  const scriptsTpl = fs.readFileSync(path.join(partialsDir, 'scripts.html'), 'utf8');
+
+  const adminPages = [
+    { file: 'dashboard.html', page: 'dashboard', title: 'Dashboard' },
+    { file: 'bookings.html', page: 'bookings', title: 'Bookings' },
+    { file: 'rooms.html', page: 'rooms', title: 'Rooms' },
+    { file: 'promotions.html', page: 'promotions', title: 'Promotions' },
+    { file: 'inquiries.html', page: 'inquiries', title: 'Inquiries' },
+  ];
+
+  for (const meta of adminPages) {
+    const contentPath = path.join(pagesDir, meta.file);
+    if (!fs.existsSync(contentPath)) continue;
+
+    const sidebar = sidebarTpl
+      .replace(/\{\{ACTIVE_DASHBOARD\}\}/g, meta.page === 'dashboard' ? ' active' : '')
+      .replace(/\{\{ACTIVE_ROOMS\}\}/g, meta.page === 'rooms' ? ' active' : '')
+      .replace(/\{\{ACTIVE_PROMOTIONS\}\}/g, meta.page === 'promotions' ? ' active' : '')
+      .replace(/\{\{ACTIVE_BOOKINGS\}\}/g, meta.page === 'bookings' ? ' active' : '')
+      .replace(/\{\{ACTIVE_INQUIRIES\}\}/g, meta.page === 'inquiries' ? ' active' : '');
+
+    const html = headTpl
+      .replace(/\{\{TITLE\}\}/g, meta.title)
+      .replace(/\{\{PAGE\}\}/g, meta.page)
+      + '\n'
+      + sidebar
+      + '\n'
+      + fs.readFileSync(contentPath, 'utf8')
+      + '\n'
+      + scriptsTpl;
+
+    fs.writeFileSync(path.join(adminOut, meta.file), html);
   }
 
   console.log('Built admin pages');

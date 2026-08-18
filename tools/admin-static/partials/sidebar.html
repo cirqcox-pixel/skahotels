@@ -1,0 +1,29 @@
+<aside class="ska-sidebar" id="skaSidebar">
+  <div class="ska-sidebar__brand">
+    <div class="ska-sidebar__brand-name">SKA <span>Admin</span></div>
+    <div class="ska-sidebar__brand-sub">GitHub Pages CMS</div>
+  </div>
+  <nav class="ska-sidebar__nav">
+    <div class="ska-nav-label">Main</div>
+    <a href="dashboard.html" class="ska-nav-link{{ACTIVE_DASHBOARD}}"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    <a href="../index.html" class="ska-nav-link" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Website</a>
+
+    <div class="ska-nav-label">Property</div>
+    <a href="rooms.html" class="ska-nav-link{{ACTIVE_ROOMS}}"><i class="fa-solid fa-bed"></i> Rooms</a>
+    <a href="promotions.html" class="ska-nav-link{{ACTIVE_PROMOTIONS}}"><i class="fa-solid fa-tag"></i> Promotions</a>
+    <a href="bookings.html" class="ska-nav-link{{ACTIVE_BOOKINGS}}"><i class="fa-solid fa-calendar-days"></i> Bookings</a>
+
+    <div class="ska-nav-label">Content</div>
+    <a href="inquiries.html" class="ska-nav-link{{ACTIVE_INQUIRIES}}"><i class="fa-solid fa-envelope"></i> Inquiries</a>
+  </nav>
+  <div class="ska-sidebar__footer">
+    <div class="ska-sidebar__avatar"><i class="fa-solid fa-user"></i></div>
+    <div>
+      <div class="ska-sidebar__user-name" id="adminUserEmail">Admin</div>
+      <div class="ska-sidebar__user-role">Supabase Auth</div>
+    </div>
+    <button type="button" class="ska-sidebar__logout" id="adminLogout" title="Sign out">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i>
+    </button>
+  </div>
+</aside>

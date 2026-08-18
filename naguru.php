@@ -23,7 +23,7 @@ $pageMeta = [
         'starRating'=> ['@type' => 'Rating', 'ratingValue' => $branch['rating'], 'bestRating' => '5'],
     ],
 ];
-$pageStyles = ['assets/css/branch.css', 'assets/css/rooms-section.css'];
+$pageStyles = ['assets/css/branch.css', 'assets/css/rooms-section.css', 'assets/css/booking-form.css'];
 $hideLandingNav = true;
 $bodyClass = '';
 include 'includes/page-start.php';
@@ -689,12 +689,13 @@ function calculateBooking() {
   const co = document.getElementById('checkout')?.value;
   const roomName = document.getElementById('room_type')?.value;
 
-  if (!ci || !co || !roomName || typeof ROOMS === 'undefined') return;
+  if (!ci || !co || !roomName) return;
 
   const nights = getNights(ci, co);
   if (nights <= 0) return;
 
-  const room = ROOMS.find(r => r.name === roomName);
+  const roomsList = window.SKA_ROOMS || window.ROOMS || [];
+  const room = roomsList.find(r => r.name === roomName);
   if (!room) return;
 
   const month = new Date(ci).getMonth() + 1;
@@ -760,8 +761,10 @@ function calculateBooking() {
   document.getElementById(id)?.addEventListener('change', calculateBooking);
 });
 
-/* Run after autofill */
+document.addEventListener('ska:rooms-ready', calculateBooking);
+/* Run after autofill / when rooms load */
 setTimeout(calculateBooking, 300);
+setTimeout(calculateBooking, 1200);
 </script>
 
 

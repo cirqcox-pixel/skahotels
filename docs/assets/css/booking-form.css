@@ -1,0 +1,183 @@
+/* ═══════════════════════════════════════════════════════════
+   booking-form.css — property page reservation form
+═══════════════════════════════════════════════════════════ */
+
+.booking-section {
+  background: var(--warm-white, #faf8f5);
+  padding: 80px 0 100px;
+}
+
+.booking-title {
+  font-family: var(--ff-display, 'Cormorant Garamond', Georgia, serif);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--text-dark, #1e1e1e);
+  margin-bottom: 8px;
+}
+
+.booking-sub {
+  font-family: var(--ff-body, 'Montserrat', sans-serif);
+  font-size: 15px;
+  color: var(--text-body, #5a5a5a);
+  margin-bottom: 40px;
+}
+
+.booking-form {
+  max-width: 860px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid var(--border, #e0d8ce);
+  border-radius: 12px;
+  padding: 36px 32px 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+}
+
+.form-label-ska {
+  display: block;
+  font-family: var(--ff-body, 'Montserrat', sans-serif);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--charcoal, #3c3c3c);
+  margin-bottom: 8px;
+}
+
+.form-label-ska small {
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--text-body, #5a5a5a);
+}
+
+.ska-input,
+.booking-form .form-control,
+.booking-form .form-select {
+  font-family: var(--ff-body, 'Montserrat', sans-serif);
+  font-size: 14px;
+  color: var(--text-dark, #1e1e1e);
+  background: #fff;
+  border: 1px solid #ddd6cb;
+  border-radius: 8px;
+  padding: 12px 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ska-input:focus,
+.booking-form .form-control:focus,
+.booking-form .form-select:focus {
+  border-color: var(--gold, #c9a96e);
+  box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.15);
+  outline: none;
+}
+
+.ska-input::placeholder {
+  color: #aaa;
+}
+
+.total-price-display {
+  font-family: var(--ff-body, 'Montserrat', sans-serif);
+  font-size: 14px;
+  color: var(--text-body, #5a5a5a);
+  white-space: nowrap;
+}
+
+.total-price-display strong {
+  color: var(--gold-deep, #a8814a);
+  font-size: 16px;
+}
+
+.btn-book-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 260px;
+  padding: 16px 36px;
+  margin-top: 8px;
+  font-family: var(--ff-body, 'Montserrat', sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, #c9a96e 0%, #a8814a 100%);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+  box-shadow: 0 4px 16px rgba(201, 169, 110, 0.35);
+}
+
+.btn-book-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(201, 169, 110, 0.45);
+}
+
+.btn-book-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-book-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Form alerts (ska-forms.js) */
+.booking-form .ska-form-alert {
+  border-radius: 8px;
+  font-family: var(--ff-body, 'Montserrat', sans-serif);
+  font-size: 14px;
+}
+
+/* Booking result notices */
+.booking-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-family: var(--ff-body, 'Montserrat', sans-serif);
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 860px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.booking-notice i {
+  font-size: 18px;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.booking-notice--success {
+  background: #edf7ed;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.booking-notice--warn {
+  background: #fff8e1;
+  color: #7d5c00;
+  border: 1px solid #ffe082;
+}
+
+.booking-notice--error {
+  background: #fdecea;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+@media (max-width: 767px) {
+  .booking-form {
+    padding: 24px 20px 20px;
+  }
+
+  .btn-book-submit {
+    width: 100%;
+    min-width: 0;
+  }
+}

@@ -12,7 +12,13 @@
     if (!global.supabase || !cfg) {
       throw new Error('Supabase SDK or SKA_CONFIG not loaded');
     }
-    client = global.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+    client = global.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    });
     return client;
   }
 
@@ -210,9 +216,37 @@
 
     adminFetchRooms: async function () {
       var sb = getClient();
-      var res = await sb.from('rooms').select('id,name,branch').order('id');
+      var res = await sb.from('rooms').select('*').order('branch').order('id');
       if (res.error) throw new Error(apiError(res.error));
       return res.data || [];
+    },
+
+    adminSaveRoom: async function (room) {
+      var sb = getClient();
+      var payload = {
+        name: room.name,
+        branch: room.branch,
+        price: parseFloat(room.price || 0),
+        price_low: room.price_low != null ? parseFloat(room.price_low) : null,
+        price_shoulder: room.price_shoulder != null ? parseFloat(room.price_shoulder) : null,
+        price_high: room.price_high != null ? parseFloat(room.price_high) : null,
+        description: room.description || null
+      };
+      var res;
+      if (room.id) {
+        res = await sb.from('rooms').update(payload).eq('id', room.id).select().single();
+      } else {
+        res = await sb.from('rooms').insert([payload]).select().single();
+      }
+      if (res.error) throw new Error(apiError(res.error));
+      return res.data;
+    },
+
+    adminDeleteRoom: async function (id) {
+      var sb = getClient();
+      var res = await sb.from('rooms').delete().eq('id', id);
+      if (res.error) throw new Error(apiError(res.error));
+      return true;
     },
 
     adminFetchBookings: async function () {
@@ -222,11 +256,61 @@
       return res.data || [];
     },
 
+    adminUpdateBookingStatus: async function (id, status) {
+      var sb = getClient();
+      var res = await sb.from('bookings').update({ status: status }).eq('id', id).select().single();
+      if (res.error) throw new Error(apiError(res.error));
+      return res.data;
+    },
+
     adminFetchInquiries: async function () {
       var sb = getClient();
       var res = await sb.from('inquiries').select('*').order('created_at', { ascending: false });
       if (res.error) throw new Error(apiError(res.error));
       return res.data || [];
+    },
+
+    adminMarkInquiryRead: async function (id, isRead) {
+      var sb = getClient();
+      var res = await sb.from('inquiries').update({ is_read: !!isRead }).eq('id', id).select().single();
+      if (res.error) throw new Error(apiError(res.error));
+      return res.data;
+    },
+
+    adminFetchPromotions: async function () {
+      var sb = getClient();
+      var res = await sb.from('promotions').select('*').order('sort_order').order('id');
+      if (res.error) throw new Error(apiError(res.error));
+      return res.data || [];
+    },
+
+    adminSavePromotion: async function (promo) {
+      var sb = getClient();
+      var payload = {
+        title: promo.title,
+        description: promo.description || null,
+        discount_type: promo.discount_type || 'percent',
+        discount_value: parseFloat(promo.discount_value || 0),
+        min_nights: parseInt(promo.min_nights || 1, 10),
+        branch: promo.branch || 'Both',
+        active: promo.active === true || promo.active === 'true'
+      };
+      var res;
+      if (promo.id) {
+        payload.updated_at = new Date().toISOString();
+        res = await sb.from('promotions').update(payload).eq('id', promo.id).select().single();
+      } else {
+        res = await sb.from('promotions').insert([payload]).select().single();
+      }
+      if (res.error) throw new Error(apiError(res.error));
+      return res.data;
+    },
+
+    adminDeletePromotion: async function (id) {
+      var sb = getClient();
+      var res = await sb.from('promotions').delete().eq('id', id);
+      if (res.error) throw new Error(apiError(res.error));
+      return true;
     }
   };
 

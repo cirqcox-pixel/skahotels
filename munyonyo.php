@@ -23,7 +23,7 @@ $pageMeta = [
         'starRating'=> ['@type' => 'Rating', 'ratingValue' => $branch['rating'], 'bestRating' => '5'],
     ],
 ];
-$pageStyles = ['assets/css/branch.css', 'assets/css/rooms-section.css'];
+$pageStyles = ['assets/css/branch.css', 'assets/css/rooms-section.css', 'assets/css/booking-form.css'];
 $hideLandingNav = true;
 $bodyClass = '';
 include 'includes/page-start.php';
@@ -711,21 +711,24 @@ function calcFormTotal() {
 document.getElementById('checkin')?.addEventListener('change', calcFormTotal);
 document.getElementById('checkout')?.addEventListener('change', calcFormTotal);
 
-/* When room is chosen manually in the form, try to set price from ROOMS data */
-document.getElementById('room_type')?.addEventListener('change', function() {
-  if (typeof ROOMS === 'undefined') return;
-  const roomName = this.value;
-  const room     = ROOMS.find(r => r.name === roomName);
+/* When room is chosen manually in the form, try to set price from room data */
+function setFormPriceFromRoom() {
+  const sel = document.getElementById('room_type');
+  if (!sel || !sel.value) return;
+  const roomsList = window.SKA_ROOMS || window.ROOMS || [];
+  const room = roomsList.find(r => r.name === sel.value);
   if (!room) return;
-  const month  = new Date().getMonth() + 1;
-  /* use getSeasonKey defined in modals.php */
-  const sk     = typeof getSeasonKey === 'function' ? getSeasonKey(month) : 'low';
-  const col    = sk === 'high' ? 'price_high' : sk === 'shoulder' ? 'price_shoulder' : 'price_low';
-  const nightly= parseFloat(room[col] || room.price || 0);
-  document.getElementById('formPrice').value  = nightly;
+  const month = new Date().getMonth() + 1;
+  const sk = typeof getSeasonKey === 'function' ? getSeasonKey(month) : 'low';
+  const col = sk === 'high' ? 'price_high' : sk === 'shoulder' ? 'price_shoulder' : 'price_low';
+  const nightly = parseFloat(room[col] || room.price || 0);
+  document.getElementById('formPrice').value = nightly;
   document.getElementById('formSeason').value = sk;
   calcFormTotal();
-});
+}
+
+document.getElementById('room_type')?.addEventListener('change', setFormPriceFromRoom);
+document.addEventListener('ska:rooms-ready', setFormPriceFromRoom);
 
 /* Auto-scroll notice into view if redirected with ?booking= */
 (function() {

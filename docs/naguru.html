@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="assets/css/ska-enhancements.css">
 <link rel="stylesheet" href="assets/css/branch.css">
 <link rel="stylesheet" href="assets/css/rooms-section.css">
+<link rel="stylesheet" href="assets/css/booking-form.css">
 <link rel="icon" href="assets/images/favicon.png" type="image/png">
 </head>
 <body class="">
@@ -605,12 +606,13 @@ function calculateBooking() {
   const co = document.getElementById('checkout')?.value;
   const roomName = document.getElementById('room_type')?.value;
 
-  if (!ci || !co || !roomName || typeof ROOMS === 'undefined') return;
+  if (!ci || !co || !roomName) return;
 
   const nights = getNights(ci, co);
   if (nights <= 0) return;
 
-  const room = (window.SKA_ROOMS||[]).find(r => r.name === roomName);
+  const roomsList = window.SKA_ROOMS || window.ROOMS || [];
+  const room = roomsList.find(r => r.name === roomName);
   if (!room) return;
 
   const month = new Date(ci).getMonth() + 1;
@@ -676,8 +678,10 @@ function calculateBooking() {
   document.getElementById(id)?.addEventListener('change', calculateBooking);
 });
 
-/* Run after autofill */
+document.addEventListener('ska:rooms-ready', calculateBooking);
+/* Run after autofill / when rooms load */
 setTimeout(calculateBooking, 300);
+setTimeout(calculateBooking, 1200);
 </script>
 
 

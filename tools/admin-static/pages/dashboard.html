@@ -1,49 +1,3 @@
-<!DOCTYPE html>
-<html lang="en" data-ska-static="true">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
-  <title>Dashboard | SKA Admin</title>
-  <link rel="icon" href="../assets/images/favicon.png" type="image/png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="assets/admin.css">
-</head>
-<body data-admin-page="dashboard">
-
-<aside class="ska-sidebar" id="skaSidebar">
-  <div class="ska-sidebar__brand">
-    <div class="ska-sidebar__brand-name">SKA <span>Admin</span></div>
-    <div class="ska-sidebar__brand-sub">GitHub Pages CMS</div>
-  </div>
-  <nav class="ska-sidebar__nav">
-    <div class="ska-nav-label">Main</div>
-    <a href="dashboard.html" class="ska-nav-link active"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
-    <a href="../index.html" class="ska-nav-link" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Website</a>
-
-    <div class="ska-nav-label">Property</div>
-    <a href="rooms.html" class="ska-nav-link"><i class="fa-solid fa-bed"></i> Rooms</a>
-    <a href="promotions.html" class="ska-nav-link"><i class="fa-solid fa-tag"></i> Promotions</a>
-    <a href="bookings.html" class="ska-nav-link"><i class="fa-solid fa-calendar-days"></i> Bookings</a>
-
-    <div class="ska-nav-label">Content</div>
-    <a href="inquiries.html" class="ska-nav-link"><i class="fa-solid fa-envelope"></i> Inquiries</a>
-  </nav>
-  <div class="ska-sidebar__footer">
-    <div class="ska-sidebar__avatar"><i class="fa-solid fa-user"></i></div>
-    <div>
-      <div class="ska-sidebar__user-name" id="adminUserEmail">Admin</div>
-      <div class="ska-sidebar__user-role">Supabase Auth</div>
-    </div>
-    <button type="button" class="ska-sidebar__logout" id="adminLogout" title="Sign out">
-      <i class="fa-solid fa-arrow-right-from-bracket"></i>
-    </button>
-  </div>
-</aside>
-
 <div class="ska-main">
   <header class="ska-topbar">
     <div class="ska-topbar__left">
@@ -138,10 +92,3 @@
     </div>
   </main>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../assets/js/ska-config.js"></script>
-<script src="../assets/js/ska-api.js"></script>
-<script src="../assets/js/ska-admin.js"></script>
-</body>
-</html>

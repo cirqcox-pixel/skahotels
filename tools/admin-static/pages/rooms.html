@@ -1,0 +1,91 @@
+<div class="ska-main">
+  <header class="ska-topbar">
+    <div class="ska-topbar__left">
+      <div class="ska-topbar__title">Rooms</div>
+      <div class="ska-topbar__breadcrumb">Manage room types and pricing</div>
+    </div>
+    <div class="ska-topbar__right">
+      <button type="button" class="ska-btn ska-btn--primary" id="btnAddRoom">
+        <i class="fa-solid fa-plus"></i> Add Room
+      </button>
+    </div>
+  </header>
+
+  <main class="ska-content">
+    <div id="adminError" class="ska-alert ska-alert--danger" style="display:none;margin-bottom:20px;" role="alert"></div>
+    <div id="adminToast" class="ska-alert ska-alert--success" style="display:none;margin-bottom:20px;" role="status"></div>
+
+    <div class="ska-card">
+      <div class="ska-card__header">
+        <h2 class="ska-card__title">Room <span>Inventory</span></h2>
+      </div>
+      <div class="ska-card__body">
+        <table class="ska-table">
+          <thead>
+            <tr>
+              <th>Room</th>
+              <th>Branch</th>
+              <th>Low</th>
+              <th>Shoulder</th>
+              <th>High</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="roomsTableBody">
+            <tr><td colspan="6" class="ska-table-empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Room modal -->
+<div class="ska-modal-backdrop" id="roomModal">
+  <div class="ska-modal" role="dialog" aria-labelledby="roomModalTitle">
+    <div class="ska-modal__header">
+      <h3 class="ska-modal__title" id="roomModalTitle">Add Room</h3>
+      <button type="button" class="ska-modal__close" id="roomModalClose" aria-label="Close">&times;</button>
+    </div>
+    <form id="roomForm" class="ska-modal__body">
+      <input type="hidden" id="roomId" name="id">
+      <div class="ska-form-grid">
+        <div class="ska-form-field">
+          <label for="roomName">Room name</label>
+          <input type="text" id="roomName" name="name" class="ska-input" required>
+        </div>
+        <div class="ska-form-field">
+          <label for="roomBranch">Branch</label>
+          <select id="roomBranch" name="branch" class="ska-input" required>
+            <option value="Naguru">Naguru</option>
+            <option value="Munyonyo">Munyonyo</option>
+          </select>
+        </div>
+        <div class="ska-form-field">
+          <label for="roomPrice">Base price (USD)</label>
+          <input type="number" id="roomPrice" name="price" class="ska-input" min="0" step="1" required>
+        </div>
+        <div class="ska-form-field">
+          <label for="roomPriceLow">Low season</label>
+          <input type="number" id="roomPriceLow" name="price_low" class="ska-input" min="0" step="1">
+        </div>
+        <div class="ska-form-field">
+          <label for="roomPriceShoulder">Shoulder season</label>
+          <input type="number" id="roomPriceShoulder" name="price_shoulder" class="ska-input" min="0" step="1">
+        </div>
+        <div class="ska-form-field">
+          <label for="roomPriceHigh">High season</label>
+          <input type="number" id="roomPriceHigh" name="price_high" class="ska-input" min="0" step="1">
+        </div>
+        <div class="ska-form-field ska-form-field--full">
+          <label for="roomDesc">Description</label>
+          <textarea id="roomDesc" name="description" class="ska-input" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="ska-modal__footer">
+        <button type="button" class="ska-btn ska-btn--ghost" id="roomModalCancel">Cancel</button>
+        <button type="submit" class="ska-btn ska-btn--primary">Save Room</button>
+      </div>
+    </form>
+  </div>
+</div>

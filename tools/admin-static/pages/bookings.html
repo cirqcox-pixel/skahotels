@@ -1,0 +1,51 @@
+<div class="ska-main">
+  <header class="ska-topbar">
+    <div class="ska-topbar__left">
+      <div class="ska-topbar__title">Bookings</div>
+      <div class="ska-topbar__breadcrumb">Manage guest reservations</div>
+    </div>
+  </header>
+
+  <main class="ska-content">
+    <div id="adminError" class="ska-alert ska-alert--danger" style="display:none;margin-bottom:20px;" role="alert"></div>
+    <div id="adminToast" class="ska-alert ska-alert--success" style="display:none;margin-bottom:20px;" role="status"></div>
+
+    <div class="ska-toolbar" style="margin-bottom:20px;display:flex;gap:12px;flex-wrap:wrap;">
+      <select id="filterStatus" class="ska-input ska-input--sm">
+        <option value="all">All statuses</option>
+        <option value="pending">Pending</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <select id="filterBranch" class="ska-input ska-input--sm">
+        <option value="all">All properties</option>
+        <option value="Naguru">Naguru</option>
+        <option value="Munyonyo">Munyonyo</option>
+      </select>
+    </div>
+
+    <div class="ska-card">
+      <div class="ska-card__header">
+        <h2 class="ska-card__title">All <span>Bookings</span></h2>
+      </div>
+      <div class="ska-card__body">
+        <table class="ska-table">
+          <thead>
+            <tr>
+              <th>Guest</th>
+              <th>Property</th>
+              <th>Room</th>
+              <th>Dates</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="bookingsTableBody">
+            <tr><td colspan="7" class="ska-table-empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
