@@ -32,10 +32,86 @@ const PROMO_CARDS = `
           <img src="assets/images/ska_furniture_home.jpg" alt="Stay 3 Nights Pay for 2" class="lp-promo-img" loading="lazy">
           <div class="lp-promo-card-label"><span>Stay 3 Nights, Pay for 2</span><i class="fa-solid fa-chevron-right"></i></div>
         </a>
+        <a href="offers.html" class="lp-promo-card">
+          <img src="assets/images/ska_munyonyo_home2.jpg" alt="Direct Booking Bonus" class="lp-promo-img" loading="lazy">
+          <div class="lp-promo-card-label"><span>Direct Booking Bonus</span><i class="fa-solid fa-chevron-right"></i></div>
+        </a>
         <a href="munyonyo.html#book" class="lp-promo-card">
           <img src="assets/images/ska_munyonyo_home2.jpg" alt="Munyonyo Lakeside Weekend" class="lp-promo-img" loading="lazy">
           <div class="lp-promo-card-label"><span>Munyonyo Lakeside Weekend</span><i class="fa-solid fa-chevron-right"></i></div>
         </a>`;
+
+const OFFERS_PAGE_BODY = `
+<section class="ska-page-hero">
+  <div class="ska-page-hero__bg" style="background-image:url('assets/images/ska_naguru_home.jpeg');opacity:.45"></div>
+  <div class="container">
+    <p class="ska-page-hero__eyebrow">Deals &amp; Packages</p>
+    <h1 class="ska-page-hero__title">Get Away, Get More</h1>
+    <p class="ska-page-hero__sub">Book direct for our best rates — free breakfast, Wi-Fi, and flexible check-in included with every reservation.</p>
+  </div>
+</section>
+<section class="ska-page-body">
+  <div class="container" style="max-width:1140px">
+    <div class="ska-grid-3" id="offersGrid">
+      <article class="ska-feature-card">
+        <div class="ska-feature-card__img" style="background-image:url('assets/images/ska_naguru_home.jpeg')"></div>
+        <div class="ska-feature-card__body">
+          <p class="ska-feature-card__tag">Best Rate Guarantee</p>
+          <h2 class="ska-feature-card__title">Book Direct &amp; Save</h2>
+          <p class="ska-feature-card__text">Our lowest prices are always here. Free Wi-Fi, breakfast, and flexible cancellation when you book on our website.</p>
+          <a href="index.html#book-search" class="ska-btn-gold">Book Now <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </article>
+      <article class="ska-feature-card">
+        <div class="ska-feature-card__img" style="background-image:url('assets/images/ska_art_home.jpg')"></div>
+        <div class="ska-feature-card__body">
+          <p class="ska-feature-card__tag">Early Bird</p>
+          <h2 class="ska-feature-card__title">Book 7 Days Early</h2>
+          <p class="ska-feature-card__text">Plan ahead and unlock exclusive savings when you reserve at least seven days before arrival.</p>
+          <a href="naguru.html#book" class="ska-btn-gold">Book Now <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </article>
+      <article class="ska-feature-card">
+        <div class="ska-feature-card__img" style="background-image:url('assets/images/ska_furniture_home.jpg')"></div>
+        <div class="ska-feature-card__body">
+          <p class="ska-feature-card__tag">Extended Stay</p>
+          <h2 class="ska-feature-card__title">Stay 3 Nights, Pay for 2</h2>
+          <p class="ska-feature-card__text">Celebrate longer stays — enjoy three nights and only pay for two at either property.</p>
+          <a href="index.html#book-search" class="ska-btn-gold">Book Now <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </article>
+      <article class="ska-feature-card">
+        <div class="ska-feature-card__img" style="background-image:url('assets/images/ska_munyonyo_home2.jpg')"></div>
+        <div class="ska-feature-card__body">
+          <p class="ska-feature-card__tag">Member Perk</p>
+          <h2 class="ska-feature-card__title">Direct Booking Bonus</h2>
+          <p class="ska-feature-card__text">Extra value when you book with us — complimentary upgrades subject to availability and welcome treats.</p>
+          <a href="loyalty.html" class="ska-btn-gold">Learn More <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </article>
+      <article class="ska-feature-card">
+        <div class="ska-feature-card__img" style="background-image:url('assets/images/ska_munyonyo_home2.jpg')"></div>
+        <div class="ska-feature-card__body">
+          <p class="ska-feature-card__tag">Weekend Escape</p>
+          <h2 class="ska-feature-card__title">Munyonyo Lakeside Weekend</h2>
+          <p class="ska-feature-card__text">Unwind by the lake with a weekend package at SKA Munyonyo — serene gardens and boutique comfort.</p>
+          <a href="munyonyo.html#book" class="ska-btn-gold">Book Now <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+<section class="ska-cta-band">
+  <div class="container">
+    <h2>Ready to experience SKA?</h2>
+    <p>Two distinctive properties. One standard of excellence.</p>
+    <div class="ska-cta-band__btns">
+      <a href="naguru.html" class="ska-btn-gold">Explore Naguru</a>
+      <a href="munyonyo.html" class="ska-btn-outline" style="border-color:#fff;color:#fff">Explore Munyonyo</a>
+    </div>
+  </div>
+</section>
+`;
 
 const PROPERTY_DEFAULTS = {
   naguru: {
@@ -182,7 +258,7 @@ function fixIndex(body) {
   );
   body = body.replace(
     /<div class="lp-promo-dots" id="promoDots">[\s\S]*?<\/div>/,
-    `<div class="lp-promo-dots" id="promoDots"><span class="lp-promo-dot active"></span><span class="lp-promo-dot"></span><span class="lp-promo-dot"></span><span class="lp-promo-dot"></span></div>`
+    `<div class="lp-promo-dots" id="promoDots"><span class="lp-promo-dot active"></span><span class="lp-promo-dot"></span><span class="lp-promo-dot"></span><span class="lp-promo-dot"></span><span class="lp-promo-dot"></span></div>`
   );
   return body;
 }
@@ -332,6 +408,7 @@ function buildPage(name, meta) {
   let body = stripPhp(fs.readFileSync(src, 'utf8')).trim();
   body = fixPaths(body);
   if (name === 'index') body = fixIndex(body);
+  if (name === 'offers') body = OFFERS_PAGE_BODY;
   if (meta.property) body = fixProperty(body, meta.property);
 
   const extraCss = (meta.css || [])

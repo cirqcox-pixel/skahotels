@@ -350,8 +350,11 @@ function handleFindRooms(e) {
     return false;
   }
 
-  const pages = { naguru: 'naguru.php', munyonyo: 'munyonyo.php' };
-  let url = pages[property] + '?checkin=' + encodeURIComponent(checkin) + '&checkout=' + encodeURIComponent(checkout) + '#rooms';
+  const isStatic = (window.SKA_CONFIG && SKA_CONFIG.isStaticHost && SKA_CONFIG.isStaticHost()) ||
+    document.documentElement.dataset.skaStatic === 'true';
+  const ext = isStatic ? '.html' : '.php';
+  const pages = { naguru: 'naguru' + ext, munyonyo: 'munyonyo' + ext };
+  let url = pages[property] + '?checkin=' + encodeURIComponent(checkin) + '&checkout=' + encodeURIComponent(checkout) + '#book';
   window.location.href = url;
   return false;
 }
@@ -362,28 +365,50 @@ document.getElementById('heroBookBtn').addEventListener('click', function(e) {
 });
 
 (function() {
-  const track = document.getElementById('promoTrack');
-  if (!track) return;
-  const dots  = document.querySelectorAll('.lp-promo-dot');
-  const cards = track.querySelectorAll('.lp-promo-card');
-  if (!cards.length) return;
-  let idx = 0;
-  const VIS = window.innerWidth < 768 ? 1 : 3;
-  const MAX = Math.max(0, cards.length - VIS);
+  function bindPromoSlider() {
+    const track = document.getElementById('promoTrack');
+    if (!track) return;
+    const dots  = document.querySelectorAll('.lp-promo-dot');
+    const cards = track.querySelectorAll('.lp-promo-card');
+    if (!cards.length) return;
+    let idx = 0;
+    const VIS = window.innerWidth < 768 ? 1 : 3;
+    const MAX = Math.max(0, cards.length - VIS);
 
-  function step() {
-    const cardW = cards[0].offsetWidth + 24;
-    track.style.transform = 'translateX(-' + (idx * cardW) + 'px)';
-    dots.forEach(function(d, i) { d.classList.toggle('active', i === idx); });
+    function step() {
+      const cardW = cards[0].offsetWidth + 24;
+      track.style.transform = 'translateX(-' + (idx * cardW) + 'px)';
+      dots.forEach(function(d, i) { d.classList.toggle('active', i === idx); });
+    }
+
+    const nextBtn = document.getElementById('promoNext');
+    if (nextBtn && !nextBtn.dataset.bound) {
+      nextBtn.dataset.bound = '1';
+      nextBtn.addEventListener('click', function() {
+        idx = idx >= MAX ? 0 : idx + 1;
+        step();
+      });
+    }
+    dots.forEach(function(d, i) {
+      if (d.dataset.bound) return;
+      d.dataset.bound = '1';
+      d.addEventListener('click', function() { idx = i; step(); });
+    });
+    if (!track.dataset.autoplay) {
+      track.dataset.autoplay = '1';
+      setInterval(function() {
+        const c = track.querySelectorAll('.lp-promo-card');
+        const max = Math.max(0, c.length - (window.innerWidth < 768 ? 1 : 3));
+        idx = idx >= max ? 0 : idx + 1;
+        step();
+      }, 6000);
+    }
+    window.addEventListener('resize', step);
+    step();
   }
 
-  document.getElementById('promoNext').addEventListener('click', function() {
-    idx = idx >= MAX ? 0 : idx + 1;
-    step();
-  });
-  dots.forEach(function(d, i) { d.addEventListener('click', function() { idx = i; step(); }); });
-  setInterval(function() { idx = idx >= MAX ? 0 : idx + 1; step(); }, 6000);
-  window.addEventListener('resize', step);
+  bindPromoSlider();
+  document.addEventListener('ska:promos-ready', bindPromoSlider);
 })();
 </script>
 

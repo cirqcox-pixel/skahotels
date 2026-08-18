@@ -64,15 +64,22 @@
     ]);
   }
 
+  function failTable(tbodyId, cols, msg) {
+    var el = document.getElementById(tbodyId);
+    if (el) {
+      el.innerHTML = '<tr><td colspan="' + cols + '" class="ska-table-empty">' + esc(msg) + '</td></tr>';
+    }
+  }
+
   async function requireAuth() {
     if (!window.SkaApi) {
       showError('Admin scripts failed to load. Refresh the page.');
       return null;
     }
     try {
-      var session = await withTimeout(SkaApi.adminSession(), 10000);
+      var session = await withTimeout(SkaApi.adminSession(), 12000);
       if (!session) {
-        location.href = 'login.html';
+        location.href = 'login.html?reason=session';
         return null;
       }
       var emailEl = document.getElementById('adminUserEmail');
@@ -82,16 +89,29 @@
       return session;
     } catch (e) {
       showError(e.message || 'Authentication failed');
+      setTimeout(function () { location.href = 'login.html?reason=auth'; }, 2000);
       return null;
     }
+  }
+
+  async function ensureAuth(tbodyId, cols) {
+    var session = await requireAuth();
+    if (!session) {
+      if (tbodyId) failTable(tbodyId, cols, 'Sign in required — redirecting…');
+      return null;
+    }
+    return session;
   }
 
   /* ── Dashboard ── */
   async function loadDashboard() {
     if (!document.getElementById('statRooms')) return;
 
-    var session = await requireAuth();
-    if (!session) return;
+    var session = await ensureAuth('bookingsBody', 6);
+    if (!session) {
+      failTable('inquiriesBody', 5, 'Sign in required — redirecting…');
+      return;
+    }
 
     hideError();
     try {
@@ -197,7 +217,7 @@
 
   async function loadBookingsPage() {
     if (!document.getElementById('bookingsTableBody')) return;
-    var session = await requireAuth();
+    var session = await ensureAuth('bookingsTableBody', 7);
     if (!session) return;
 
     hideError();
@@ -242,7 +262,7 @@
   async function loadRoomsPage() {
     var tbody = document.getElementById('roomsTableBody');
     if (!tbody) return;
-    var session = await requireAuth();
+    var session = await ensureAuth('roomsTableBody', 6);
     if (!session) return;
 
     hideError();
@@ -332,7 +352,7 @@
   async function loadPromotionsPage() {
     var tbody = document.getElementById('promosTableBody');
     if (!tbody) return;
-    var session = await requireAuth();
+    var session = await ensureAuth('promosTableBody', 6);
     if (!session) return;
 
     hideError();
@@ -428,7 +448,7 @@
   async function loadInquiriesPage() {
     var tbody = document.getElementById('inquiriesTableBody');
     if (!tbody) return;
-    var session = await requireAuth();
+    var session = await ensureAuth('inquiriesTableBody', 7);
     if (!session) return;
 
     hideError();

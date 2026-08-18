@@ -231,13 +231,17 @@
           <img src="assets/images/ska_furniture_home.jpg" alt="Stay 3 Nights Pay for 2" class="lp-promo-img" loading="lazy">
           <div class="lp-promo-card-label"><span>Stay 3 Nights, Pay for 2</span><i class="fa-solid fa-chevron-right"></i></div>
         </a>
+        <a href="offers.html" class="lp-promo-card">
+          <img src="assets/images/ska_munyonyo_home2.jpg" alt="Direct Booking Bonus" class="lp-promo-img" loading="lazy">
+          <div class="lp-promo-card-label"><span>Direct Booking Bonus</span><i class="fa-solid fa-chevron-right"></i></div>
+        </a>
         <a href="munyonyo.html#book" class="lp-promo-card">
           <img src="assets/images/ska_munyonyo_home2.jpg" alt="Munyonyo Lakeside Weekend" class="lp-promo-img" loading="lazy">
           <div class="lp-promo-card-label"><span>Munyonyo Lakeside Weekend</span><i class="fa-solid fa-chevron-right"></i></div>
         </a>
       </div>
       <button class="lp-promo-next" id="promoNext" aria-label="Next offers"><i class="fa-solid fa-chevron-right"></i></button>
-      <div class="lp-promo-dots" id="promoDots"><span class="lp-promo-dot active"></span><span class="lp-promo-dot"></span><span class="lp-promo-dot"></span><span class="lp-promo-dot"></span></div>
+      <div class="lp-promo-dots" id="promoDots"><span class="lp-promo-dot active"></span><span class="lp-promo-dot"></span><span class="lp-promo-dot"></span><span class="lp-promo-dot"></span><span class="lp-promo-dot"></span></div>
     </div>
   </div>
 </section>
@@ -392,8 +396,11 @@ function handleFindRooms(e) {
     return false;
   }
 
-  const pages = { naguru: 'naguru.html', munyonyo: 'munyonyo.html' };
-  let url = pages[property] + '?checkin=' + encodeURIComponent(checkin) + '&checkout=' + encodeURIComponent(checkout) + '#rooms';
+  const isStatic = (window.SKA_CONFIG && SKA_CONFIG.isStaticHost && SKA_CONFIG.isStaticHost()) ||
+    document.documentElement.dataset.skaStatic === 'true';
+  const ext = isStatic ? '.html' : '.html';
+  const pages = { naguru: 'naguru' + ext, munyonyo: 'munyonyo' + ext };
+  let url = pages[property] + '?checkin=' + encodeURIComponent(checkin) + '&checkout=' + encodeURIComponent(checkout) + '#book';
   window.location.href = url;
   return false;
 }
@@ -404,28 +411,50 @@ document.getElementById('heroBookBtn').addEventListener('click', function(e) {
 });
 
 (function() {
-  const track = document.getElementById('promoTrack');
-  if (!track) return;
-  const dots  = document.querySelectorAll('.lp-promo-dot');
-  const cards = track.querySelectorAll('.lp-promo-card');
-  if (!cards.length) return;
-  let idx = 0;
-  const VIS = window.innerWidth < 768 ? 1 : 3;
-  const MAX = Math.max(0, cards.length - VIS);
+  function bindPromoSlider() {
+    const track = document.getElementById('promoTrack');
+    if (!track) return;
+    const dots  = document.querySelectorAll('.lp-promo-dot');
+    const cards = track.querySelectorAll('.lp-promo-card');
+    if (!cards.length) return;
+    let idx = 0;
+    const VIS = window.innerWidth < 768 ? 1 : 3;
+    const MAX = Math.max(0, cards.length - VIS);
 
-  function step() {
-    const cardW = cards[0].offsetWidth + 24;
-    track.style.transform = 'translateX(-' + (idx * cardW) + 'px)';
-    dots.forEach(function(d, i) { d.classList.toggle('active', i === idx); });
+    function step() {
+      const cardW = cards[0].offsetWidth + 24;
+      track.style.transform = 'translateX(-' + (idx * cardW) + 'px)';
+      dots.forEach(function(d, i) { d.classList.toggle('active', i === idx); });
+    }
+
+    const nextBtn = document.getElementById('promoNext');
+    if (nextBtn && !nextBtn.dataset.bound) {
+      nextBtn.dataset.bound = '1';
+      nextBtn.addEventListener('click', function() {
+        idx = idx >= MAX ? 0 : idx + 1;
+        step();
+      });
+    }
+    dots.forEach(function(d, i) {
+      if (d.dataset.bound) return;
+      d.dataset.bound = '1';
+      d.addEventListener('click', function() { idx = i; step(); });
+    });
+    if (!track.dataset.autoplay) {
+      track.dataset.autoplay = '1';
+      setInterval(function() {
+        const c = track.querySelectorAll('.lp-promo-card');
+        const max = Math.max(0, c.length - (window.innerWidth < 768 ? 1 : 3));
+        idx = idx >= max ? 0 : idx + 1;
+        step();
+      }, 6000);
+    }
+    window.addEventListener('resize', step);
+    step();
   }
 
-  document.getElementById('promoNext').addEventListener('click', function() {
-    idx = idx >= MAX ? 0 : idx + 1;
-    step();
-  });
-  dots.forEach(function(d, i) { d.addEventListener('click', function() { idx = i; step(); }); });
-  setInterval(function() { idx = idx >= MAX ? 0 : idx + 1; step(); }, 6000);
-  window.addEventListener('resize', step);
+  bindPromoSlider();
+  document.addEventListener('ska:promos-ready', bindPromoSlider);
 })();
 </script>
 <link rel="stylesheet" href="assets/css/footer.css">

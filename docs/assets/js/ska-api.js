@@ -28,7 +28,31 @@
 
   function apiError(err) {
     console.error('[SKA API]', err);
-    return err && err.message ? err.message : 'Request failed';
+    var msg = err && err.message ? err.message : 'Request failed';
+    if (err && (err.code === 'PGRST301' || err.status === 401)) {
+      return 'Session expired — please sign in again.';
+    }
+    return msg;
+  }
+
+  function isAuthError(err) {
+    if (!err) return false;
+    if (err.status === 401 || err.code === 'PGRST301') return true;
+    var msg = (err.message || '').toLowerCase();
+    return msg.indexOf('jwt') >= 0 || msg.indexOf('expired') >= 0 || msg.indexOf('invalid') >= 0;
+  }
+
+  async function adminRequest(queryFn) {
+    var sb = getClient();
+    var res = await queryFn(sb);
+    if (res.error && isAuthError(res.error)) {
+      var refreshed = await sb.auth.refreshSession();
+      if (!refreshed.error && refreshed.data.session) {
+        res = await queryFn(getClient());
+      }
+    }
+    if (res.error) throw new Error(apiError(res.error));
+    return res.data;
   }
 
   var SkaApi = {
@@ -210,19 +234,32 @@
 
     adminSession: async function () {
       var sb = getClient();
-      var res = await sb.auth.getSession();
-      return res.data && res.data.session;
+      var sessRes = await sb.auth.getSession();
+      var session = sessRes.data && sessRes.data.session;
+      if (!session) return null;
+
+      var exp = session.expires_at;
+      if (exp && exp * 1000 < Date.now() + 120000) {
+        var ref = await sb.auth.refreshSession();
+        if (ref.data && ref.data.session) session = ref.data.session;
+      }
+
+      var userRes = await sb.auth.getUser();
+      if (userRes.error || !userRes.data.user) {
+        await sb.auth.signOut();
+        return null;
+      }
+      return session;
     },
 
     adminFetchRooms: async function () {
-      var sb = getClient();
-      var res = await sb.from('rooms').select('*').order('branch').order('id');
-      if (res.error) throw new Error(apiError(res.error));
-      return res.data || [];
+      var data = await adminRequest(function (sb) {
+        return sb.from('rooms').select('*').order('branch').order('id');
+      });
+      return data || [];
     },
 
     adminSaveRoom: async function (room) {
-      var sb = getClient();
       var payload = {
         name: room.name,
         branch: room.branch,
@@ -232,60 +269,57 @@
         price_high: room.price_high != null ? parseFloat(room.price_high) : null,
         description: room.description || null
       };
-      var res;
       if (room.id) {
-        res = await sb.from('rooms').update(payload).eq('id', room.id).select().single();
-      } else {
-        res = await sb.from('rooms').insert([payload]).select().single();
+        return adminRequest(function (sb) {
+          return sb.from('rooms').update(payload).eq('id', room.id).select().single();
+        });
       }
-      if (res.error) throw new Error(apiError(res.error));
-      return res.data;
+      return adminRequest(function (sb) {
+        return sb.from('rooms').insert([payload]).select().single();
+      });
     },
 
     adminDeleteRoom: async function (id) {
-      var sb = getClient();
-      var res = await sb.from('rooms').delete().eq('id', id);
-      if (res.error) throw new Error(apiError(res.error));
+      await adminRequest(function (sb) {
+        return sb.from('rooms').delete().eq('id', id);
+      });
       return true;
     },
 
     adminFetchBookings: async function () {
-      var sb = getClient();
-      var res = await sb.from('bookings').select('*').order('created_at', { ascending: false });
-      if (res.error) throw new Error(apiError(res.error));
-      return res.data || [];
+      var data = await adminRequest(function (sb) {
+        return sb.from('bookings').select('*').order('created_at', { ascending: false });
+      });
+      return data || [];
     },
 
     adminUpdateBookingStatus: async function (id, status) {
-      var sb = getClient();
-      var res = await sb.from('bookings').update({ status: status }).eq('id', id).select().single();
-      if (res.error) throw new Error(apiError(res.error));
-      return res.data;
+      return adminRequest(function (sb) {
+        return sb.from('bookings').update({ status: status }).eq('id', id).select().single();
+      });
     },
 
     adminFetchInquiries: async function () {
-      var sb = getClient();
-      var res = await sb.from('inquiries').select('*').order('created_at', { ascending: false });
-      if (res.error) throw new Error(apiError(res.error));
-      return res.data || [];
+      var data = await adminRequest(function (sb) {
+        return sb.from('inquiries').select('*').order('created_at', { ascending: false });
+      });
+      return data || [];
     },
 
     adminMarkInquiryRead: async function (id, isRead) {
-      var sb = getClient();
-      var res = await sb.from('inquiries').update({ is_read: !!isRead }).eq('id', id).select().single();
-      if (res.error) throw new Error(apiError(res.error));
-      return res.data;
+      return adminRequest(function (sb) {
+        return sb.from('inquiries').update({ is_read: !!isRead }).eq('id', id).select().single();
+      });
     },
 
     adminFetchPromotions: async function () {
-      var sb = getClient();
-      var res = await sb.from('promotions').select('*').order('sort_order').order('id');
-      if (res.error) throw new Error(apiError(res.error));
-      return res.data || [];
+      var data = await adminRequest(function (sb) {
+        return sb.from('promotions').select('*').order('sort_order').order('id');
+      });
+      return data || [];
     },
 
     adminSavePromotion: async function (promo) {
-      var sb = getClient();
       var payload = {
         title: promo.title,
         description: promo.description || null,
@@ -295,21 +329,21 @@
         branch: promo.branch || 'Both',
         active: promo.active === true || promo.active === 'true'
       };
-      var res;
       if (promo.id) {
         payload.updated_at = new Date().toISOString();
-        res = await sb.from('promotions').update(payload).eq('id', promo.id).select().single();
-      } else {
-        res = await sb.from('promotions').insert([payload]).select().single();
+        return adminRequest(function (sb) {
+          return sb.from('promotions').update(payload).eq('id', promo.id).select().single();
+        });
       }
-      if (res.error) throw new Error(apiError(res.error));
-      return res.data;
+      return adminRequest(function (sb) {
+        return sb.from('promotions').insert([payload]).select().single();
+      });
     },
 
     adminDeletePromotion: async function (id) {
-      var sb = getClient();
-      var res = await sb.from('promotions').delete().eq('id', id);
-      if (res.error) throw new Error(apiError(res.error));
+      await adminRequest(function (sb) {
+        return sb.from('promotions').delete().eq('id', id);
+      });
       return true;
     }
   };
