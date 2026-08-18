@@ -16,8 +16,8 @@ window.SKA_CONFIG = {
    * 3. Paste IDs below. Same ID for both is fine if you prefer one inbox.
    */
   formspree: {
-    booking: '',   // e.g. 'xyzeabcd'
-    inquiry: ''    // e.g. 'wqazplmn'
+    booking: 'myegbgjy',
+    inquiry: 'myegbgjy'
   },
 
   /**
