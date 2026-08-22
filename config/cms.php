@@ -81,6 +81,88 @@ function cms_bootstrap(): void
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
+    // ── Rooms / bookings / promotions / admins ──────────────────────────────
+    // These are referenced by public pages (rooms, promotions, gallery) and the
+    // booking forms. Self-healing here means the site works on a fresh cPanel
+    // MySQL database without a manual import. See database/schema_mysql.sql for
+    // the canonical, importable version (identical columns).
+    $c->query("CREATE TABLE IF NOT EXISTS rooms (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        price DECIMAL(10,2) NOT NULL DEFAULT 0,
+        price_low DECIMAL(10,2) DEFAULT NULL,
+        price_shoulder DECIMAL(10,2) DEFAULT NULL,
+        price_high DECIMAL(10,2) DEFAULT NULL,
+        description TEXT,
+        branch VARCHAR(50) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_rooms_branch (branch)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    $c->query("CREATE TABLE IF NOT EXISTS room_images (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        room_id INT NOT NULL,
+        image_path VARCHAR(500) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_room_images_room (room_id),
+        CONSTRAINT fk_room_images_room FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    $c->query("CREATE TABLE IF NOT EXISTS room_amenities (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        room_id INT NOT NULL,
+        icon_class VARCHAR(120) DEFAULT NULL,
+        name VARCHAR(120) NOT NULL,
+        INDEX idx_room_amenities_room (room_id),
+        CONSTRAINT fk_room_amenities_room FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    $c->query("CREATE TABLE IF NOT EXISTS bookings (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        phone VARCHAR(50) DEFAULT NULL,
+        whatsapp VARCHAR(50) DEFAULT NULL,
+        room_type VARCHAR(255) NOT NULL,
+        price DECIMAL(10,2) DEFAULT 0,
+        checkin DATE NOT NULL,
+        checkout DATE NOT NULL,
+        total DECIMAL(10,2) DEFAULT 0,
+        message TEXT,
+        season VARCHAR(20) DEFAULT 'low',
+        branch VARCHAR(50) NOT NULL,
+        status VARCHAR(20) NOT NULL DEFAULT 'pending',
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_bookings_status (status),
+        INDEX idx_bookings_branch (branch)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    $c->query("CREATE TABLE IF NOT EXISTS promotions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        tag VARCHAR(120) DEFAULT NULL,
+        description TEXT,
+        discount_type VARCHAR(20) DEFAULT 'percent',
+        discount_value DECIMAL(10,2) DEFAULT 0,
+        min_nights INT DEFAULT 1,
+        branch VARCHAR(50) DEFAULT 'Both',
+        image VARCHAR(500) DEFAULT NULL,
+        booking_url VARCHAR(500) DEFAULT NULL,
+        active TINYINT(1) NOT NULL DEFAULT 1,
+        valid_from DATE DEFAULT NULL,
+        valid_to DATE DEFAULT NULL,
+        sort_order INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    $c->query("CREATE TABLE IF NOT EXISTS admins (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(100) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
     cms_seed_defaults($c);
 }
 
