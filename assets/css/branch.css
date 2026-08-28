@@ -453,8 +453,17 @@ a { text-decoration: none; }
   .flex-months        { grid-template-columns: repeat(3,1fr); }
   .dm-info            { flex-direction: column; }
   .hero-cta-group     { flex-direction: column; align-items: center; }
+  .hero-cta-group a,
+  .btn-hero-primary,
+  .btn-hero-outline {
+    width: min(100%, 320px);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
   .amenities-tabs     { overflow-x: auto; flex-wrap: nowrap; }
-  .am-tab             { white-space: nowrap; }
+  .am-tab             { white-space: nowrap; min-height: 44px; }
   .marketplace-inner  { flex-direction: column; }
   .marketplace-text   { flex: none; padding: 50px 28px; }
   .marketplace-image  { min-height: 240px; flex: none; }
@@ -464,4 +473,6 @@ a { text-decoration: none; }
 
   .gh-text            { flex: none; }
   .gh-map             { min-height: 240px; width: 100%; }
+  .hero { min-height: 70svh; height: auto; padding: 80px 16px 48px; }
+  .hero-content h1 { font-size: clamp(2rem, 8vw, 2.6rem); }
 }

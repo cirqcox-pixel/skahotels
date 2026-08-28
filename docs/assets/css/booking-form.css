@@ -172,12 +172,20 @@
 }
 
 @media (max-width: 767px) {
+  .booking-section { padding: 48px 0 64px; }
   .booking-form {
-    padding: 24px 20px 20px;
+    padding: 24px 16px 20px;
   }
 
   .btn-book-submit {
     width: 100%;
     min-width: 0;
+  }
+
+  .ska-input,
+  .booking-form .form-control,
+  .booking-form .form-select {
+    font-size: 16px;
+    min-height: 44px;
   }
 }

@@ -171,4 +171,13 @@
 @media (max-width: 640px) {
   .ska-footer__main { grid-template-columns: 1fr; padding: 48px 20px 36px; }
   .ska-footer__bottom { flex-direction: column; align-items: flex-start; padding: 20px; }
+  .ska-footer__legal { flex-wrap: wrap; gap: 8px 16px; }
+  .ska-footer__legal a,
+  .ska-footer__nav a,
+  .ska-footer__contact-item,
+  .ska-footer__social-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
 }

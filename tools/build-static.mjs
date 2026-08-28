@@ -215,7 +215,7 @@ const PAGES = {
 };
 
 const COPY_DIRS = ['assets'];
-const COPY_FILES = ['robots.txt', 'sitemap.xml', 'google0f5359f7f26f1d03.html'];
+const COPY_FILES = ['robots.txt', 'sitemap.xml', 'google0f5359f7f26f1d03.html', 'CNAME'];
 
 function readPartial(name) {
   return fs.readFileSync(path.join(PARTIALS, name), 'utf8');

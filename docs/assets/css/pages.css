@@ -216,9 +216,12 @@
 }
 
 @media (max-width: 768px) {
-  .ska-content-card { padding: 28px 24px; }
+  .ska-content-card { padding: 24px 18px; }
   .ska-grid-3 { grid-template-columns: 1fr; }
-  .ska-page-hero { padding: 100px 0 48px; }
+  .ska-page-hero { padding: 88px 0 40px; min-height: 38vh; }
+  .ska-page-body { padding: 40px 0 64px; }
+  .ska-cta-band { padding: 48px 16px; }
+  .ska-help-toc a { min-height: 44px; display: inline-flex; align-items: center; }
 }
 
 /* ── Help / Contact / Loyalty enhancements ───────────────── */

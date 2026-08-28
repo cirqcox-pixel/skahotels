@@ -25,8 +25,8 @@ $navActive = $navActive ?? '';
     <div class="ska-nav-right">
       <a href="help.php" class="ska-hide-tablet ska-hide-mobile <?= $navActive === 'help' ? 'active' : '' ?>"><i class="fa-regular fa-circle-question"></i> Help</a>
       <a href="index.php#book-search" class="ska-book-btn ska-hide-mobile"><i class="fa-solid fa-calendar-check"></i> Book Now</a>
-      <a href="loyalty.php" class="ska-login-btn <?= $navActive === 'loyalty' ? 'active' : '' ?>"><i class="fa-regular fa-gem"></i> SKA Rewards</a>
-      <button class="ska-hamburger" id="skaHamburger" aria-label="Toggle menu" aria-expanded="false">
+      <a href="loyalty.php" class="ska-login-btn ska-hide-phone <?= $navActive === 'loyalty' ? 'active' : '' ?>"><i class="fa-regular fa-gem"></i> SKA Rewards</a>
+      <button class="ska-hamburger" id="skaHamburger" type="button" aria-label="Open menu" aria-controls="skaMobileMenu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -49,7 +49,10 @@ $navActive = $navActive ?? '';
       <a href="naguru.php"><i class="fa-solid fa-location-dot"></i> Naguru</a>
       <a href="munyonyo.php"><i class="fa-solid fa-location-dot"></i> Munyonyo</a>
     </div>
-    <a href="loyalty.php" class="ska-mobile-cta"><i class="fa-regular fa-gem"></i> SKA Rewards</a>
+    <div class="ska-mobile-actions">
+      <a href="index.php#book-search" class="ska-mobile-cta ska-mobile-cta--book"><i class="fa-solid fa-calendar-check"></i> Book Now</a>
+      <a href="loyalty.php" class="ska-mobile-cta"><i class="fa-regular fa-gem"></i> SKA Rewards</a>
+    </div>
   </div>
 </div>
 
@@ -64,6 +67,7 @@ $navActive = $navActive ?? '';
     mobileMenu.classList.remove('open');
     hamburger.classList.remove('open');
     hamburger.setAttribute('aria-expanded', 'false');
+    hamburger.setAttribute('aria-label', 'Open menu');
     mobileMenu.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
   }
@@ -72,6 +76,7 @@ $navActive = $navActive ?? '';
     const isOpen = mobileMenu.classList.toggle('open');
     hamburger.classList.toggle('open', isOpen);
     hamburger.setAttribute('aria-expanded', isOpen);
+    hamburger.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
     mobileMenu.setAttribute('aria-hidden', !isOpen);
     document.body.style.overflow = isOpen ? 'hidden' : '';
   });
@@ -82,6 +87,10 @@ $navActive = $navActive ?? '';
 
   document.addEventListener('click', function (e) {
     if (!navbar.contains(e.target) && !mobileMenu.contains(e.target)) closeMenu();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeMenu();
   });
 
   window.addEventListener('scroll', function () {

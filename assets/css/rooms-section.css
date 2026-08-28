@@ -386,8 +386,11 @@
   .rs-nav-line { width: 40px; }
   .rs-track-wrap { width: 120px; }
   .rs-season-pill { display: none; } /* too crowded on mobile */
-  
-  
+  .rs-nav-btn {
+    width: 44px;
+    height: 44px;
+  }
+
   
   
   
