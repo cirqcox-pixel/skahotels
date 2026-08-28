@@ -9,6 +9,11 @@ if (!empty($_SESSION['admin'])) {
 }
 
 $error = '';
+$needsSetup = false;
+if (isset($conn) && $conn instanceof mysqli) {
+    $n = $conn->query("SELECT COUNT(*) AS n FROM admins");
+    $needsSetup = $n && (int)$n->fetch_assoc()['n'] === 0;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
@@ -48,7 +53,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <p class="logo-sub">Property management &amp; reservations</p>
     </div>
 
-    <?php if ($error): ?>
+    <?php if ($needsSetup): ?>
+      <div class="error" role="alert">
+        <i class="fa-solid fa-circle-info"></i>
+        No admin account yet. <a href="setup.php">Create the first admin</a> to finish database setup.
+      </div>
+    <?php elseif ($error): ?>
       <div class="error" role="alert">
         <i class="fa-solid fa-circle-xmark"></i>
         <?= htmlspecialchars($error) ?>

@@ -1,5 +1,5 @@
 -- SKA Hotels — Supabase PostgreSQL schema
--- Run in Supabase SQL Editor: https://supabase.com/dashboard/project/aoofgjyhwbxasdvhdwoe/sql
+-- Run in Supabase SQL Editor: https://supabase.com/dashboard/project/nllqkepymtwwbvbjnbyz/sql
 
 -- Extensions
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";

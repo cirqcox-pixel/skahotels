@@ -48,7 +48,7 @@ supabase functions deploy notify-email
 
 ```js
 notify: {
-  webhookUrl: 'https://aoofgjyhwbxasdvhdwoe.supabase.co/functions/v1/notify-email',
+  webhookUrl: 'https://nllqkepymtwwbvbjnbyz.supabase.co/functions/v1/notify-email',
   to: 'info@skaboutiquebnb.com'
 },
 ```

@@ -234,8 +234,14 @@
     /* ── Admin auth (GitHub Pages admin) ── */
     adminSignIn: async function (email, password) {
       var sb = getClient();
-      var res = await sb.auth.signInWithPassword({ email: email, password: password });
+      var res = await sb.auth.signInWithPassword({
+        email: String(email || '').trim(),
+        password: password
+      });
       if (res.error) throw new Error(apiError(res.error));
+      try {
+        await sb.rpc('claim_first_admin');
+      } catch (e) { /* allowlist seeded in SQL; dashboard still enforces RLS */ }
       return res.data;
     },
 

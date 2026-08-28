@@ -8,7 +8,7 @@ function cms_conn(): mysqli
 {
     global $conn;
     if (!isset($conn) || !($conn instanceof mysqli)) {
-        require __DIR__ . '/db.php';
+        require_once __DIR__ . '/db.php';
     }
     return $conn;
 }
@@ -81,6 +81,88 @@ function cms_bootstrap(): void
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
+    // ── Rooms / bookings / promotions / admins ──────────────────────────────
+    // These are referenced by public pages (rooms, promotions, gallery) and the
+    // booking forms. Self-healing here means the site works on a fresh cPanel
+    // MySQL database without a manual import. See database/schema_mysql.sql for
+    // the canonical, importable version (identical columns).
+    $c->query("CREATE TABLE IF NOT EXISTS rooms (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        price DECIMAL(10,2) NOT NULL DEFAULT 0,
+        price_low DECIMAL(10,2) DEFAULT NULL,
+        price_shoulder DECIMAL(10,2) DEFAULT NULL,
+        price_high DECIMAL(10,2) DEFAULT NULL,
+        description TEXT,
+        branch VARCHAR(50) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_rooms_branch (branch)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    $c->query("CREATE TABLE IF NOT EXISTS room_images (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        room_id INT NOT NULL,
+        image_path VARCHAR(500) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_room_images_room (room_id),
+        CONSTRAINT fk_room_images_room FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    $c->query("CREATE TABLE IF NOT EXISTS room_amenities (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        room_id INT NOT NULL,
+        icon_class VARCHAR(120) DEFAULT NULL,
+        name VARCHAR(120) NOT NULL,
+        INDEX idx_room_amenities_room (room_id),
+        CONSTRAINT fk_room_amenities_room FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    $c->query("CREATE TABLE IF NOT EXISTS bookings (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        phone VARCHAR(50) DEFAULT NULL,
+        whatsapp VARCHAR(50) DEFAULT NULL,
+        room_type VARCHAR(255) NOT NULL,
+        price DECIMAL(10,2) DEFAULT 0,
+        checkin DATE NOT NULL,
+        checkout DATE NOT NULL,
+        total DECIMAL(10,2) DEFAULT 0,
+        message TEXT,
+        season VARCHAR(20) DEFAULT 'low',
+        branch VARCHAR(50) NOT NULL,
+        status VARCHAR(20) NOT NULL DEFAULT 'pending',
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_bookings_status (status),
+        INDEX idx_bookings_branch (branch)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    $c->query("CREATE TABLE IF NOT EXISTS promotions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        tag VARCHAR(120) DEFAULT NULL,
+        description TEXT,
+        discount_type VARCHAR(20) DEFAULT 'percent',
+        discount_value DECIMAL(10,2) DEFAULT 0,
+        min_nights INT DEFAULT 1,
+        branch VARCHAR(50) DEFAULT 'Both',
+        image VARCHAR(500) DEFAULT NULL,
+        booking_url VARCHAR(500) DEFAULT NULL,
+        active TINYINT(1) NOT NULL DEFAULT 1,
+        valid_from DATE DEFAULT NULL,
+        valid_to DATE DEFAULT NULL,
+        sort_order INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    $c->query("CREATE TABLE IF NOT EXISTS admins (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(100) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
     cms_seed_defaults($c);
 }
 
@@ -94,6 +176,16 @@ function cms_seed_defaults(mysqli $c): void
     $pc = $c->query("SELECT COUNT(*) AS n FROM cms_pages");
     if ($pc && (int)$pc->fetch_assoc()['n'] === 0) {
         cms_seed_pages_and_blocks($c);
+    }
+
+    $rc = $c->query("SELECT COUNT(*) AS n FROM rooms");
+    if ($rc && (int)$rc->fetch_assoc()['n'] === 0) {
+        cms_seed_rooms($c);
+    }
+
+    $pr = $c->query("SELECT COUNT(*) AS n FROM promotions");
+    if ($pr && (int)$pr->fetch_assoc()['n'] === 0) {
+        cms_seed_promotions($c);
     }
 }
 
@@ -171,6 +263,82 @@ function cms_seed_pages_and_blocks(mysqli $c): void
         $bStmt->execute();
     }
     $bStmt->close();
+}
+
+function cms_seed_rooms(mysqli $c): void
+{
+    $rooms = [
+        ['Standard Room', 150, 130, 150, 170, 'Cosy ensuite room with garden views — ideal for solo travellers and short stays.', 'Naguru'],
+        ['Deluxe Room', 180, 160, 180, 200, 'Spacious deluxe room with premium linens, smart TV and boutique ensuite.', 'Naguru'],
+        ['Deluxe Twin', 190, 170, 190, 210, 'Twin deluxe configuration — perfect for friends or colleagues travelling together.', 'Naguru'],
+        ['Superior Room', 220, 200, 220, 250, 'Our finest Naguru category with elevated views, extra space and curated amenities.', 'Naguru'],
+        ['Standard Double', 180, 160, 180, 200, 'Comfortable lakeside double room with ensuite and garden access.', 'Munyonyo'],
+        ['Deluxe Room', 210, 190, 210, 230, 'Deluxe lakeside room with refined finishes and tranquil views.', 'Munyonyo'],
+        ['Superior Room', 240, 220, 240, 270, 'Superior category with generous space and premium Munyonyo outlook.', 'Munyonyo'],
+        ['Dube Suite', 280, 260, 280, 320, 'Signature suite — the ultimate lakeside boutique escape at SKA Munyonyo.', 'Munyonyo'],
+    ];
+    $stmt = $c->prepare("INSERT INTO rooms (name, price, price_low, price_shoulder, price_high, description, branch) VALUES (?,?,?,?,?,?,?)");
+    foreach ($rooms as $r) {
+        $stmt->bind_param('sddddss', $r[0], $r[1], $r[2], $r[3], $r[4], $r[5], $r[6]);
+        $stmt->execute();
+    }
+    $stmt->close();
+
+    $images = [
+        ['Standard Room', 'Naguru', 'assets/images/standard_naguru.jpeg'],
+        ['Deluxe Room', 'Naguru', 'assets/images/deluxe_naguru.jpeg'],
+        ['Deluxe Twin', 'Naguru', 'assets/images/deluxe_twin_naguru.jpeg'],
+        ['Superior Room', 'Naguru', 'assets/images/superior_naguru.jpeg'],
+        ['Standard Double', 'Munyonyo', 'assets/images/munyonyo/standard_double_munyonyo.jpg'],
+        ['Deluxe Room', 'Munyonyo', 'assets/images/deluxe_munyonyo.jpg'],
+        ['Superior Room', 'Munyonyo', 'assets/images/superior_munyonyo.jpg'],
+        ['Dube Suite', 'Munyonyo', 'assets/images/dube_munyonyo.jpg'],
+    ];
+    $img = $c->prepare("INSERT INTO room_images (room_id, image_path) SELECT id, ? FROM rooms WHERE name = ? AND branch = ? LIMIT 1");
+    foreach ($images as $i) {
+        $img->bind_param('sss', $i[2], $i[0], $i[1]);
+        $img->execute();
+    }
+    $img->close();
+
+    $galCheck = $c->query("SELECT COUNT(*) AS n FROM property_gallery");
+    if ($galCheck && (int)$galCheck->fetch_assoc()['n'] === 0) {
+        $gallery = [
+            ['Naguru', 'assets/images/naguru/IMG_1044.jpg', 'SKA Naguru', 1],
+            ['Naguru', 'assets/images/naguru/IMG_1066.jpg', 'Garden views', 2],
+            ['Naguru', 'assets/images/naguru/IMG_1069.jpg', 'Boutique interiors', 3],
+            ['Naguru', 'assets/images/naguru/IMG_1093.jpg', 'Relaxation spaces', 4],
+            ['Naguru', 'assets/images/naguru/IMG_1120.jpg', 'SKA Naguru retreat', 5],
+            ['Naguru', 'assets/images/naguru/IMG_1157.jpg', 'Hillside setting', 6],
+            ['Munyonyo', 'assets/images/munyonyo/IMG_0879.jpg', 'SKA Munyonyo', 1],
+            ['Munyonyo', 'assets/images/munyonyo/IMG_0883.jpg', 'Lakeside views', 2],
+            ['Munyonyo', 'assets/images/munyonyo/IMG_0912.jpg', 'Boutique comfort', 3],
+            ['Munyonyo', 'assets/images/munyonyo/IMG_0973.jpg', 'Serene gardens', 4],
+        ];
+        $gStmt = $c->prepare("INSERT INTO property_gallery (branch, image_path, caption, sort_order, active) VALUES (?,?,?,?,1)");
+        foreach ($gallery as $g) {
+            $gStmt->bind_param('sssi', $g[0], $g[1], $g[2], $g[3]);
+            $gStmt->execute();
+        }
+        $gStmt->close();
+    }
+}
+
+function cms_seed_promotions(mysqli $c): void
+{
+    $promos = [
+        ['Book Direct & Save', 'Best Rate Guarantee', 'Our lowest prices are always here. Free Wi-Fi, breakfast, and flexible cancellation when you book on our website.', 'percent', 0, 1, 'Both', 'assets/images/ska_naguru_home.jpeg', 'index.php#book-search', 1],
+        ['Book 7 Days Early', 'Early Bird', 'Plan ahead and unlock exclusive savings when you reserve at least seven days before arrival.', 'percent', 10, 1, 'Both', 'assets/images/ska_art_home.jpg', 'naguru.php#book', 2],
+        ['Stay 3 Nights, Pay for 2', 'Extended Stay', 'Celebrate longer stays — enjoy three nights and only pay for two at either property.', 'free_night', 1, 3, 'Both', 'assets/images/ska_furniture_home.jpg', 'index.php#book-search', 3],
+        ['Direct Booking Bonus', 'Member Perk', 'Extra value when you book with us — complimentary upgrades subject to availability and welcome treats.', 'percent', 5, 1, 'Both', 'assets/images/ska_munyonyo_home2.jpg', 'loyalty.php', 4],
+        ['Munyonyo Lakeside Weekend', 'Weekend Escape', 'Unwind by the lake with a weekend package at SKA Munyonyo — serene gardens and boutique comfort.', 'percent', 15, 2, 'Munyonyo', 'assets/images/ska_munyonyo_home2.jpg', 'munyonyo.php#book', 5],
+    ];
+    $stmt = $c->prepare("INSERT INTO promotions (title, tag, description, discount_type, discount_value, min_nights, branch, image, booking_url, active, sort_order) VALUES (?,?,?,?,?,?,?,?,?,1,?)");
+    foreach ($promos as $p) {
+        $stmt->bind_param('ssssdisssi', $p[0], $p[1], $p[2], $p[3], $p[4], $p[5], $p[6], $p[7], $p[8], $p[9]);
+        $stmt->execute();
+    }
+    $stmt->close();
 }
 
 function cms_default_privacy(): string

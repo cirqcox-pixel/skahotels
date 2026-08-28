@@ -37,7 +37,7 @@
         <label class="form-label-ska" for="adminEmail">Email</label>
         <div class="input-icon-wrap">
           <i class="fa-regular fa-envelope"></i>
-          <input type="email" id="adminEmail" class="form-control" placeholder="admin@skaboutiquebnb.com" required autofocus>
+          <input type="email" id="adminEmail" class="form-control" placeholder="admin@skahotels.com" required autofocus>
         </div>
       </div>
 
@@ -85,7 +85,7 @@ document.getElementById('adminLoginForm').addEventListener('submit', async funct
   var errTxt = document.getElementById('loginErrorText');
   errEl.style.display = 'none';
   try {
-    await SkaApi.adminSignIn(adminEmail.value, adminPass.value);
+    await SkaApi.adminSignIn(adminEmail.value.trim(), adminPass.value);
     location.href = 'dashboard.html';
   } catch (ex) {
     errTxt.textContent = ex.message || 'Sign in failed';
