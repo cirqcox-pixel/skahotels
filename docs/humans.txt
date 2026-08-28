@@ -1,0 +1,21 @@
+/* TEAM */
+
+Company: Cirqco Systems
+Site: https://cirqco.com/
+Kind: Technology company
+Founder & CEO: Maxwell Odoi
+LinkedIn (company): https://www.linkedin.com/company/cirqco
+LinkedIn (founder): https://www.linkedin.com/in/sir-maxwell-odoi-37474495
+
+Cirqco Systems designs and engineers software, digital products, and web platforms.
+This site is not a Cirqco product brand page — Cirqco built the website for SKA The Boutique.
+
+/* SITE */
+
+Name: SKA The Boutique
+URL: https://www.skaboutiquebnb.com/
+Standards: HTML5, CSS3, JSON-LD (Schema.org)
+Language: English
+Doctype: HTML5
+Engineered by: Cirqco Systems
+Founded by: Maxwell Odoi, CEO

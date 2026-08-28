@@ -1,7 +1,31 @@
 User-agent: *
 Allow: /
+Allow: /humans.txt
+Allow: /llms.txt
+Allow: /sitemap.xml
 Disallow: /admin/
 Disallow: /forms/
 Disallow: /config/
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
 
 Sitemap: https://www.skaboutiquebnb.com/sitemap.xml
