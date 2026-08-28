@@ -70,11 +70,9 @@ function ska_builder_founder_id(): string
 
 function ska_builder_credit_html(): string
 {
-    $name    = htmlspecialchars(BUILDER_NAME, ENT_QUOTES, 'UTF-8');
-    $url     = htmlspecialchars(BUILDER_URL, ENT_QUOTES, 'UTF-8');
-    $founder = htmlspecialchars(BUILDER_FOUNDER, ENT_QUOTES, 'UTF-8');
+    $name = htmlspecialchars(BUILDER_NAME, ENT_QUOTES, 'UTF-8');
+    $url  = htmlspecialchars(BUILDER_URL, ENT_QUOTES, 'UTF-8');
     return '<p class="ska-footer__credit">'
         . 'Engineered by <a href="' . $url . '" target="_blank" rel="noopener noreferrer author">' . $name . '</a>'
-        . '<span class="ska-footer__credit-meta">A technology company · Founded by ' . $founder . ', CEO</span>'
         . '</p>';
 }
