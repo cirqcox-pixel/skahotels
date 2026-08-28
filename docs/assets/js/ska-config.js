@@ -4,7 +4,7 @@
  */
 window.SKA_CONFIG = {
   supabaseUrl: 'https://nllqkepymtwwbvbjnbyz.supabase.co',
-  supabaseAnonKey: '',
+  supabaseAnonKey: 'sb_publishable_LCuHabxBgF-bth8zDI2mgw_7QsdljHH',
 
   siteName: 'SKA The Boutique',
   siteEmail: 'info@skaboutiquebnb.com',
