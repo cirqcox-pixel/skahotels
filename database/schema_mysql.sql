@@ -163,28 +163,60 @@ CREATE TABLE IF NOT EXISTS admins (
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================================================================
--- OPTIONAL sample content — remove this block if you prefer to add rooms
--- yourself in the admin. Runs only when the rooms table is still empty.
+-- OPTIONAL sample content — same inventory as supabase/migrations/004 + 006.
+-- Runs only when the target table is still empty (will not clobber live data).
 -- ============================================================================
 INSERT INTO rooms (name, price, price_low, price_shoulder, price_high, description, branch)
-SELECT * FROM (SELECT
-  'Deluxe King Room' AS name, 120.00 AS price, 110.00 AS price_low,
-  130.00 AS price_shoulder, 160.00 AS price_high,
-  'Elegant king room with city views, workspace and en-suite bathroom.' AS description,
-  'Naguru' AS branch) AS s
+SELECT v.name, v.price, v.price_low, v.price_shoulder, v.price_high, v.description, v.branch
+FROM (
+  SELECT 'Standard Room' AS name, 150.00 AS price, 130.00 AS price_low, 150.00 AS price_shoulder, 170.00 AS price_high, 'Cosy ensuite room with garden views — ideal for solo travellers and short stays.' AS description, 'Naguru' AS branch
+  UNION ALL SELECT 'Deluxe Room', 180.00, 160.00, 180.00, 200.00, 'Spacious deluxe room with premium linens, smart TV and boutique ensuite.', 'Naguru'
+  UNION ALL SELECT 'Deluxe Twin', 190.00, 170.00, 190.00, 210.00, 'Twin deluxe configuration — perfect for friends or colleagues travelling together.', 'Naguru'
+  UNION ALL SELECT 'Superior Room', 220.00, 200.00, 220.00, 250.00, 'Our finest Naguru category with elevated views, extra space and curated amenities.', 'Naguru'
+  UNION ALL SELECT 'Standard Double', 180.00, 160.00, 180.00, 200.00, 'Comfortable lakeside double room with ensuite and garden access.', 'Munyonyo'
+  UNION ALL SELECT 'Deluxe Room', 210.00, 190.00, 210.00, 230.00, 'Deluxe lakeside room with refined finishes and tranquil views.', 'Munyonyo'
+  UNION ALL SELECT 'Superior Room', 240.00, 220.00, 240.00, 270.00, 'Superior category with generous space and premium Munyonyo outlook.', 'Munyonyo'
+  UNION ALL SELECT 'Dube Suite', 280.00, 260.00, 280.00, 320.00, 'Signature suite — the ultimate lakeside boutique escape at SKA Munyonyo.', 'Munyonyo'
+) AS v
 WHERE NOT EXISTS (SELECT 1 FROM rooms LIMIT 1);
 
-INSERT INTO rooms (name, price, price_low, price_shoulder, price_high, description, branch)
-SELECT * FROM (SELECT
-  'Lakeview Suite', 180.00, 165.00, 195.00, 240.00,
-  'Spacious suite overlooking Lake Victoria with private balcony.',
-  'Munyonyo') AS s
-WHERE (SELECT COUNT(*) FROM rooms) = 1;
+INSERT INTO room_images (room_id, image_path)
+SELECT r.id, m.path FROM rooms r
+JOIN (
+  SELECT 'Standard Room' AS name, 'Naguru' AS branch, 'assets/images/standard_naguru.jpeg' AS path
+  UNION ALL SELECT 'Deluxe Room', 'Naguru', 'assets/images/deluxe_naguru.jpeg'
+  UNION ALL SELECT 'Deluxe Twin', 'Naguru', 'assets/images/deluxe_twin_naguru.jpeg'
+  UNION ALL SELECT 'Superior Room', 'Naguru', 'assets/images/superior_naguru.jpeg'
+  UNION ALL SELECT 'Standard Double', 'Munyonyo', 'assets/images/munyonyo/standard_double_munyonyo.jpg'
+  UNION ALL SELECT 'Deluxe Room', 'Munyonyo', 'assets/images/deluxe_munyonyo.jpg'
+  UNION ALL SELECT 'Superior Room', 'Munyonyo', 'assets/images/superior_munyonyo.jpg'
+  UNION ALL SELECT 'Dube Suite', 'Munyonyo', 'assets/images/dube_munyonyo.jpg'
+) AS m ON r.name = m.name AND r.branch = m.branch
+WHERE NOT EXISTS (SELECT 1 FROM room_images LIMIT 1);
 
-INSERT INTO promotions (title, tag, description, discount_type, discount_value, min_nights, branch, active, sort_order)
-SELECT * FROM (SELECT
-  'Book Direct & Save' AS title, 'Best Rate' AS tag,
-  'Book direct for our lowest rates plus complimentary breakfast and Wi-Fi.' AS description,
-  'percent' AS discount_type, 10.00 AS discount_value, 1 AS min_nights,
-  'Both' AS branch, 1 AS active, 1 AS sort_order) AS s
+INSERT INTO property_gallery (branch, image_path, caption, sort_order, active)
+SELECT g.branch, g.image_path, g.caption, g.sort_order, g.active
+FROM (
+  SELECT 'Naguru' AS branch, 'assets/images/naguru/IMG_1044.jpg' AS image_path, 'SKA Naguru' AS caption, 1 AS sort_order, 1 AS active
+  UNION ALL SELECT 'Naguru', 'assets/images/naguru/IMG_1066.jpg', 'Garden views', 2, 1
+  UNION ALL SELECT 'Naguru', 'assets/images/naguru/IMG_1069.jpg', 'Boutique interiors', 3, 1
+  UNION ALL SELECT 'Naguru', 'assets/images/naguru/IMG_1093.jpg', 'Relaxation spaces', 4, 1
+  UNION ALL SELECT 'Naguru', 'assets/images/naguru/IMG_1120.jpg', 'SKA Naguru retreat', 5, 1
+  UNION ALL SELECT 'Naguru', 'assets/images/naguru/IMG_1157.jpg', 'Hillside setting', 6, 1
+  UNION ALL SELECT 'Munyonyo', 'assets/images/munyonyo/IMG_0879.jpg', 'SKA Munyonyo', 1, 1
+  UNION ALL SELECT 'Munyonyo', 'assets/images/munyonyo/IMG_0883.jpg', 'Lakeside views', 2, 1
+  UNION ALL SELECT 'Munyonyo', 'assets/images/munyonyo/IMG_0912.jpg', 'Boutique comfort', 3, 1
+  UNION ALL SELECT 'Munyonyo', 'assets/images/munyonyo/IMG_0973.jpg', 'Serene gardens', 4, 1
+) AS g
+WHERE NOT EXISTS (SELECT 1 FROM property_gallery LIMIT 1);
+
+INSERT INTO promotions (title, tag, description, discount_type, discount_value, min_nights, branch, image, booking_url, active, sort_order)
+SELECT v.title, v.tag, v.description, v.discount_type, v.discount_value, v.min_nights, v.branch, v.image, v.booking_url, v.active, v.sort_order
+FROM (
+  SELECT 'Book Direct & Save' AS title, 'Best Rate Guarantee' AS tag, 'Our lowest prices are always here. Free Wi-Fi, breakfast, and flexible cancellation when you book on our website.' AS description, 'percent' AS discount_type, 0.00 AS discount_value, 1 AS min_nights, 'Both' AS branch, 'assets/images/ska_naguru_home.jpeg' AS image, 'index.php#book-search' AS booking_url, 1 AS active, 1 AS sort_order
+  UNION ALL SELECT 'Book 7 Days Early', 'Early Bird', 'Plan ahead and unlock exclusive savings when you reserve at least seven days before arrival.', 'percent', 10.00, 1, 'Both', 'assets/images/ska_art_home.jpg', 'naguru.php#book', 1, 2
+  UNION ALL SELECT 'Stay 3 Nights, Pay for 2', 'Extended Stay', 'Celebrate longer stays — enjoy three nights and only pay for two at either property.', 'free_night', 1.00, 3, 'Both', 'assets/images/ska_furniture_home.jpg', 'index.php#book-search', 1, 3
+  UNION ALL SELECT 'Direct Booking Bonus', 'Member Perk', 'Extra value when you book with us — complimentary upgrades subject to availability and welcome treats.', 'percent', 5.00, 1, 'Both', 'assets/images/ska_munyonyo_home2.jpg', 'loyalty.php', 1, 4
+  UNION ALL SELECT 'Munyonyo Lakeside Weekend', 'Weekend Escape', 'Unwind by the lake with a weekend package at SKA Munyonyo — serene gardens and boutique comfort.', 'percent', 15.00, 2, 'Munyonyo', 'assets/images/ska_munyonyo_home2.jpg', 'munyonyo.php#book', 1, 5
+) AS v
 WHERE NOT EXISTS (SELECT 1 FROM promotions LIMIT 1);
