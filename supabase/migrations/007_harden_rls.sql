@@ -1,6 +1,6 @@
 -- SKA Hotels — RLS hardening
 -- Run in Supabase SQL Editor AFTER 001–006.
--- Dashboard: https://supabase.com/dashboard/project/aoofgjyhwbxasdvhdwoe/sql
+-- Dashboard: https://supabase.com/dashboard/project/nllqkepymtwwbvbjnbyz/sql
 --
 -- What this migration does
 --   1. Introduces real admin authorization (an allowlist + is_admin() helper),

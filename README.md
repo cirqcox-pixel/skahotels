@@ -14,10 +14,12 @@ This is a **PHP + static HTML** site, not Laravel. There is no `database.php`, n
 
 | Host | Database | How to create it |
 |---|---|---|
-| **GitHub Pages** (live: `cirqcox-pixel.github.io/skahotels`) | **Supabase PostgreSQL** project [`aoofgjyhwbxasdvhdwoe`](https://supabase.com/dashboard/project/aoofgjyhwbxasdvhdwoe) | Paste `supabase/RUN_THIS_IN_SUPABASE.sql` into the [SQL Editor](https://supabase.com/dashboard/project/aoofgjyhwbxasdvhdwoe/sql) once |
+| **GitHub Pages** (live: `cirqcox-pixel.github.io/skahotels`) | **Supabase PostgreSQL** project [`nllqkepymtwwbvbjnbyz`](https://supabase.com/dashboard/project/nllqkepymtwwbvbjnbyz) | Paste `supabase/RUN_THIS_IN_SUPABASE.sql` into the [SQL Editor](https://supabase.com/dashboard/project/nllqkepymtwwbvbjnbyz/sql) once |
 | **cPanel / PHP server** | **MySQL / MariaDB** named `skabcwvw_ska001` (cPanel prefix may vary) | Create the DB in cPanel, put credentials in `.env`, import `database/schema_mysql.sql` **or** load any page (tables self-create). Then visit `/admin/setup.php` |
 
 There is no committed `.env` — copy `.env.example`. The MySQL password is **not** in this repo. The Supabase **anon** key in `assets/js/ska-config.js` is public by design; the **service role** key must never be committed.
+
+Cursor / Claude Code can talk to this project via MCP (`.cursor/mcp.json` and `.mcp.json`). Authenticate once in the client, then the agent can apply SQL. Until then, paste `supabase/RUN_THIS_IN_SUPABASE.sql` in the SQL Editor yourself.
 
 Step-by-step for Namecheap/cPanel: [`DEPLOY_CPANEL.md`](DEPLOY_CPANEL.md).
 
@@ -28,7 +30,7 @@ Step-by-step for Namecheap/cPanel: [`DEPLOY_CPANEL.md`](DEPLOY_CPANEL.md).
 | Environment | URL |
 |---|---|
 | GitHub Pages | `https://cirqcox-pixel.github.io/skahotels/` |
-| Supabase project | `https://supabase.com/dashboard/project/aoofgjyhwbxasdvhdwoe` |
+| Supabase project | `https://supabase.com/dashboard/project/nllqkepymtwwbvbjnbyz` |
 | GitHub repo | `https://github.com/cirqcox-pixel/skahotels` |
 
 ---
@@ -51,7 +53,7 @@ Supabase PostgreSQL + Auth + Storage
 
 ## 1. Supabase setup (required for GitHub Pages)
 
-Easiest: paste the whole file `supabase/RUN_THIS_IN_SUPABASE.sql` into the [SQL Editor](https://supabase.com/dashboard/project/aoofgjyhwbxasdvhdwoe/sql) and run it once.
+Easiest: paste the whole file `supabase/RUN_THIS_IN_SUPABASE.sql` into the [SQL Editor](https://supabase.com/dashboard/project/nllqkepymtwwbvbjnbyz/sql) and run it once.
 
 Or run migrations **in order**:
 

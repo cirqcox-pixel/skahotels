@@ -91,7 +91,7 @@ If you ever want the PHP server to read/write Supabase instead of MySQL, set in
 
 ```
 DB_CONNECTION=supabase
-SUPABASE_URL=https://aoofgjyhwbxasdvhdwoe.supabase.co
+SUPABASE_URL=https://nllqkepymtwwbvbjnbyz.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=...   # server-side only, never commit
 ```
 

@@ -3,8 +3,8 @@
  * Safe to commit: uses publishable (anon) key only.
  */
 window.SKA_CONFIG = {
-  supabaseUrl: 'https://aoofgjyhwbxasdvhdwoe.supabase.co',
-  supabaseAnonKey: 'sb_publishable_QiSDAOjXaeTxIMXFvJBqdA_fSUM8bY6',
+  supabaseUrl: 'https://nllqkepymtwwbvbjnbyz.supabase.co',
+  supabaseAnonKey: '',
 
   siteName: 'SKA The Boutique',
   siteEmail: 'info@skaboutiquebnb.com',
@@ -25,7 +25,7 @@ window.SKA_CONFIG = {
    * Leave empty if using Formspree only.
    */
   notify: {
-    webhookUrl: '',  // e.g. 'https://aoofgjyhwbxasdvhdwoe.supabase.co/functions/v1/notify-email'
+    webhookUrl: '',  // e.g. 'https://nllqkepymtwwbvbjnbyz.supabase.co/functions/v1/notify-email'
     to: 'info@skaboutiquebnb.com'
   },
 
