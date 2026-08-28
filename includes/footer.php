@@ -48,6 +48,7 @@ $footerNaguruHref = preg_replace('/\D+/', '', $footerNaguru);
         <li><a href="naguru.php#services">Dining</a></li>
         <li><a href="naguru.php#experiences">Experiences</a></li>
         <li><a href="meetings-events.php">Meetings &amp; Events</a></li>
+        <li><a href="admin/login.php" rel="nofollow">Staff login</a></li>
       </ul>
     </div>
 
@@ -91,6 +92,8 @@ $footerNaguruHref = preg_replace('/\D+/', '', $footerNaguru);
       <a href="terms-of-use.php">Terms of Use</a>
       <span class="ska-footer__legal-dot"></span>
       <a href="cookie-policy.php">Cookie Policy</a>
+      <span class="ska-footer__legal-dot"></span>
+      <a href="admin/login.php" rel="nofollow">Staff</a>
     </div>
     <p class="ska-footer__credit">
       Crafted by <a href="<?= BUILDER_URL ?>" target="_blank" rel="noopener noreferrer"><?= BUILDER_NAME ?></a>
