@@ -177,24 +177,87 @@ const PROPERTY_DEFAULTS = {
 const PAGES = {
   index: {
     title: 'SKA The Boutique | Luxury Boutique Hotel in Kampala, Uganda',
-    description: 'Book direct at SKA The Boutique — Naguru and Munyonyo, Kampala.',
+    description: 'Book direct at SKA The Boutique — refined boutique bed & breakfast in Naguru and Munyonyo, Kampala. Best rates, free breakfast, Wi-Fi and flexible check-in.',
+    image: 'assets/images/ska_naguru_home.jpeg',
     css: ['assets/css/home.css'],
     nav: 'landing',
     bodyClass: 'has-landing-nav',
   },
-  offers: { title: 'Special Offers | SKA The Boutique', description: 'Exclusive direct-booking offers at SKA Naguru and Munyonyo.', css: ['assets/css/pages.css'], nav: 'landing' },
-  'about-us': { title: 'About Us | SKA The Boutique Kampala', description: 'Discover SKA The Boutique — Naguru hillside and Munyonyo lakeside boutique stays in Kampala.', css: ['assets/css/pages.css'], nav: 'landing' },
-  'meetings-events': { title: 'Meetings & Events | SKA The Boutique', description: 'Intimate meetings, weddings and social events at SKA.', css: ['assets/css/pages.css'], nav: 'landing', staticBody: 'meetings-events' },
-  contact: { title: 'Contact Us | SKA The Boutique', description: 'Contact SKA Naguru and Munyonyo for reservations and events.', css: ['assets/css/pages.css'], nav: 'landing', staticBody: 'contact' },
-  help: { title: 'Help Centre | SKA The Boutique', description: 'How to book, get from Entebbe Airport, weather, roads, and attractions near SKA.', css: ['assets/css/pages.css'], nav: 'landing', staticBody: 'help' },
-  careers: { title: 'Careers | SKA', description: 'Join our team.', css: ['assets/css/pages.css'], nav: 'landing' },
-  loyalty: { title: 'SKA Rewards | Loyalty Programme', description: 'Member rates and exclusive offers for direct bookers.', css: ['assets/css/pages.css'], nav: 'landing', staticBody: 'loyalty' },
-  'privacy-policy': { title: 'Privacy Policy | SKA', description: 'Privacy policy.', css: ['assets/css/pages.css'], nav: 'landing' },
-  'terms-of-use': { title: 'Terms of Use | SKA', description: 'Terms of use.', css: ['assets/css/pages.css'], nav: 'landing' },
-  'cookie-policy': { title: 'Cookie Policy | SKA', description: 'Cookie policy.', css: ['assets/css/pages.css'], nav: 'landing' },
+  offers: {
+    title: 'Special Offers | SKA The Boutique Kampala',
+    description: 'Exclusive direct-booking offers at SKA Naguru and Munyonyo — early-bird savings, stay-longer packages, and member perks. Book on our site for the best rate.',
+    image: 'assets/images/ska_naguru_home.jpeg',
+    css: ['assets/css/pages.css'],
+    nav: 'landing',
+  },
+  'about-us': {
+    title: 'About Us | SKA The Boutique Kampala',
+    description: 'Discover SKA The Boutique — two distinctive properties in Naguru and Munyonyo redefining boutique hospitality in Kampala, Uganda.',
+    image: 'assets/images/dube_munyonyo.jpg',
+    css: ['assets/css/pages.css'],
+    nav: 'landing',
+  },
+  'meetings-events': {
+    title: 'Meetings & Events | SKA The Boutique Kampala',
+    description: 'Intimate meetings, weddings and social events at SKA Naguru and Munyonyo. Boutique venues in Kampala with gardens, dining and dedicated hosting.',
+    image: 'assets/images/ska_art_home.jpg',
+    css: ['assets/css/pages.css'],
+    nav: 'landing',
+    staticBody: 'meetings-events',
+  },
+  contact: {
+    title: 'Contact Us | SKA The Boutique Kampala',
+    description: 'Contact SKA Naguru and SKA Munyonyo for reservations, events and enquiries. Call, WhatsApp or write to the boutique hotels in Kampala.',
+    image: 'assets/images/ska_naguru_home.jpeg',
+    css: ['assets/css/pages.css'],
+    nav: 'landing',
+    staticBody: 'contact',
+  },
+  help: {
+    title: 'Help Centre | SKA The Boutique Kampala',
+    description: 'How to book SKA The Boutique, transfers from Entebbe Airport, weather, roads, and what to see near Naguru and Munyonyo.',
+    image: 'assets/images/ska_naguru_home.jpeg',
+    css: ['assets/css/pages.css'],
+    nav: 'landing',
+    staticBody: 'help',
+  },
+  careers: {
+    title: 'Careers | SKA The Boutique Kampala',
+    description: 'Join the team at SKA The Boutique in Kampala — hospitality careers across Naguru and Munyonyo.',
+    image: 'assets/images/ska_art_home.jpg',
+    css: ['assets/css/pages.css'],
+    nav: 'landing',
+  },
+  loyalty: {
+    title: 'SKA Rewards | Loyalty Programme',
+    description: 'SKA Rewards member rates and exclusive offers when you book direct at SKA Naguru and Munyonyo.',
+    image: 'assets/images/ska_naguru_home.jpeg',
+    css: ['assets/css/pages.css'],
+    nav: 'landing',
+    staticBody: 'loyalty',
+  },
+  'privacy-policy': {
+    title: 'Privacy Policy | SKA The Boutique',
+    description: 'How SKA The Boutique collects, uses and protects personal information when you book or contact us.',
+    css: ['assets/css/pages.css'],
+    nav: 'landing',
+  },
+  'terms-of-use': {
+    title: 'Terms of Use | SKA The Boutique',
+    description: 'Terms of use for the SKA The Boutique website and direct booking services.',
+    css: ['assets/css/pages.css'],
+    nav: 'landing',
+  },
+  'cookie-policy': {
+    title: 'Cookie Policy | SKA The Boutique',
+    description: 'How SKA The Boutique uses cookies and similar technologies on this website.',
+    css: ['assets/css/pages.css'],
+    nav: 'landing',
+  },
   naguru: {
-    title: 'SKA Naguru | Boutique Hotel Kampala',
-    description: 'Book SKA Naguru.',
+    title: 'SKA Naguru | Boutique Hotel Hillside Kampala',
+    description: 'Book SKA Naguru — an elegant boutique B&B in Naguru, Kampala. Seasonal rates, direct booking benefits, free breakfast and Wi-Fi.',
+    image: 'assets/images/ska_naguru_home.jpeg',
     css: ['assets/css/branch.css', 'assets/css/rooms-section.css', 'assets/css/booking-form.css'],
     nav: 'property',
     property: 'naguru',
@@ -203,8 +266,9 @@ const PAGES = {
     extraScripts: '<script src="assets/js/ska-rooms.js"></script>',
   },
   munyonyo: {
-    title: 'SKA Munyonyo | Lakeside Boutique Hotel',
-    description: 'Book SKA Munyonyo.',
+    title: 'SKA Munyonyo | Lakeside Boutique Hotel Kampala',
+    description: 'Book SKA Munyonyo — a serene boutique escape in Munyonyo, Kampala near Lake Victoria. Direct booking, free breakfast and seasonal rates.',
+    image: 'assets/images/ska_munyonyo_home2.jpg',
     css: ['assets/css/branch.css', 'assets/css/rooms-section.css', 'assets/css/booking-form.css'],
     nav: 'property',
     property: 'munyonyo',
@@ -215,7 +279,174 @@ const PAGES = {
 };
 
 const COPY_DIRS = ['assets'];
-const COPY_FILES = ['robots.txt', 'sitemap.xml', 'google0f5359f7f26f1d03.html', 'CNAME'];
+const COPY_FILES = ['robots.txt', 'sitemap.xml', 'google0f5359f7f26f1d03.html', 'CNAME', 'humans.txt', 'llms.txt', 'site.webmanifest'];
+
+const SITE_URL = 'https://www.skaboutiquebnb.com';
+const BUILDER = {
+  name: 'Cirqco Systems',
+  url: 'https://cirqco.com/',
+  founder: 'Maxwell Odoi',
+  founderTitle: 'Founder & CEO',
+  description: 'Cirqco Systems is a technology company that designs and engineers software, digital products, and web platforms.',
+  credit: 'Engineered by Cirqco Systems, a technology company. Founded by Maxwell Odoi, CEO.',
+};
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function pageUrl(name) {
+  return name === 'index' ? `${SITE_URL}/` : `${SITE_URL}/${name}.html`;
+}
+
+function generateSeoHead(name, meta) {
+  const title = meta.title;
+  const description = meta.description || title;
+  const canonical = pageUrl(name);
+  const imagePath = meta.image || 'assets/images/ska_naguru_home.jpeg';
+  const imageAbs = imagePath.startsWith('http') ? imagePath : `${SITE_URL}/${imagePath}`;
+  const robots = 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+  const siteId = `${SITE_URL}/#website`;
+  const hotelId = `${SITE_URL}/#hotel`;
+  const pageId = `${canonical}#webpage`;
+  const builderId = `${BUILDER.url.replace(/\/$/, '')}/#organization`;
+  const founderId = `${BUILDER.url.replace(/\/$/, '')}/#founder`;
+
+  const graph = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': builderId,
+        name: BUILDER.name,
+        legalName: BUILDER.name,
+        url: BUILDER.url,
+        description: BUILDER.description,
+        founder: { '@id': founderId },
+        sameAs: [BUILDER.url, 'https://www.linkedin.com/company/cirqco'],
+      },
+      {
+        '@type': 'Person',
+        '@id': founderId,
+        name: BUILDER.founder,
+        jobTitle: BUILDER.founderTitle,
+        worksFor: { '@id': builderId },
+        sameAs: ['https://www.linkedin.com/in/sir-maxwell-odoi-37474495'],
+      },
+      {
+        '@type': 'Hotel',
+        '@id': hotelId,
+        name: 'SKA The Boutique',
+        alternateName: 'SKA The Boutique B&B',
+        url: SITE_URL,
+        logo: `${SITE_URL}/assets/images/ska_logo1.png`,
+        image: `${SITE_URL}/assets/images/ska_naguru_home.jpeg`,
+        email: 'info@skaboutiquebnb.com',
+        telephone: ['+256200987770', '+256741186891'],
+        description: 'Boutique bed and breakfast with properties in Naguru and Munyonyo, Kampala, Uganda.',
+        sameAs: [
+          'https://www.instagram.com/skanaguru/',
+          'https://www.facebook.com/skaboutiquebnb',
+        ],
+        address: { '@type': 'PostalAddress', addressLocality: 'Kampala', addressCountry: 'UG' },
+        geo: { '@type': 'GeoCoordinates', latitude: 0.3476, longitude: 32.5825 },
+        amenityFeature: [
+          { '@type': 'LocationFeatureSpecification', name: 'Free WiFi', value: true },
+          { '@type': 'LocationFeatureSpecification', name: 'Free Breakfast', value: true },
+        ],
+        starRating: { '@type': 'Rating', ratingValue: '4.5', bestRating: '5' },
+        priceRange: '$$',
+        checkinTime: '14:00',
+        checkoutTime: '12:00',
+      },
+      {
+        '@type': 'WebSite',
+        '@id': siteId,
+        url: SITE_URL,
+        name: 'SKA The Boutique',
+        inLanguage: 'en-UG',
+        publisher: { '@id': hotelId },
+        creator: { '@id': builderId },
+        author: { '@id': builderId },
+        copyrightHolder: { '@id': hotelId },
+        sourceOrganization: { '@id': builderId },
+        creditText: BUILDER.credit,
+      },
+      {
+        '@type': 'WebPage',
+        '@id': pageId,
+        url: canonical,
+        name: title,
+        description,
+        isPartOf: { '@id': siteId },
+        about: { '@id': hotelId },
+        primaryImageOfPage: imageAbs,
+        inLanguage: 'en-UG',
+        creator: { '@id': builderId },
+        author: { '@id': builderId },
+        publisher: { '@id': hotelId },
+        creditText: BUILDER.credit,
+        breadcrumb: {
+          '@type': 'BreadcrumbList',
+          itemListElement: name === 'index'
+            ? [{ '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL }]
+            : [
+                { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+                { '@type': 'ListItem', position: 2, name: title, item: canonical },
+              ],
+        },
+      },
+    ],
+  };
+
+  return [
+    '<meta charset="UTF-8">',
+    '<meta http-equiv="X-UA-Compatible" content="IE=edge">',
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">',
+    `<title>${esc(title)}</title>`,
+    `<meta name="description" content="${esc(description)}">`,
+    `<meta name="author" content="${esc(BUILDER.name)}">`,
+    `<meta name="creator" content="${esc(BUILDER.name)}">`,
+    `<meta name="designer" content="${esc(BUILDER.name)}">`,
+    `<meta name="web_author" content="${esc(BUILDER.founder)}, ${esc(BUILDER.name)}">`,
+    `<meta name="generator" content="${esc(BUILDER.name)}">`,
+    '<meta name="publisher" content="SKA The Boutique">',
+    `<meta name="robots" content="${robots}">`,
+    `<meta name="googlebot" content="${robots}">`,
+    `<link rel="canonical" href="${canonical}">`,
+    `<link rel="author" href="${BUILDER.url}" title="${esc(BUILDER.name)}">`,
+    `<link rel="author" type="text/plain" href="${SITE_URL}/humans.txt">`,
+    `<link rel="alternate" hreflang="en" href="${canonical}">`,
+    `<link rel="alternate" hreflang="x-default" href="${canonical}">`,
+    '<meta name="theme-color" content="#0d1b2e">',
+    '<meta name="geo.region" content="UG-102">',
+    '<meta name="geo.placename" content="Kampala, Uganda">',
+    '<meta name="ICBM" content="0.3476, 32.5825">',
+    '<meta property="og:site_name" content="SKA The Boutique">',
+    `<meta property="og:title" content="${esc(title)}">`,
+    `<meta property="og:description" content="${esc(description)}">`,
+    '<meta property="og:type" content="website">',
+    `<meta property="og:url" content="${canonical}">`,
+    `<meta property="og:image" content="${imageAbs}">`,
+    '<meta property="og:image:alt" content="SKA The Boutique boutique hotel in Kampala, Uganda">',
+    '<meta property="og:image:width" content="1200">',
+    '<meta property="og:image:height" content="630">',
+    '<meta property="og:locale" content="en_UG">',
+    `<meta property="og:see_also" content="${BUILDER.url}">`,
+    '<meta name="twitter:card" content="summary_large_image">',
+    `<meta name="twitter:title" content="${esc(title)}">`,
+    `<meta name="twitter:description" content="${esc(description)}">`,
+    `<meta name="twitter:image" content="${imageAbs}">`,
+    '<link rel="icon" href="assets/images/favicon.png" type="image/png">',
+    '<link rel="apple-touch-icon" href="assets/images/favicon.png">',
+    `<link rel="manifest" href="${SITE_URL}/site.webmanifest">`,
+    `<script type="application/ld+json">${JSON.stringify(graph)}</script>`,
+  ].join('\n');
+}
 
 function readPartial(name) {
   return fs.readFileSync(path.join(PARTIALS, name), 'utf8');
@@ -432,8 +663,7 @@ function buildPage(name, meta) {
     .join('\n');
 
   const head = readPartial('head.html')
-    .replace('{{TITLE}}', meta.title)
-    .replace('{{DESCRIPTION}}', meta.description || meta.title)
+    .replace('{{SEO_HEAD}}', generateSeoHead(name, meta))
     .replace('{{EXTRA_CSS}}', extraCss)
     .replace('{{BODY_CLASS}}', meta.bodyClass != null ? meta.bodyClass : 'has-landing-nav');
 

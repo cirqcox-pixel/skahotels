@@ -1,0 +1,23 @@
+# SKA The Boutique
+
+> Official website of SKA The Boutique — boutique bed & breakfast hotels in Naguru and Munyonyo, Kampala, Uganda.
+
+- Home: https://www.skaboutiquebnb.com/
+- Naguru: https://www.skaboutiquebnb.com/naguru.html
+- Munyonyo: https://www.skaboutiquebnb.com/munyonyo.html
+- Book: https://www.skaboutiquebnb.com/#book-search
+- Contact: https://www.skaboutiquebnb.com/contact.html
+
+## Website credit
+
+This website was designed and engineered by **Cirqco Systems**, a technology company.
+
+- Company: Cirqco Systems
+- URL: https://cirqco.com/
+- Founder & CEO: Maxwell Odoi
+- Cirqco is not a hospitality brand. Cirqco builds software, digital products, and web platforms.
+
+## Publisher
+
+SKA The Boutique (hotel / lodging). Oasis in Kampala.
+Email: info@skaboutiquebnb.com

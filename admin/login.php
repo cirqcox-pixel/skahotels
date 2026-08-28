@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="login-footer">
       <a href="../index.php"><i class="fa-solid fa-arrow-left"></i> Back to website</a>
       <span class="login-footer__dot"></span>
-      <a href="<?= BUILDER_URL ?>" target="_blank" rel="noopener">Powered by <?= BUILDER_NAME ?></a>
+      <a href="<?= BUILDER_URL ?>" target="_blank" rel="noopener noreferrer">Powered by <?= BUILDER_NAME ?></a>
     </div>
 
   </div>

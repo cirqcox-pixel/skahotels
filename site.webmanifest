@@ -1,0 +1,17 @@
+{
+  "name": "SKA The Boutique",
+  "short_name": "SKA",
+  "description": "Boutique hotels in Naguru and Munyonyo, Kampala. Website engineered by Cirqco Systems.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#121110",
+  "theme_color": "#0d1b2e",
+  "lang": "en-UG",
+  "icons": [
+    {
+      "src": "assets/images/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

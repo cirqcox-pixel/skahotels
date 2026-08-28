@@ -95,10 +95,7 @@ $footerNaguruHref = preg_replace('/\D+/', '', $footerNaguru);
       <span class="ska-footer__legal-dot"></span>
       <a href="admin/login.php" rel="nofollow">Staff</a>
     </div>
-    <p class="ska-footer__credit">
-      Crafted by <a href="<?= BUILDER_URL ?>" target="_blank" rel="noopener noreferrer"><?= BUILDER_NAME ?></a>
-      — hospitality technology &amp; digital experience
-    </p>
+    <?= ska_builder_credit_html() ?>
   </div>
 
 </footer>
