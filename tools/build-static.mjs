@@ -792,7 +792,7 @@ if (process.argv.includes('--admin-only')) {
   fs.mkdirSync(path.join(OUT, 'admin', 'assets'), { recursive: true });
   buildAdmin();
   copyDir(path.join(ROOT, 'admin', 'assets'), path.join(OUT, 'admin', 'assets'));
-  const jsFiles = ['ska-admin.js', 'ska-api.js', 'ska-config.js'];
+  const jsFiles = ['ska-admin.js', 'ska-api.js', 'ska-config.js', 'ska-notify.js'];
   for (const file of jsFiles) {
     const src = path.join(ROOT, 'assets', 'js', file);
     const dest = path.join(OUT, 'assets', 'js', file);

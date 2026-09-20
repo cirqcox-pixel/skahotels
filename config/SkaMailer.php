@@ -89,11 +89,9 @@ class SkaMailer
             $cfg
         );
 
-        return $this->send($b['email'], $subject, $body, $cfg['replyTo']);
-    }
-
-    /* ══════════════════════════════════════════════════════
-       2.  ADMIN — new booking alert (routed to correct branch)
+        $ok = $this->send($b['email'], $subject, $body, $cfg['replyTo']);
+        $this->notifyEdge('booking', $b);
+        return $ok;
     ══════════════════════════════════════════════════════ */
     public function sendAdminNewBooking(array $b): bool
     {
@@ -192,11 +190,9 @@ class SkaMailer
             $cfg
         );
 
-        return $this->send($b['email'], $subject, $body, $cfg['replyTo']);
-    }
-
-    /* ══════════════════════════════════════════════════════
-       4.  GUEST — booking rejected / cancelled by admin
+        $ok = $this->send($b['email'], $subject, $body, $cfg['replyTo']);
+        $this->notifyEdge('booking_confirmed', $b);
+        return $ok;
     ══════════════════════════════════════════════════════ */
     public function sendBookingCancelled(array $b, string $reason = ''): bool
     {
@@ -227,10 +223,9 @@ class SkaMailer
             $cfg
         );
 
-        return $this->send($b['email'], $subject, $body, $cfg['replyTo']);
-    }
-
-    public function sendAdminInvite(
+        $ok = $this->send($b['email'], $subject, $body, $cfg['replyTo']);
+        $this->notifyEdge('booking_cancelled', $b);
+        return $ok;
         string $to,
         string $username,
         string $roleLabel,
@@ -272,6 +267,23 @@ class SkaMailer
         $headers .= "X-Mailer: PHP/" . phpversion() . "\r\n";
 
         return mail($to, $subject, $htmlBody, $headers);
+    }
+
+    private function notifyEdge(string $type, array $b): void
+    {
+        $url = 'https://nllqkepymtwwbvbjnbyz.supabase.co/functions/v1/notify-email';
+        $key = 'sb_publishable_LCuHabxBgF-bth8zDI2mgw_7QsdljHH';
+        $payload = json_encode(['type' => $type, 'data' => $b]);
+        $ctx = stream_context_create([
+            'http' => [
+                'method'  => 'POST',
+                'header'  => "Content-Type: application/json\r\nAccept: application/json\r\nAuthorization: Bearer {$key}\r\n",
+                'content' => $payload,
+                'timeout' => 12,
+                'ignore_errors' => true,
+            ],
+        ]);
+        @file_get_contents($url, false, $ctx);
     }
 
     /* ══════════════════════════════════════════════════════

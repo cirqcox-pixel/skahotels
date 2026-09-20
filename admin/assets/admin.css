@@ -1074,7 +1074,8 @@ button.ska-sidebar__logout {
 #imageInput,
 #promoImageInput,
 #pkgImageFile,
-#pkgImageInput { display: none; }
+#pkgImageInput,
+#promoImageFile { display: none; }
 
 .ska-img-preview-grid {
   display: flex;

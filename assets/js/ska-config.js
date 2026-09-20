@@ -30,7 +30,7 @@ window.SKA_CONFIG = {
    * Leave empty if using Formspree only.
    */
   notify: {
-    webhookUrl: '',  // e.g. 'https://nllqkepymtwwbvbjnbyz.supabase.co/functions/v1/notify-email'
+    webhookUrl: 'https://nllqkepymtwwbvbjnbyz.supabase.co/functions/v1/notify-email',
     to: 'naguru.booking@skaboutiquebnb.com'
   },
 

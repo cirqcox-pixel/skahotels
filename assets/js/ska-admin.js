@@ -407,14 +407,14 @@
   async function loadPromotionsPage() {
     var tbody = document.getElementById('promosTableBody');
     if (!tbody) return;
-    var session = await ensureAuth('promosTableBody', 6);
+    var session = await ensureAuth('promosTableBody', 7);
     if (!session) return;
 
     hideError();
     try {
       var promos = await withTimeout(SkaApi.adminFetchPromotions());
       if (!promos.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="ska-table-empty">No promotions yet.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="ska-table-empty">No promotions yet.</td></tr>';
         return;
       }
       tbody.innerHTML = promos.map(function (p) {
@@ -423,7 +423,11 @@
           : p.discount_type === 'free_night'
             ? esc(p.discount_value) + ' free night(s)'
             : 'USD ' + esc(p.discount_value);
+        var thumb = mediaUrl(p.image);
         return '<tr>' +
+          '<td>' + (thumb
+            ? '<img src="' + esc(thumb) + '" alt="" class="ska-table-thumb">'
+            : '<div class="ska-table-thumb-empty"><i class="fa-regular fa-image"></i></div>') + '</td>' +
           '<td><strong>' + esc(p.title) + '</strong></td>' +
           '<td>' + esc(p.branch) + '</td>' +
           '<td>' + disc + '</td>' +
@@ -439,15 +443,7 @@
         btn.addEventListener('click', function () {
           var promo = promos.find(function (p) { return String(p.id) === btn.dataset.editPromo; });
           if (!promo) return;
-          document.getElementById('promoModalTitle').textContent = 'Edit Promotion';
-          document.getElementById('promoId').value = promo.id;
-          document.getElementById('promoTitle').value = promo.title || '';
-          document.getElementById('promoBranch').value = promo.branch || 'Both';
-          document.getElementById('promoType').value = promo.discount_type || 'percent';
-          document.getElementById('promoValue').value = promo.discount_value || 0;
-          document.getElementById('promoMinNights').value = promo.min_nights || 1;
-          document.getElementById('promoActive').value = promo.active ? 'true' : 'false';
-          document.getElementById('promoDesc').value = promo.description || '';
+          fillPromoForm(promo);
           openModal('promoModal');
         });
       });
@@ -466,15 +462,46 @@
       });
     } catch (e) {
       showError('Could not load promotions: ' + (e.message || e));
-      tbody.innerHTML = '<tr><td colspan="6" class="ska-table-empty">Failed to load promotions.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="ska-table-empty">Failed to load promotions.</td></tr>';
     }
+  }
+
+  function setPromoImagePreview(path) {
+    var wrap = document.getElementById('promoImagePreviewWrap');
+    var img = document.getElementById('promoImagePreview');
+    var hidden = document.getElementById('promoImage');
+    var pathField = document.getElementById('promoImagePath');
+    if (hidden) hidden.value = path || '';
+    if (pathField && pathField !== document.activeElement) pathField.value = path || '';
+    if (!wrap || !img) return;
+    if (path) {
+      wrap.style.display = '';
+      img.src = mediaUrl(path);
+    } else {
+      wrap.style.display = 'none';
+      img.removeAttribute('src');
+    }
+  }
+
+  function fillPromoForm(promo) {
+    document.getElementById('promoModalTitle').textContent = promo && promo.id ? 'Edit Promotion' : 'Add Promotion';
+    document.getElementById('promoId').value = (promo && promo.id) || '';
+    document.getElementById('promoTitle').value = (promo && promo.title) || '';
+    document.getElementById('promoBranch').value = (promo && promo.branch) || 'Both';
+    document.getElementById('promoType').value = (promo && promo.discount_type) || 'percent';
+    document.getElementById('promoValue').value = (promo && promo.discount_value) || 0;
+    document.getElementById('promoMinNights').value = (promo && promo.min_nights) || 1;
+    document.getElementById('promoActive').value = !promo || promo.active ? 'true' : 'false';
+    document.getElementById('promoDesc').value = (promo && promo.description) || '';
+    var file = document.getElementById('promoImageFile');
+    if (file) file.value = '';
+    setPromoImagePreview((promo && promo.image) || '');
   }
 
   function initPromotionsPage() {
     document.getElementById('btnAddPromo')?.addEventListener('click', function () {
       document.getElementById('promoForm').reset();
-      document.getElementById('promoId').value = '';
-      document.getElementById('promoModalTitle').textContent = 'Add Promotion';
+      fillPromoForm(null);
       openModal('promoModal');
     });
 
@@ -482,19 +509,50 @@
       document.getElementById(id)?.addEventListener('click', function () { closeModal('promoModal'); });
     });
 
+    document.getElementById('promoUploadZone')?.addEventListener('click', function () {
+      document.getElementById('promoImageFile')?.click();
+    });
+    document.getElementById('promoImageReplace')?.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      document.getElementById('promoImageFile')?.click();
+    });
+    document.getElementById('promoImageFile')?.addEventListener('change', function () {
+      var file = this.files && this.files[0];
+      if (!file) return;
+      setPromoImagePreview(URL.createObjectURL(file));
+    });
+    document.getElementById('promoImagePath')?.addEventListener('input', function () {
+      setPromoImagePreview(this.value.trim());
+    });
+
     document.getElementById('promoForm')?.addEventListener('submit', async function (e) {
       e.preventDefault();
+      hideError();
       var fd = new FormData(e.target);
       var data = {};
-      fd.forEach(function (v, k) { data[k] = v; });
+      fd.forEach(function (v, k) {
+        if (typeof File !== 'undefined' && v instanceof File) return;
+        data[k] = v;
+      });
       data.active = data.active === 'true';
+      var pathField = document.getElementById('promoImagePath');
+      if (pathField && pathField.value.trim()) data.image = pathField.value.trim();
+      var fileInput = document.getElementById('promoImageFile');
+      var file = fileInput && fileInput.files && fileInput.files[0];
       try {
+        if (file) {
+          data.image = await SkaApi.adminUploadPublicFile('promotions', file);
+        }
         await SkaApi.adminSavePromotion(data);
         closeModal('promoModal');
         showToast('Promotion saved.');
         loadPromotionsPage();
       } catch (err) {
-        showError(err.message || 'Save failed');
+        var msg = err.message || 'Save failed';
+        if (/bucket|not found|row-level security/i.test(msg)) {
+          msg = 'Image upload needs the ska-uploads bucket. In Supabase SQL Editor run supabase/migrations/010_storage_uploads.sql, then try again.';
+        }
+        showError(msg);
       }
     });
   }

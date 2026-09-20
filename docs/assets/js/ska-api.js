@@ -359,9 +359,14 @@
     },
 
     adminUpdateBookingStatus: async function (id, status) {
-      return adminRequest(function (sb) {
+      var row = await adminRequest(function (sb) {
         return sb.from('bookings').update({ status: status }).eq('id', id).select().single();
       });
+      if (global.SkaNotify && row) {
+        var type = status === 'confirmed' ? 'booking_confirmed' : 'booking_cancelled';
+        try { await SkaNotify.notify(type, row); } catch (e) { /* status already saved */ }
+      }
+      return row;
     },
 
     adminFetchInquiries: async function () {
@@ -392,6 +397,7 @@
         discount_value: parseFloat(promo.discount_value || 0),
         min_nights: parseInt(promo.min_nights || 1, 10),
         branch: promo.branch || 'Both',
+        image: promo.image || null,
         active: promo.active === true || promo.active === 'true'
       };
       if (promo.id) {

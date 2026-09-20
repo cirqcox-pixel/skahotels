@@ -71,6 +71,7 @@
         <table class="ska-table">
           <thead>
             <tr>
+              <th></th>
               <th>Title</th>
               <th>Branch</th>
               <th>Discount</th>
@@ -80,7 +81,7 @@
             </tr>
           </thead>
           <tbody id="promosTableBody">
-            <tr><td colspan="6" class="ska-table-empty">Loading…</td></tr>
+            <tr><td colspan="7" class="ska-table-empty">Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -89,52 +90,73 @@
 </div>
 
 <div class="ska-modal-backdrop" id="promoModal">
-  <div class="ska-modal" role="dialog" aria-labelledby="promoModalTitle">
+  <div class="ska-modal ska-modal--lg" role="dialog" aria-labelledby="promoModalTitle">
     <div class="ska-modal__header">
       <h3 class="ska-modal__title" id="promoModalTitle">Add Promotion</h3>
       <button type="button" class="ska-modal__close" id="promoModalClose" aria-label="Close">&times;</button>
     </div>
-    <form id="promoForm" class="ska-modal__body">
-      <input type="hidden" id="promoId" name="id">
-      <div class="ska-form-grid">
-        <div class="ska-form-field ska-form-field--full">
-          <label for="promoTitle">Title</label>
-          <input type="text" id="promoTitle" name="title" class="ska-input" required>
-        </div>
-        <div class="ska-form-field">
-          <label for="promoBranch">Branch</label>
-          <select id="promoBranch" name="branch" class="ska-input">
-            <option value="Both">Both</option>
-            <option value="Naguru">Naguru</option>
-            <option value="Munyonyo">Munyonyo</option>
-          </select>
-        </div>
-        <div class="ska-form-field">
-          <label for="promoType">Discount type</label>
-          <select id="promoType" name="discount_type" class="ska-input">
-            <option value="percent">Percent</option>
-            <option value="fixed">Fixed USD</option>
-            <option value="free_night">Free nights</option>
-          </select>
-        </div>
-        <div class="ska-form-field">
-          <label for="promoValue">Discount value</label>
-          <input type="number" id="promoValue" name="discount_value" class="ska-input" min="0" step="1" value="10">
-        </div>
-        <div class="ska-form-field">
-          <label for="promoMinNights">Min nights</label>
-          <input type="number" id="promoMinNights" name="min_nights" class="ska-input" min="1" value="1">
-        </div>
-        <div class="ska-form-field">
-          <label for="promoActive">Active</label>
-          <select id="promoActive" name="active" class="ska-input">
-            <option value="true">Yes</option>
-            <option value="false">No</option>
-          </select>
-        </div>
-        <div class="ska-form-field ska-form-field--full">
-          <label for="promoDesc">Description</label>
-          <textarea id="promoDesc" name="description" class="ska-input" rows="3"></textarea>
+    <form id="promoForm" class="ska-modal__form">
+      <div class="ska-modal__body">
+        <input type="hidden" id="promoId" name="id">
+        <input type="hidden" id="promoImage" name="image">
+        <div class="ska-form-grid">
+          <div class="ska-form-field ska-form-field--full">
+            <label for="promoTitle">Title</label>
+            <input type="text" id="promoTitle" name="title" class="ska-input" required>
+          </div>
+          <div class="ska-form-field">
+            <label for="promoBranch">Branch</label>
+            <select id="promoBranch" name="branch" class="ska-input">
+              <option value="Both">Both</option>
+              <option value="Naguru">Naguru</option>
+              <option value="Munyonyo">Munyonyo</option>
+            </select>
+          </div>
+          <div class="ska-form-field">
+            <label for="promoType">Discount type</label>
+            <select id="promoType" name="discount_type" class="ska-input">
+              <option value="percent">Percent</option>
+              <option value="fixed">Fixed USD</option>
+              <option value="free_night">Free nights</option>
+            </select>
+          </div>
+          <div class="ska-form-field">
+            <label for="promoValue">Discount value</label>
+            <input type="number" id="promoValue" name="discount_value" class="ska-input" min="0" step="1" value="10">
+          </div>
+          <div class="ska-form-field">
+            <label for="promoMinNights">Min nights</label>
+            <input type="number" id="promoMinNights" name="min_nights" class="ska-input" min="1" value="1">
+          </div>
+          <div class="ska-form-field">
+            <label for="promoActive">Active</label>
+            <select id="promoActive" name="active" class="ska-input">
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+          <div class="ska-form-field ska-form-field--full">
+            <label>Promotion image</label>
+            <div id="promoImagePreviewWrap" class="ska-current-img-wrap" style="display:none;margin-bottom:12px">
+              <img id="promoImagePreview" alt="Promotion image">
+              <span class="ska-current-img-wrap__badge">Current image</span>
+              <button type="button" class="ska-current-img-wrap__replace" id="promoImageReplace">
+                <i class="fa-solid fa-arrow-up-from-bracket"></i> Replace
+              </button>
+            </div>
+            <div id="promoUploadZone" class="ska-upload-zone">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <p>Click to upload or drag &amp; drop an image</p>
+              <span>JPEG · PNG · WebP · max 2.5 MB</span>
+            </div>
+            <input type="file" id="promoImageFile" accept="image/jpeg,image/png,image/webp">
+            <p class="ska-hint" style="margin-top:8px">Or paste an existing path</p>
+            <input type="text" id="promoImagePath" class="ska-input" placeholder="assets/images/ska_naguru_home.jpeg">
+          </div>
+          <div class="ska-form-field ska-form-field--full">
+            <label for="promoDesc">Description</label>
+            <textarea id="promoDesc" name="description" class="ska-input" rows="3"></textarea>
+          </div>
         </div>
       </div>
       <div class="ska-modal__footer">
@@ -146,8 +168,9 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../assets/js/ska-config.js?v=20260920g"></script>
-<script src="../assets/js/ska-api.js?v=20260920g"></script>
-<script src="../assets/js/ska-admin.js?v=20260920g"></script>
+<script src="../assets/js/ska-config.js?v=20260920h"></script>
+<script src="../assets/js/ska-notify.js?v=20260920h"></script>
+<script src="../assets/js/ska-api.js?v=20260920h"></script>
+<script src="../assets/js/ska-admin.js?v=20260920h"></script>
 </body>
 </html>

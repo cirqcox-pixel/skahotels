@@ -23,13 +23,17 @@
     return 'https://formspree.io/f/' + id;
   }
 
-  async function postJson(url, payload) {
+  async function postJson(url, payload, extraHeaders) {
+    var headers = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    };
+    if (extraHeaders) {
+      Object.keys(extraHeaders).forEach(function (k) { headers[k] = extraHeaders[k]; });
+    }
     var res = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      },
+      headers: headers,
       body: JSON.stringify(payload)
     });
     if (!res.ok) {
@@ -49,7 +53,7 @@
       payload = {
         _subject: 'SKA Booking Request — ' + (data.branch || 'Property'),
         _replyto: data.email,
-        _cc: adminInbox(data.branch),
+        _cc: [adminInbox(data.branch), data.email].filter(Boolean).join(','),
         type: 'booking',
         name: data.name,
         email: data.email,
@@ -92,14 +96,23 @@
    */
   async function sendWebhook(type, data) {
     var url = (cfg.notify && cfg.notify.webhookUrl) || cfg.resendWebhook || '';
+    if (!url && cfg.supabaseUrl) {
+      url = String(cfg.supabaseUrl).replace(/\/$/, '') + '/functions/v1/notify-email';
+    }
     if (!url) return false;
+
+    var headers = {};
+    if (cfg.supabaseAnonKey) {
+      headers.Authorization = 'Bearer ' + cfg.supabaseAnonKey;
+      headers.apikey = cfg.supabaseAnonKey;
+    }
 
     await postJson(url, {
       type: type,
-      to: type === 'booking' ? adminInbox(data.branch) : ((cfg.notify && cfg.notify.to) || cfg.siteEmail || 'info@skaboutiquebnb.com'),
+      to: type.indexOf('booking') === 0 ? adminInbox(data.branch) : ((cfg.notify && cfg.notify.to) || cfg.siteEmail || 'info@skaboutiquebnb.com'),
       data: data,
       site: cfg.siteName || 'SKA The Boutique'
-    });
+    }, headers);
     return true;
   }
 
@@ -109,17 +122,19 @@
   async function notify(type, data) {
     var results = { formspree: false, webhook: false };
     try {
-      results.formspree = await sendFormspree(type, data);
-    } catch (e) {
-      console.warn('[SKA Notify] Formspree:', e.message || e);
-    }
-    try {
       results.webhook = await sendWebhook(type, data);
     } catch (e) {
       console.warn('[SKA Notify] Webhook/Resend:', e.message || e);
     }
+    if (!results.webhook) {
+      try {
+        results.formspree = await sendFormspree(type, data);
+      } catch (e) {
+        console.warn('[SKA Notify] Formspree:', e.message || e);
+      }
+    }
     if (!results.formspree && !results.webhook) {
-      console.info('[SKA Notify] No email provider configured. Add Formspree IDs in ska-config.js');
+      console.info('[SKA Notify] No email went out. Deploy notify-email or check Formspree.');
     }
     return results;
   }
