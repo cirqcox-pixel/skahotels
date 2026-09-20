@@ -745,21 +745,25 @@
       });
       tbody.querySelectorAll('[data-staff-resend]').forEach(function (btn) {
         btn.addEventListener('click', async function () {
+          hideError();
           btn.disabled = true;
+          var label = btn.textContent;
+          btn.textContent = 'Sending…';
           try {
             var sent = await SkaApi.adminResendInvite(
               btn.getAttribute('data-staff-resend'),
               btn.getAttribute('data-staff-resend-role') || 'manager'
             );
             if (sent && sent.emailed === false) {
-              showError(sent.error || 'Invite was not emailed. Check Resend / Auth email settings.');
+              showError(sent.error || 'Invite was not emailed.');
             } else {
-              showToast('Invite resent. Ask them to check inbox and spam.');
+              showToast('Invite sent to ' + btn.getAttribute('data-staff-resend') + '. Check inbox and spam.');
             }
           } catch (err) {
             showError(err.message || 'Could not resend invite');
           }
           btn.disabled = false;
+          btn.textContent = label;
         });
       });
       tbody.querySelectorAll('[data-staff-remove]').forEach(function (btn) {

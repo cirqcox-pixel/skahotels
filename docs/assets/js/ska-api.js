@@ -474,33 +474,88 @@
       }
     },
 
-    adminInviteStaff: async function (email, role, opts) {
-      var sb = getClient();
-      var body = {
-        email: String(email || '').trim(),
-        role: role || 'manager',
-        redirectTo: SkaApi.adminLoginUrl(),
-        resend: !!(opts && opts.resend)
-      };
-      var res = await sb.functions.invoke('invite-staff', { body: body });
-      var fallback = null;
-      if (res.error) {
-        if (!(opts && opts.resend)) {
-          try {
-            fallback = await SkaApi.adminAddStaffRpc(body.email, body.role);
-          } catch (e) { /* keep function error */ }
+    adminInviteRedirect: function () {
+      var url = SkaApi.adminLoginUrl();
+      try {
+        var u = new URL(url);
+        u.searchParams.set('set_password', '1');
+        return u.toString();
+      } catch (e) {
+        return url + (url.indexOf('?') >= 0 ? '&' : '?') + 'set_password=1';
+      }
+    },
+
+    adminSendInviteEmail: async function (email) {
+      email = String(email || '').trim().toLowerCase();
+      if (!email) throw new Error('A valid email is required.');
+      var redirectTo = SkaApi.adminInviteRedirect();
+      var otpClient = global.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false
         }
-        var msg = (res.error && res.error.message) || 'Invite email could not be sent.';
-        if (fallback) {
-          throw new Error(msg + ' Access was saved, but no email went out. Deploy the invite-staff function and try Resend invite.');
+      });
+      var otp = await otpClient.auth.signInWithOtp({
+        email: email,
+        options: {
+          emailRedirectTo: redirectTo,
+          shouldCreateUser: true
+        }
+      });
+      if (otp.error) {
+        var msg = otp.error.message || 'Could not send invite email.';
+        if (/rate|seconds/i.test(msg)) {
+          msg = 'Supabase is rate-limiting invites. Wait about a minute, then resend.';
+        } else if (/redirect|whitelist|allow/i.test(msg)) {
+          msg = 'Add this URL under Supabase Authentication → URL Configuration → Redirect URLs: ' + redirectTo.split('?')[0];
+        } else if (/signups? (not |are )?disabled|disabled/i.test(msg)) {
+          msg = 'Email sign-ups are disabled in Supabase Auth. Enable them, or allow magic-link invites.';
         }
         throw new Error(msg);
       }
-      var data = res.data || {};
-      if (data.error && data.ok !== true) {
-        throw new Error(data.error);
+      return { ok: true, emailed: true, provider: 'magic_link' };
+    },
+
+    adminInviteStaff: async function (email, role, opts) {
+      var bodyEmail = String(email || '').trim();
+      var bodyRole = role || 'manager';
+      var resend = !!(opts && opts.resend);
+
+      if (!resend) {
+        await SkaApi.adminAddStaffRpc(bodyEmail, bodyRole);
+      } else {
+        try {
+          await SkaApi.adminUpdateStaff(bodyEmail, bodyRole);
+        } catch (e) { /* invite row may not have an auth user yet */ }
       }
-      return data;
+
+      var fnErr = null;
+      try {
+        var sb = getClient();
+        var res = await sb.functions.invoke('invite-staff', {
+          body: {
+            email: bodyEmail,
+            role: bodyRole,
+            redirectTo: SkaApi.adminInviteRedirect(),
+            resend: resend
+          }
+        });
+        var data = res.data || {};
+        if (!res.error && data && data.emailed) {
+          return data;
+        }
+        if (res.error) fnErr = res.error.message;
+        else if (data.error) fnErr = data.error;
+      } catch (e) {
+        fnErr = e.message || String(e);
+      }
+
+      try {
+        return await SkaApi.adminSendInviteEmail(bodyEmail);
+      } catch (otpErr) {
+        throw new Error(otpErr.message || fnErr || 'Could not send invite email.');
+      }
     },
 
     adminAddStaffRpc: async function (email, role) {
