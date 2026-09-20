@@ -230,6 +230,30 @@ class SkaMailer
         return $this->send($b['email'], $subject, $body, $cfg['replyTo']);
     }
 
+    public function sendAdminInvite(
+        string $to,
+        string $username,
+        string $roleLabel,
+        string $loginUrl,
+        ?string $password = null
+    ): bool {
+        $userEsc = htmlspecialchars($username);
+        $roleEsc = htmlspecialchars($roleLabel);
+        $urlEsc = htmlspecialchars($loginUrl);
+        $passLine = $password
+            ? '<p style="font-size:14px;color:#333;">Temporary password: <strong>' . htmlspecialchars($password) . '</strong></p>'
+            : '<p style="font-size:14px;color:#333;">Use the password you were given, or ask a Super Admin to reset it.</p>';
+        $html = '<!DOCTYPE html><html><body style="font-family:Georgia,serif;background:#f6f3ee;padding:24px;">
+          <div style="max-width:520px;margin:0 auto;background:#fff;padding:32px;border-radius:12px;">
+            <p style="letter-spacing:.2em;text-transform:uppercase;font-size:11px;color:#c9a96e;">SKA The Boutique</p>
+            <h1 style="font-weight:400;color:#0d1b2e;">You are invited to the admin dashboard</h1>
+            <p>Sign in as <strong>' . $userEsc . '</strong> with the role <strong>' . $roleEsc . '</strong>.</p>
+            ' . $passLine . '
+            <p><a href="' . $urlEsc . '" style="display:inline-block;background:#0d1b2e;color:#fff;text-decoration:none;padding:12px 22px;border-radius:999px;">Open admin sign-in</a></p>
+          </div></body></html>';
+        return $this->send($to, 'Your SKA Admin invitation', $html, 'info@skaboutiquebnb.com');
+    }
+
     /* ══════════════════════════════════════════════════════
        PRIVATE — raw mail() wrapper
     ══════════════════════════════════════════════════════ */

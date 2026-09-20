@@ -466,10 +466,55 @@
       return data || [];
     },
 
-    adminAddStaff: async function (email, role) {
+    adminLoginUrl: function () {
+      try {
+        return new URL('login.html', location.href).toString();
+      } catch (e) {
+        return 'https://www.skaboutiquebnb.com/admin/login.html';
+      }
+    },
+
+    adminInviteStaff: async function (email, role, opts) {
+      var sb = getClient();
+      var body = {
+        email: String(email || '').trim(),
+        role: role || 'manager',
+        redirectTo: SkaApi.adminLoginUrl(),
+        resend: !!(opts && opts.resend)
+      };
+      var res = await sb.functions.invoke('invite-staff', { body: body });
+      var fallback = null;
+      if (res.error) {
+        if (!(opts && opts.resend)) {
+          try {
+            fallback = await SkaApi.adminAddStaffRpc(body.email, body.role);
+          } catch (e) { /* keep function error */ }
+        }
+        var msg = (res.error && res.error.message) || 'Invite email could not be sent.';
+        if (fallback) {
+          throw new Error(msg + ' Access was saved, but no email went out. Deploy the invite-staff function and try Resend invite.');
+        }
+        throw new Error(msg);
+      }
+      var data = res.data || {};
+      if (data.error && data.ok !== true) {
+        throw new Error(data.error);
+      }
+      return data;
+    },
+
+    adminAddStaffRpc: async function (email, role) {
       return adminRequest(function (sb) {
         return sb.rpc('ska_add_staff', { p_email: email, p_role: role });
       });
+    },
+
+    adminAddStaff: async function (email, role) {
+      return SkaApi.adminInviteStaff(email, role, { resend: false });
+    },
+
+    adminResendInvite: async function (email, role) {
+      return SkaApi.adminInviteStaff(email, role, { resend: true });
     },
 
     adminUpdateStaff: async function (email, role) {

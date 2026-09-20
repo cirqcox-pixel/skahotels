@@ -32,6 +32,28 @@
       <span id="loginNoticeText"></span>
     </div>
 
+    <form id="adminSetPasswordForm" class="ska-login-form" autocomplete="on" style="display:none">
+      <p class="logo-sub" style="margin-bottom:16px">Choose a password for your admin account.</p>
+      <div class="mb-3">
+        <label class="form-label-ska" for="adminNewPass">New password</label>
+        <div class="input-icon-wrap">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="adminNewPass" class="form-control" placeholder="At least 8 characters" required minlength="8">
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label-ska" for="adminNewPass2">Confirm password</label>
+        <div class="input-icon-wrap">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="adminNewPass2" class="form-control" placeholder="Repeat password" required minlength="8">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-login">
+        <span>Save password &amp; continue</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </form>
+
     <form id="adminLoginForm" class="ska-login-form" autocomplete="on">
       <div class="mb-3">
         <label class="form-label-ska" for="adminEmail">Email</label>
@@ -68,8 +90,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../assets/js/ska-config.js"></script>
-<script src="../assets/js/ska-api.js"></script>
+<script src="../assets/js/ska-config.js?v=20260920e"></script>
+<script src="../assets/js/ska-api.js?v=20260920e"></script>
 <script>
 document.getElementById('togglePw')?.addEventListener('click', function () {
   var input = document.getElementById('adminPass');
@@ -79,23 +101,79 @@ document.getElementById('togglePw')?.addEventListener('click', function () {
   icon.className = show ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
 });
 
-document.getElementById('adminLoginForm').addEventListener('submit', async function (e) {
-  e.preventDefault();
+function showErr(msg) {
   var errEl = document.getElementById('loginError');
   var errTxt = document.getElementById('loginErrorText');
-  errEl.style.display = 'none';
+  errTxt.textContent = msg;
+  errEl.style.display = 'flex';
+}
+
+function wantsSetPassword() {
+  var q = new URLSearchParams(location.search);
+  var h = new URLSearchParams((location.hash || '').replace(/^#/, ''));
+  return q.get('set_password') === '1' ||
+    h.get('type') === 'invite' ||
+    h.get('type') === 'recovery' ||
+    h.get('type') === 'magiclink';
+}
+
+function showSetPassword() {
+  document.getElementById('adminLoginForm').style.display = 'none';
+  document.getElementById('adminSetPasswordForm').style.display = '';
+  var notice = document.getElementById('loginNotice');
+  var noticeTxt = document.getElementById('loginNoticeText');
+  noticeTxt.textContent = 'Invite received. Set a password to finish signing in.';
+  notice.style.display = 'flex';
+}
+
+document.getElementById('adminLoginForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  document.getElementById('loginError').style.display = 'none';
   try {
     await SkaApi.adminSignIn(adminEmail.value.trim(), adminPass.value);
     location.href = 'dashboard.html';
   } catch (ex) {
-    errTxt.textContent = ex.message || 'Sign in failed';
-    errEl.style.display = 'flex';
+    showErr(ex.message || 'Sign in failed');
   }
 });
 
-SkaApi.adminSession().then(function (s) {
-  if (s) location.href = 'dashboard.html';
+document.getElementById('adminSetPasswordForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  document.getElementById('loginError').style.display = 'none';
+  var a = document.getElementById('adminNewPass').value;
+  var b = document.getElementById('adminNewPass2').value;
+  if (a !== b) {
+    showErr('Passwords do not match.');
+    return;
+  }
+  try {
+    var sb = SkaApi.client();
+    var res = await sb.auth.updateUser({ password: a });
+    if (res.error) throw res.error;
+    location.href = 'dashboard.html';
+  } catch (ex) {
+    showErr(ex.message || 'Could not save password');
+  }
 });
+
+(function () {
+  var needPw = wantsSetPassword();
+  SkaApi.client().auth.onAuthStateChange(function (event, session) {
+    if (!session) return;
+    if (needPw || event === 'PASSWORD_RECOVERY') {
+      showSetPassword();
+      return;
+    }
+    if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+      location.href = 'dashboard.html';
+    }
+  });
+  SkaApi.adminSession().then(function (s) {
+    if (!s) return;
+    if (needPw) showSetPassword();
+    else location.href = 'dashboard.html';
+  });
+})();
 
 (function () {
   var p = new URLSearchParams(location.search);

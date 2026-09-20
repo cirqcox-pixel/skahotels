@@ -1,6 +1,8 @@
 <?php
 require_once '../config/db.php';
 require_once '../config/cms.php';
+require_once '../config/site.php';
+require_once '../config/SkaMailer.php';
 require_once 'includes/auth.php';
 ska_admin_require();
 
@@ -13,6 +15,22 @@ $roles = [
     'reservations' => 'Reservations — bookings and inquiries',
     'marketing' => 'Marketing — promotions and packages',
 ];
+
+function ska_staff_send_invite(string $username, string $role, ?string $password = null): string
+{
+    if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
+        return ' User created. To email an invite, use an email address as the username.';
+    }
+    $mailer = new SkaMailer();
+    $ok = $mailer->sendAdminInvite(
+        $username,
+        $username,
+        ska_admin_role_label($role),
+        rtrim(SITE_URL, '/') . '/admin/login.php',
+        $password
+    );
+    return $ok ? ' Invite emailed to ' . $username . '.' : ' User saved, but the invite email did not send.';
+}
 
 function ska_staff_fetch_admins(mysqli $c): array
 {
@@ -51,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->bind_param('ss', $username, $hash);
             }
             if ($stmt->execute()) {
-                $msg = 'Staff user created.';
+                $msg = 'Staff user created.' . ska_staff_send_invite($username, $role, $password);
             } else {
                 $error = 'Username may already exist.';
             }
@@ -85,6 +103,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             } else {
                 $error = 'Role column is not on this database yet. Reload once so the schema can update.';
+            }
+        }
+    }
+
+    if ($action === 'resend_invite') {
+        $id = (int) $_POST['id'];
+        $row = null;
+        $chk = $c->prepare('SELECT username, role FROM admins WHERE id = ?');
+        if ($chk) {
+            $chk->bind_param('i', $id);
+            $chk->execute();
+            $row = $chk->get_result()->fetch_assoc();
+            $chk->close();
+        }
+        if (!$row) {
+            $error = 'Staff user not found.';
+        } else {
+            $note = ska_staff_send_invite($row['username'], $row['role'] ?? 'manager', null);
+            if (strpos($note, 'did not send') !== false || strpos($note, 'To email') !== false) {
+                $error = trim($note);
+            } else {
+                $msg = 'Invite resent.' . $note;
             }
         }
     }
@@ -143,7 +183,7 @@ include 'includes/layout-start.php';
         <p class="ska-hint mb-3">Each person gets a login and a role. The sidebar only shows pages that role is allowed to open.</p>
         <form method="POST">
           <input type="hidden" name="action" value="add">
-          <div class="mb-3"><label class="ska-label">Username</label><input name="username" class="ska-input" required></div>
+          <div class="mb-3"><label class="ska-label">Username (use their email so they get an invite)</label><input name="username" class="ska-input" required placeholder="front.desk@skahotels.com"></div>
           <div class="mb-3"><label class="ska-label">Password</label><input type="password" name="password" class="ska-input" required minlength="6"></div>
           <div class="mb-3">
             <label class="ska-label">Role</label>
@@ -189,7 +229,12 @@ include 'includes/layout-start.php';
               </td>
               <td>
                 <?php if ($a['username'] !== ($_SESSION['admin'] ?? '')): ?>
-                <form method="POST" onsubmit="return confirm('Remove this staff user?')"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?= (int) $a['id'] ?>"><button class="ska-btn ska-btn--ghost-del"><i class="fa-regular fa-trash-can"></i></button></form>
+                <form method="POST" style="display:inline" onsubmit="return confirm('Resend invite email?')">
+                  <input type="hidden" name="action" value="resend_invite">
+                  <input type="hidden" name="id" value="<?= (int) $a['id'] ?>">
+                  <button class="ska-btn ska-btn--outline ska-btn--sm" type="submit">Resend invite</button>
+                </form>
+                <form method="POST" onsubmit="return confirm('Remove this staff user?')" style="display:inline"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?= (int) $a['id'] ?>"><button class="ska-btn ska-btn--ghost-del"><i class="fa-regular fa-trash-can"></i></button></form>
                 <?php endif; ?>
               </td>
             </tr>

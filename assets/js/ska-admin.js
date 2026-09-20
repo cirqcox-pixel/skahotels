@@ -722,9 +722,13 @@
           '<td>' + roleSelectHtml(email, u.role || 'manager', !isSuper) + '</td>' +
           '<td>' + esc(pageLabels(u.pages)) + '</td>' +
           '<td>' + esc(status) + '</td>' +
-          '<td>' + (canRemove
+          '<td class="ska-staff-actions">' +
+          (isSuper
+            ? '<button type="button" class="ska-btn ska-btn--outline ska-btn--sm" data-staff-resend="' + esc(email) + '" data-staff-resend-role="' + esc(u.role || 'manager') + '">Resend invite</button>'
+            : '') +
+          (canRemove
             ? '<button type="button" class="ska-btn ska-btn--ghost-del" data-staff-remove="' + esc(email) + '" title="Remove"><i class="fa-regular fa-trash-can"></i></button>'
-            : '—') +
+            : (isSuper ? '' : '—')) +
           '</td></tr>';
       }).join('');
 
@@ -737,6 +741,25 @@
           } catch (err) {
             showError(err.message || 'Could not update role');
           }
+        });
+      });
+      tbody.querySelectorAll('[data-staff-resend]').forEach(function (btn) {
+        btn.addEventListener('click', async function () {
+          btn.disabled = true;
+          try {
+            var sent = await SkaApi.adminResendInvite(
+              btn.getAttribute('data-staff-resend'),
+              btn.getAttribute('data-staff-resend-role') || 'manager'
+            );
+            if (sent && sent.emailed === false) {
+              showError(sent.error || 'Invite was not emailed. Check Resend / Auth email settings.');
+            } else {
+              showToast('Invite resent. Ask them to check inbox and spam.');
+            }
+          } catch (err) {
+            showError(err.message || 'Could not resend invite');
+          }
+          btn.disabled = false;
         });
       });
       tbody.querySelectorAll('[data-staff-remove]').forEach(function (btn) {
@@ -767,10 +790,10 @@
         var email = (document.getElementById('staffEmail') || {}).value || '';
         var role = (document.getElementById('staffRole') || {}).value || 'manager';
         try {
-          var res = await SkaApi.adminAddStaff(email.trim(), role);
-          var status = res && res.status === 'invited'
-            ? 'Invited — they will get access on first sign-in with this email.'
-            : 'User added.';
+          var res = await SkaApi.adminInviteStaff(email.trim(), role);
+          var status = res && res.emailed === false
+            ? 'User saved, but the invite email did not send. Use Resend invite.'
+            : 'Invite emailed. Ask them to check inbox and spam.';
           showToast(status);
           form.reset();
           loadUsersPage();
