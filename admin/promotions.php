@@ -125,7 +125,7 @@ include 'includes/layout-start.php';
       <div class="ska-card__header">
         <div class="ska-card__title">
           <?= $editing ? 'Edit Promotion' : 'Create New Promotion' ?>
-          <span><?= $editing ? 'Update the details below' : 'Fill in the details to publish a new offer' ?></span>
+          <span><?= $editing ? 'Update the details below' : 'Fill in the details to publish a new offer. Event packages (weddings, conferences) are managed under Packages.' ?></span>
         </div>
         <?php if ($editing): ?>
         <a href="promotions.php" class="ska-btn ska-btn--outline">

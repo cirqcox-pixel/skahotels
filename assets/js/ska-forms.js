@@ -62,9 +62,16 @@
 
   async function handleBooking(form) {
     var d = formData(form);
-    if (!d.name || !d.email || !d.phone || !d.room_type || !d.checkin || !d.checkout) {
+    if (!d.name || !d.email || !d.phone || !d.checkin || !d.checkout) {
       showAlert(form, 'danger', 'Please complete all required fields.');
       return;
+    }
+    if (d.checkin && d.checkout && d.checkout <= d.checkin) {
+      var next = new Date(d.checkin);
+      next.setDate(next.getDate() + 1);
+      d.checkout = next.toISOString().slice(0, 10);
+      var co = form.querySelector('[name="checkout"]');
+      if (co) co.value = d.checkout;
     }
     setLoading(form, true);
     try {

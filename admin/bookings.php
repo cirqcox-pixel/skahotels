@@ -184,7 +184,7 @@ include 'includes/layout-start.php';
                 <td><?= htmlspecialchars($b['room_type']) ?></td>
                 <td class="ska-muted"><?= htmlspecialchars($b['checkin']) ?></td>
                 <td class="ska-muted"><?= htmlspecialchars($b['checkout']) ?></td>
-                <td><span class="ska-price-tag">USD <?= number_format((float)($b['total']??0),0) ?></span></td>
+                <td><span class="ska-price-tag"><?= htmlspecialchars($b['currency'] ?? 'USD') ?> <?= number_format((float)($b['total']??0),0) ?></span></td>
                 <td>
                   <span class="ska-badge ska-badge--<?= $b['status'] ?>">
                     <?= ucfirst($b['status']) ?>

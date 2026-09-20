@@ -36,11 +36,11 @@ include 'includes/page-start.php';
           <h2>Reach Us Directly</h2>
           <p><strong>Naguru</strong><br>
             <a href="tel:+256741186891">+256 741 186 891</a><br>
-            <a href="mailto:bookings.naguru@skaboutiquebnb.com">bookings.naguru@skaboutiquebnb.com</a>
+            <a href="mailto:naguru.booking@skaboutiquebnb.com">naguru.booking@skaboutiquebnb.com</a>
           </p>
           <p><strong>Munyonyo</strong><br>
             <a href="tel:+256200904877">+256 200 904 877</a><br>
-            <a href="mailto:bookings.munyonyo@skaboutiquebnb.com">bookings.munyonyo@skaboutiquebnb.com</a>
+            <a href="mailto:munyonyo.booking@skaboutiquebnb.com">munyonyo.booking@skaboutiquebnb.com</a>
           </p>
           <p><strong>General</strong><br>
             <a href="mailto:info@skaboutiquebnb.com">info@skaboutiquebnb.com</a>

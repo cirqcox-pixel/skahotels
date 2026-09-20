@@ -64,6 +64,10 @@ CREATE TABLE IF NOT EXISTS bookings (
   season     VARCHAR(20) DEFAULT 'low',
   branch     VARCHAR(50) NOT NULL,
   status     VARCHAR(20) NOT NULL DEFAULT 'pending',
+  package_id INT DEFAULT NULL,
+  package_option VARCHAR(255) DEFAULT NULL,
+  currency   VARCHAR(10) DEFAULT 'USD',
+  guests     INT DEFAULT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_bookings_status (status),
   INDEX idx_bookings_branch (branch)
@@ -87,6 +91,28 @@ CREATE TABLE IF NOT EXISTS promotions (
   sort_order     INT NOT NULL DEFAULT 0,
   created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS packages (
+  id             INT AUTO_INCREMENT PRIMARY KEY,
+  title          VARCHAR(255) NOT NULL,
+  tag            VARCHAR(120) DEFAULT NULL,
+  description    TEXT,
+  inclusions     TEXT,
+  options        TEXT,
+  currency       VARCHAR(10) NOT NULL DEFAULT 'UGX',
+  price          DECIMAL(12,2) DEFAULT 0,
+  pricing_mode   VARCHAR(20) NOT NULL DEFAULT 'fixed',
+  branch         VARCHAR(50) NOT NULL,
+  image          VARCHAR(500) DEFAULT NULL,
+  booking_url    VARCHAR(500) DEFAULT NULL,
+  active         TINYINT(1) NOT NULL DEFAULT 1,
+  valid_from     DATE DEFAULT NULL,
+  valid_to       DATE DEFAULT NULL,
+  sort_order     INT NOT NULL DEFAULT 0,
+  created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_packages_branch (branch)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ── Inquiries (general contact form) ────────────────────────────────────────

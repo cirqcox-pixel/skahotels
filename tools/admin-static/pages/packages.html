@@ -1,0 +1,110 @@
+<div class="ska-main">
+  <header class="ska-topbar">
+    <div class="ska-topbar__left">
+      <div class="ska-topbar__title">Packages</div>
+      <div class="ska-topbar__breadcrumb">Wedding, conference and group packages per property</div>
+    </div>
+    <div class="ska-topbar__right">
+      <button type="button" class="ska-btn ska-btn--primary" id="btnAddPkg">
+        <i class="fa-solid fa-plus"></i> Add Package
+      </button>
+    </div>
+  </header>
+
+  <main class="ska-content">
+    <div id="adminError" class="ska-alert ska-alert--danger" style="display:none;margin-bottom:20px;" role="alert"></div>
+    <div id="adminToast" class="ska-alert ska-alert--success" style="display:none;margin-bottom:20px;" role="status"></div>
+
+    <div class="ska-card">
+      <div class="ska-card__header">
+        <h2 class="ska-card__title">Bookable <span>Packages</span></h2>
+      </div>
+      <div class="ska-card__body">
+        <table class="ska-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Branch</th>
+              <th>From price</th>
+              <th>Active</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="packagesTableBody">
+            <tr><td colspan="5" class="ska-table-empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="ska-modal-backdrop" id="pkgModal">
+  <div class="ska-modal" role="dialog" aria-labelledby="pkgModalTitle">
+    <div class="ska-modal__header">
+      <h3 class="ska-modal__title" id="pkgModalTitle">Add Package</h3>
+      <button type="button" class="ska-modal__close" id="pkgModalClose" aria-label="Close">&times;</button>
+    </div>
+    <form id="pkgForm" class="ska-modal__body">
+      <input type="hidden" id="pkgId" name="id">
+      <div class="ska-form-grid">
+        <div class="ska-form-field ska-form-field--full">
+          <label for="pkgTitle">Title</label>
+          <input type="text" id="pkgTitle" name="title" class="ska-input" required>
+        </div>
+        <div class="ska-form-field">
+          <label for="pkgTag">Tag</label>
+          <input type="text" id="pkgTag" name="tag" class="ska-input" placeholder="Wedding">
+        </div>
+        <div class="ska-form-field">
+          <label for="pkgBranch">Branch</label>
+          <select id="pkgBranch" name="branch" class="ska-input">
+            <option value="Naguru">Naguru</option>
+            <option value="Munyonyo">Munyonyo</option>
+          </select>
+        </div>
+        <div class="ska-form-field">
+          <label for="pkgCurrency">Currency</label>
+          <select id="pkgCurrency" name="currency" class="ska-input">
+            <option value="UGX">UGX</option>
+            <option value="USD">USD</option>
+          </select>
+        </div>
+        <div class="ska-form-field">
+          <label for="pkgPrice">From price</label>
+          <input type="number" id="pkgPrice" name="price" class="ska-input" min="0" step="1" value="0">
+        </div>
+        <div class="ska-form-field">
+          <label for="pkgPricing">Pricing</label>
+          <select id="pkgPricing" name="pricing_mode" class="ska-input">
+            <option value="fixed">Fixed</option>
+            <option value="per_person">Per person</option>
+          </select>
+        </div>
+        <div class="ska-form-field">
+          <label for="pkgActive">Active</label>
+          <select id="pkgActive" name="active" class="ska-input">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+        <div class="ska-form-field ska-form-field--full">
+          <label for="pkgDesc">Description</label>
+          <textarea id="pkgDesc" name="description" class="ska-input" rows="2"></textarea>
+        </div>
+        <div class="ska-form-field ska-form-field--full">
+          <label for="pkgInc">Inclusions (one per line)</label>
+          <textarea id="pkgInc" name="inclusions" class="ska-input" rows="4"></textarea>
+        </div>
+        <div class="ska-form-field ska-form-field--full">
+          <label for="pkgOptions">Options (Label|price|detail|fixed or per_person)</label>
+          <textarea id="pkgOptions" name="options" class="ska-input" rows="5" placeholder="Full Day Conference Package|120000|Per delegate, per day|per_person"></textarea>
+        </div>
+      </div>
+      <div class="ska-modal__footer">
+        <button type="button" class="ska-btn ska-btn--ghost" id="pkgModalCancel">Cancel</button>
+        <button type="submit" class="ska-btn ska-btn--primary">Save Package</button>
+      </div>
+    </form>
+  </div>
+</div>

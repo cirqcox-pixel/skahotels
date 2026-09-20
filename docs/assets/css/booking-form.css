@@ -171,6 +171,33 @@
   border: 1px solid #ef9a9a;
 }
 
+.ska-book-mode {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.ska-book-mode button {
+  flex: 1;
+  border: 1px solid var(--border, #e0d8ce);
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4a4a4a;
+  cursor: pointer;
+}
+.ska-book-mode button.is-active {
+  border-color: #c9a96e;
+  background: #faf6ee;
+  color: #1a1a1a;
+}
+.ska-pkg-inc-mini {
+  font-size: 12px;
+  color: #6b6b6b;
+  margin: 0 0 8px;
+}
+
 @media (max-width: 767px) {
   .booking-section { padding: 48px 0 64px; }
   .booking-form {

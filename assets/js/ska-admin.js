@@ -138,7 +138,7 @@
             '<td>' + esc(b.branch) + '</td>' +
             '<td>' + esc(b.room_type) + '</td>' +
             '<td>' + fmtDate(b.checkin, b.checkout) + '</td>' +
-            '<td>USD ' + esc(Number(b.total || 0).toFixed(0)) + '</td>' +
+            '<td>' + esc(b.currency || 'USD') + ' ' + esc(Number(b.total || 0).toFixed(0)) + '</td>' +
             '<td>' + statusBadge(b.status) + '</td>' +
             '</tr>';
         }).join('');
@@ -208,7 +208,7 @@
         '<td>' + esc(b.branch) + '</td>' +
         '<td>' + esc(b.room_type) + '</td>' +
         '<td>' + fmtDate(b.checkin, b.checkout) + '</td>' +
-        '<td>USD ' + esc(Number(b.total || 0).toFixed(0)) + '</td>' +
+        '<td>' + esc(b.currency || 'USD') + ' ' + esc(Number(b.total || 0).toFixed(0)) + '</td>' +
         '<td>' + statusBadge(b.status) + '</td>' +
         '<td><div class="d-flex gap-2">' + actions + '</div></td>' +
         '</tr>';
@@ -444,6 +444,122 @@
     });
   }
 
+  /* ── Packages page ── */
+  function optionsToText(raw) {
+    if (!raw) return '';
+    var arr = raw;
+    if (typeof raw === 'string') {
+      try { arr = JSON.parse(raw); } catch (e) { return raw; }
+    }
+    if (!Array.isArray(arr)) return String(raw);
+    return arr.map(function (o) {
+      return [o.label || '', o.price || 0, o.detail || '', o.pricing || ''].join('|');
+    }).join('\n');
+  }
+
+  function textToOptionsJson(text) {
+    text = (text || '').trim();
+    if (!text) return '[]';
+    try {
+      var parsed = JSON.parse(text);
+      if (Array.isArray(parsed)) return JSON.stringify(parsed);
+    } catch (e) {}
+    var lines = text.split(/\r?\n/).filter(Boolean).map(function (line) {
+      var p = line.split('|').map(function (s) { return s.trim(); });
+      return { label: p[0], price: parseFloat(p[1] || 0), detail: p[2] || '', pricing: p[3] || 'fixed' };
+    });
+    return JSON.stringify(lines);
+  }
+
+  async function loadPackagesPage() {
+    var tbody = document.getElementById('packagesTableBody');
+    if (!tbody) return;
+    var session = await ensureAuth('packagesTableBody', 5);
+    if (!session) return;
+    hideError();
+    try {
+      var pkgs = await withTimeout(SkaApi.adminFetchPackages());
+      if (!pkgs.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="ska-table-empty">No packages yet.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = pkgs.map(function (p) {
+        return '<tr>' +
+          '<td><strong>' + esc(p.title) + '</strong></td>' +
+          '<td>' + esc(p.branch) + '</td>' +
+          '<td>' + esc(p.currency || 'UGX') + ' ' + esc(Number(p.price || 0).toFixed(0)) + '</td>' +
+          '<td>' + (p.active ? '<span class="ska-badge ska-badge--confirmed">Active</span>' : '<span class="ska-badge ska-badge--cancelled">Off</span>') + '</td>' +
+          '<td><div class="d-flex gap-2">' +
+          '<button type="button" class="ska-btn ska-btn--edit ska-btn--sm" data-edit-pkg="' + p.id + '"><i class="fa fa-pen"></i> Edit</button>' +
+          '<button type="button" class="ska-btn ska-btn--delete ska-btn--sm" data-delete-pkg="' + p.id + '"><i class="fa fa-trash"></i></button>' +
+          '</div></td></tr>';
+      }).join('');
+
+      tbody.querySelectorAll('[data-edit-pkg]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var pkg = pkgs.find(function (p) { return String(p.id) === btn.dataset.editPkg; });
+          if (!pkg) return;
+          document.getElementById('pkgModalTitle').textContent = 'Edit Package';
+          document.getElementById('pkgId').value = pkg.id;
+          document.getElementById('pkgTitle').value = pkg.title || '';
+          document.getElementById('pkgTag').value = pkg.tag || '';
+          document.getElementById('pkgBranch').value = pkg.branch || 'Naguru';
+          document.getElementById('pkgCurrency').value = pkg.currency || 'UGX';
+          document.getElementById('pkgPrice').value = pkg.price || 0;
+          document.getElementById('pkgPricing').value = pkg.pricing_mode || 'fixed';
+          document.getElementById('pkgActive').value = pkg.active ? 'true' : 'false';
+          document.getElementById('pkgDesc').value = pkg.description || '';
+          document.getElementById('pkgInc').value = pkg.inclusions || '';
+          document.getElementById('pkgOptions').value = optionsToText(pkg.options);
+          openModal('pkgModal');
+        });
+      });
+      tbody.querySelectorAll('[data-delete-pkg]').forEach(function (btn) {
+        btn.addEventListener('click', async function () {
+          if (!confirm('Delete this package?')) return;
+          try {
+            await SkaApi.adminDeletePackage(btn.dataset.deletePkg);
+            showToast('Package deleted.');
+            loadPackagesPage();
+          } catch (err) {
+            showError(err.message || 'Delete failed');
+          }
+        });
+      });
+    } catch (e) {
+      showError('Could not load packages: ' + (e.message || e));
+      tbody.innerHTML = '<tr><td colspan="5" class="ska-table-empty">Failed to load packages.</td></tr>';
+    }
+  }
+
+  function initPackagesPage() {
+    document.getElementById('btnAddPkg')?.addEventListener('click', function () {
+      document.getElementById('pkgForm').reset();
+      document.getElementById('pkgId').value = '';
+      document.getElementById('pkgModalTitle').textContent = 'Add Package';
+      openModal('pkgModal');
+    });
+    ['pkgModalClose', 'pkgModalCancel'].forEach(function (id) {
+      document.getElementById(id)?.addEventListener('click', function () { closeModal('pkgModal'); });
+    });
+    document.getElementById('pkgForm')?.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var fd = new FormData(e.target);
+      var data = {};
+      fd.forEach(function (v, k) { data[k] = v; });
+      data.active = data.active === 'true';
+      data.options = textToOptionsJson(data.options);
+      try {
+        await SkaApi.adminSavePackage(data);
+        closeModal('pkgModal');
+        showToast('Package saved.');
+        loadPackagesPage();
+      } catch (err) {
+        showError(err.message || 'Save failed');
+      }
+    });
+  }
+
   /* ── Inquiries page ── */
   async function loadInquiriesPage() {
     var tbody = document.getElementById('inquiriesTableBody');
@@ -504,11 +620,13 @@
 
   initRoomsPage();
   initPromotionsPage();
+  initPackagesPage();
 
   function boot() {
     if (page === 'bookings') loadBookingsPage();
     else if (page === 'rooms') loadRoomsPage();
     else if (page === 'promotions') loadPromotionsPage();
+    else if (page === 'packages') loadPackagesPage();
     else if (page === 'inquiries') loadInquiriesPage();
     else loadDashboard();
   }

@@ -51,6 +51,9 @@ function skaNavActive(string $page, string $current): string {
     <a href="promotions.php" class="ska-nav-link<?= skaNavActive('promotions', $activePage) ?>">
       <i class="fa-solid fa-tag"></i> Promotions
     </a>
+    <a href="packages.php" class="ska-nav-link<?= skaNavActive('packages', $activePage) ?>">
+      <i class="fa-solid fa-gift"></i> Packages
+    </a>
     <a href="bookings.php" class="ska-nav-link<?= skaNavActive('bookings', $activePage) ?>">
       <i class="fa-solid fa-calendar-days"></i> Bookings
     </a>

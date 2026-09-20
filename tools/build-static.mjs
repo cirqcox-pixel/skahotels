@@ -113,6 +113,53 @@ const OFFERS_PAGE_BODY = `
 </section>
 `;
 
+const PACKAGES_PAGE_BODY = `
+<section class="ska-page-hero">
+  <div class="ska-page-hero__bg" style="background-image:url('assets/images/packages/conference-package.jpg');opacity:.45"></div>
+  <div class="container">
+    <p class="ska-page-hero__eyebrow">Weddings &amp; Conferences</p>
+    <h1 class="ska-page-hero__title">Packages, not just rooms</h1>
+    <p class="ska-page-hero__sub">Choose a property package, pick your dates, and send a request. The Naguru or Munyonyo team is notified instantly.</p>
+  </div>
+</section>
+<section class="ska-page-body">
+  <div class="container" style="max-width:1140px">
+    <div class="ska-grid-3" id="packagesGrid">
+      <article class="ska-feature-card">
+        <div class="ska-feature-card__img" style="background-image:url('assets/images/packages/conference-package.jpg')"></div>
+        <div class="ska-feature-card__body">
+          <p class="ska-feature-card__tag">Corporate · Naguru</p>
+          <h2 class="ska-feature-card__title">Conference Package Menu</h2>
+          <p class="ska-feature-card__text">Full-day and half-day delegate packages with teas, lunch, stationery and PA support.</p>
+          <p class="ska-feature-card__text"><strong>From UGX 100,000</strong></p>
+          <a href="naguru.html?package=conference#book" class="ska-btn-gold">Book this package <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </article>
+      <article class="ska-feature-card">
+        <div class="ska-feature-card__img" style="background-image:url('assets/images/packages/wedding-package.jpg')"></div>
+        <div class="ska-feature-card__body">
+          <p class="ska-feature-card__tag">Wedding · Naguru</p>
+          <h2 class="ska-feature-card__title">Get Wedding Ready With Your Tribe</h2>
+          <p class="ska-feature-card__text">Exclusive-use and luxury group stays with dinner and breakfast included.</p>
+          <p class="ska-feature-card__text"><strong>From UGX 300,000</strong></p>
+          <a href="naguru.html?package=wedding#book" class="ska-btn-gold">Book this package <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+<section class="ska-cta-band">
+  <div class="container">
+    <h2>Need a custom group rate?</h2>
+    <p>Tell us the date and headcount — we will shape a package around your agenda.</p>
+    <div class="ska-cta-band__btns">
+      <a href="contact.html?subject=Custom+Package" class="ska-btn-gold">Talk to us</a>
+      <a href="offers.html" class="ska-btn-outline" style="border-color:#fff;color:#fff">View offers</a>
+    </div>
+  </div>
+</section>
+`;
+
 const PROPERTY_DEFAULTS = {
   naguru: {
     branch: 'Naguru',
@@ -187,6 +234,13 @@ const PAGES = {
     title: 'Special Offers | SKA The Boutique Kampala',
     description: 'Exclusive direct-booking offers at SKA Naguru and Munyonyo — early-bird savings, stay-longer packages, and member perks. Book on our site for the best rate.',
     image: 'assets/images/ska_naguru_home.jpeg',
+    css: ['assets/css/pages.css'],
+    nav: 'landing',
+  },
+  packages: {
+    title: 'Packages | SKA The Boutique Kampala',
+    description: 'Wedding, conference and group packages at SKA Naguru and Munyonyo. Book a package and the property team is notified by email.',
+    image: 'assets/images/packages/conference-package.jpg',
     css: ['assets/css/pages.css'],
     nav: 'landing',
   },
@@ -640,6 +694,7 @@ function buildPage(name, meta) {
   body = fixPaths(body);
   if (name === 'index') body = fixIndex(body);
   if (name === 'offers') body = OFFERS_PAGE_BODY;
+  if (name === 'packages') body = PACKAGES_PAGE_BODY;
   if (meta.staticBody) {
     const pagePartial = path.join(PARTIALS, 'pages', `${meta.staticBody}.html`);
     if (fs.existsSync(pagePartial)) body = fs.readFileSync(pagePartial, 'utf8');
@@ -698,6 +753,7 @@ function buildAdmin() {
     { file: 'bookings.html', page: 'bookings', title: 'Bookings' },
     { file: 'rooms.html', page: 'rooms', title: 'Rooms' },
     { file: 'promotions.html', page: 'promotions', title: 'Promotions' },
+    { file: 'packages.html', page: 'packages', title: 'Packages' },
     { file: 'inquiries.html', page: 'inquiries', title: 'Inquiries' },
   ];
 
@@ -709,6 +765,7 @@ function buildAdmin() {
       .replace(/\{\{ACTIVE_DASHBOARD\}\}/g, meta.page === 'dashboard' ? ' active' : '')
       .replace(/\{\{ACTIVE_ROOMS\}\}/g, meta.page === 'rooms' ? ' active' : '')
       .replace(/\{\{ACTIVE_PROMOTIONS\}\}/g, meta.page === 'promotions' ? ' active' : '')
+      .replace(/\{\{ACTIVE_PACKAGES\}\}/g, meta.page === 'packages' ? ' active' : '')
       .replace(/\{\{ACTIVE_BOOKINGS\}\}/g, meta.page === 'bookings' ? ' active' : '')
       .replace(/\{\{ACTIVE_INQUIRIES\}\}/g, meta.page === 'inquiries' ? ' active' : '');
 

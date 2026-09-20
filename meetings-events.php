@@ -58,7 +58,8 @@ include 'includes/page-start.php';
         <li>Custom catering menus</li>
         <li>Airport transfer coordination</li>
       </ul>
-      <a href="contact.php?subject=Group+Booking" class="ska-btn-gold">Request Group Proposal</a>
+          <a href="packages.php" class="ska-btn-gold">View packages</a>
+          <a href="contact.php?subject=Group+Booking" class="ska-btn-gold" style="margin-left:12px">Request Group Proposal</a>
     </div>
 
   </div>

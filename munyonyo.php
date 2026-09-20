@@ -285,6 +285,7 @@ $stmt->bind_param('s', $branch);
 $stmt->execute();
 $allRooms = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $totalRooms = count($allRooms);
+$packages = cms_packages(true, 'Munyonyo');
 
 
 /* ── Fetch images and amenities, compute price_now ── */
@@ -752,7 +753,7 @@ document.addEventListener('ska:rooms-ready', setFormPriceFromRoom);
         <h2 class="gh-title">GETTING HERE</h2>
         <address class="gh-address">SKA The Boutique B&B — Munyonyo<br>Wavamunno, Kampala, Uganda</address>
         <p class="gh-phone"><i class="fa-solid fa-phone"></i> +256 200 98777</p>
-        <p class="gh-email"><i class="fa-solid fa-envelope"></i><a href="mailto:bookings.munyonyo@skaboutiquebnb.com">bookings.munyonyo@skaboutiquebnb.com</a></p>
+        <p class="gh-email"><i class="fa-solid fa-envelope"></i><a href="mailto:munyonyo.booking@skaboutiquebnb.com">munyonyo.booking@skaboutiquebnb.com</a></p>
         <p class="gh-email"><i class="fa-solid fa-envelope"></i><a href="mailto:skaboutiquebb@gmail.com">skaboutiquebb@gmail.com</a></p>
         <div class="gh-airport">
           <i class="fa-solid fa-plane-arrival"></i>
@@ -782,6 +783,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ───────── ROOM DATA ───────── */
   const ROOMS = <?= $roomsJson ?> || [];
+  window.SKA_PACKAGES = <?= json_encode($packages ?? []) ?>;
   let currentIndex = 0;
 
   const HIGH_MONTHS     = [6,7,8,12,1];

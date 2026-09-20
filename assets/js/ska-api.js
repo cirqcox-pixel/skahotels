@@ -107,6 +107,49 @@
       });
     },
 
+    fetchPackages: async function (branch) {
+      var sb = getClient();
+      var res = await sb.from('packages')
+        .select('*')
+        .eq('active', true)
+        .order('sort_order')
+        .order('id');
+      if (res.error) throw new Error(apiError(res.error));
+      var today = todayISO();
+      return (res.data || []).filter(function (p) {
+        if (p.valid_from && p.valid_from > today) return false;
+        if (p.valid_to && p.valid_to < today) return false;
+        if (branch && p.branch && p.branch !== branch && p.branch !== 'Both' && p.branch !== 'All') return false;
+        return true;
+      });
+    },
+
+    parsePackageOptions: function (pkg) {
+      var raw = pkg && pkg.options;
+      if (Array.isArray(raw)) return raw;
+      if (!raw) {
+        return [{
+          label: (pkg && pkg.title) || 'Package',
+          price: parseFloat((pkg && pkg.price) || 0),
+          detail: '',
+          pricing: (pkg && pkg.pricing_mode) || 'fixed'
+        }];
+      }
+      try {
+        var json = JSON.parse(raw);
+        if (Array.isArray(json)) return json;
+      } catch (e) {}
+      return String(raw).split(/\r?\n/).filter(Boolean).map(function (line) {
+        var p = line.split('|').map(function (s) { return s.trim(); });
+        return {
+          label: p[0],
+          price: parseFloat(p[1] || (pkg && pkg.price) || 0),
+          detail: p[2] || '',
+          pricing: p[3] || (pkg && pkg.pricing_mode) || 'fixed'
+        };
+      });
+    },
+
     /* ── CMS ── */
     fetchSetting: async function (key, fallback) {
       var sb = getClient();
@@ -219,8 +262,12 @@
         message: data.message || null,
         season: data.season || 'low',
         branch: data.branch,
-        status: 'pending'
+        status: 'pending',
+        currency: data.currency || 'USD',
+        guests: data.guests ? parseInt(data.guests, 10) : null,
+        package_option: data.package_option || null
       };
+      if (data.package_id) payload.package_id = parseInt(data.package_id, 10);
       var res = await sb.from('bookings').insert([payload]);
       if (res.error) throw new Error(apiError(res.error));
       if (global.SkaNotify) {
@@ -361,6 +408,46 @@
     adminDeletePromotion: async function (id) {
       await adminRequest(function (sb) {
         return sb.from('promotions').delete().eq('id', id);
+      });
+      return true;
+    },
+
+    adminFetchPackages: async function () {
+      var data = await adminRequest(function (sb) {
+        return sb.from('packages').select('*').order('sort_order').order('id');
+      });
+      return data || [];
+    },
+
+    adminSavePackage: async function (pkg) {
+      var payload = {
+        title: pkg.title,
+        tag: pkg.tag || null,
+        description: pkg.description || null,
+        inclusions: pkg.inclusions || null,
+        options: pkg.options || null,
+        currency: pkg.currency || 'UGX',
+        price: parseFloat(pkg.price || 0),
+        pricing_mode: pkg.pricing_mode || 'fixed',
+        branch: pkg.branch || 'Naguru',
+        booking_url: pkg.booking_url || null,
+        active: pkg.active === true || pkg.active === 'true' || pkg.active === '1'
+      };
+      if (pkg.sort_order != null) payload.sort_order = parseInt(pkg.sort_order, 10) || 0;
+      if (pkg.id) {
+        payload.updated_at = new Date().toISOString();
+        return adminRequest(function (sb) {
+          return sb.from('packages').update(payload).eq('id', pkg.id).select().single();
+        });
+      }
+      return adminRequest(function (sb) {
+        return sb.from('packages').insert([payload]).select().single();
+      });
+    },
+
+    adminDeletePackage: async function (id) {
+      await adminRequest(function (sb) {
+        return sb.from('packages').delete().eq('id', id);
       });
       return true;
     }

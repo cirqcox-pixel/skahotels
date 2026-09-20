@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>Promotions | SKA Admin</title>
+  <title>Packages | SKA Admin</title>
   <link rel="icon" href="../assets/images/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="assets/admin.css">
 </head>
-<body data-admin-page="promotions">
+<body data-admin-page="packages">
 
 <aside class="ska-sidebar" id="skaSidebar">
   <div class="ska-sidebar__brand">
@@ -26,8 +26,8 @@
 
     <div class="ska-nav-label">Property</div>
     <a href="rooms.html" class="ska-nav-link"><i class="fa-solid fa-bed"></i> Rooms</a>
-    <a href="promotions.html" class="ska-nav-link active"><i class="fa-solid fa-tag"></i> Promotions</a>
-    <a href="packages.html" class="ska-nav-link"><i class="fa-solid fa-gift"></i> Packages</a>
+    <a href="promotions.html" class="ska-nav-link"><i class="fa-solid fa-tag"></i> Promotions</a>
+    <a href="packages.html" class="ska-nav-link active"><i class="fa-solid fa-gift"></i> Packages</a>
     <a href="bookings.html" class="ska-nav-link"><i class="fa-solid fa-calendar-days"></i> Bookings</a>
 
     <div class="ska-nav-label">Content</div>
@@ -48,12 +48,12 @@
 <div class="ska-main">
   <header class="ska-topbar">
     <div class="ska-topbar__left">
-      <div class="ska-topbar__title">Promotions</div>
-      <div class="ska-topbar__breadcrumb">Special offers and discounts</div>
+      <div class="ska-topbar__title">Packages</div>
+      <div class="ska-topbar__breadcrumb">Wedding, conference and group packages per property</div>
     </div>
     <div class="ska-topbar__right">
-      <button type="button" class="ska-btn ska-btn--primary" id="btnAddPromo">
-        <i class="fa-solid fa-plus"></i> Add Promotion
+      <button type="button" class="ska-btn ska-btn--primary" id="btnAddPkg">
+        <i class="fa-solid fa-plus"></i> Add Package
       </button>
     </div>
   </header>
@@ -64,7 +64,7 @@
 
     <div class="ska-card">
       <div class="ska-card__header">
-        <h2 class="ska-card__title">Active &amp; Draft <span>Offers</span></h2>
+        <h2 class="ska-card__title">Bookable <span>Packages</span></h2>
       </div>
       <div class="ska-card__body">
         <table class="ska-table">
@@ -72,14 +72,13 @@
             <tr>
               <th>Title</th>
               <th>Branch</th>
-              <th>Discount</th>
-              <th>Valid</th>
+              <th>From price</th>
               <th>Active</th>
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="promosTableBody">
-            <tr><td colspan="6" class="ska-table-empty">Loading…</td></tr>
+          <tbody id="packagesTableBody">
+            <tr><td colspan="5" class="ska-table-empty">Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -87,58 +86,71 @@
   </main>
 </div>
 
-<div class="ska-modal-backdrop" id="promoModal">
-  <div class="ska-modal" role="dialog" aria-labelledby="promoModalTitle">
+<div class="ska-modal-backdrop" id="pkgModal">
+  <div class="ska-modal" role="dialog" aria-labelledby="pkgModalTitle">
     <div class="ska-modal__header">
-      <h3 class="ska-modal__title" id="promoModalTitle">Add Promotion</h3>
-      <button type="button" class="ska-modal__close" id="promoModalClose" aria-label="Close">&times;</button>
+      <h3 class="ska-modal__title" id="pkgModalTitle">Add Package</h3>
+      <button type="button" class="ska-modal__close" id="pkgModalClose" aria-label="Close">&times;</button>
     </div>
-    <form id="promoForm" class="ska-modal__body">
-      <input type="hidden" id="promoId" name="id">
+    <form id="pkgForm" class="ska-modal__body">
+      <input type="hidden" id="pkgId" name="id">
       <div class="ska-form-grid">
         <div class="ska-form-field ska-form-field--full">
-          <label for="promoTitle">Title</label>
-          <input type="text" id="promoTitle" name="title" class="ska-input" required>
+          <label for="pkgTitle">Title</label>
+          <input type="text" id="pkgTitle" name="title" class="ska-input" required>
         </div>
         <div class="ska-form-field">
-          <label for="promoBranch">Branch</label>
-          <select id="promoBranch" name="branch" class="ska-input">
-            <option value="Both">Both</option>
+          <label for="pkgTag">Tag</label>
+          <input type="text" id="pkgTag" name="tag" class="ska-input" placeholder="Wedding">
+        </div>
+        <div class="ska-form-field">
+          <label for="pkgBranch">Branch</label>
+          <select id="pkgBranch" name="branch" class="ska-input">
             <option value="Naguru">Naguru</option>
             <option value="Munyonyo">Munyonyo</option>
           </select>
         </div>
         <div class="ska-form-field">
-          <label for="promoType">Discount type</label>
-          <select id="promoType" name="discount_type" class="ska-input">
-            <option value="percent">Percent</option>
-            <option value="fixed">Fixed USD</option>
-            <option value="free_night">Free nights</option>
+          <label for="pkgCurrency">Currency</label>
+          <select id="pkgCurrency" name="currency" class="ska-input">
+            <option value="UGX">UGX</option>
+            <option value="USD">USD</option>
           </select>
         </div>
         <div class="ska-form-field">
-          <label for="promoValue">Discount value</label>
-          <input type="number" id="promoValue" name="discount_value" class="ska-input" min="0" step="1" value="10">
+          <label for="pkgPrice">From price</label>
+          <input type="number" id="pkgPrice" name="price" class="ska-input" min="0" step="1" value="0">
         </div>
         <div class="ska-form-field">
-          <label for="promoMinNights">Min nights</label>
-          <input type="number" id="promoMinNights" name="min_nights" class="ska-input" min="1" value="1">
+          <label for="pkgPricing">Pricing</label>
+          <select id="pkgPricing" name="pricing_mode" class="ska-input">
+            <option value="fixed">Fixed</option>
+            <option value="per_person">Per person</option>
+          </select>
         </div>
         <div class="ska-form-field">
-          <label for="promoActive">Active</label>
-          <select id="promoActive" name="active" class="ska-input">
+          <label for="pkgActive">Active</label>
+          <select id="pkgActive" name="active" class="ska-input">
             <option value="true">Yes</option>
             <option value="false">No</option>
           </select>
         </div>
         <div class="ska-form-field ska-form-field--full">
-          <label for="promoDesc">Description</label>
-          <textarea id="promoDesc" name="description" class="ska-input" rows="3"></textarea>
+          <label for="pkgDesc">Description</label>
+          <textarea id="pkgDesc" name="description" class="ska-input" rows="2"></textarea>
+        </div>
+        <div class="ska-form-field ska-form-field--full">
+          <label for="pkgInc">Inclusions (one per line)</label>
+          <textarea id="pkgInc" name="inclusions" class="ska-input" rows="4"></textarea>
+        </div>
+        <div class="ska-form-field ska-form-field--full">
+          <label for="pkgOptions">Options (Label|price|detail|fixed or per_person)</label>
+          <textarea id="pkgOptions" name="options" class="ska-input" rows="5" placeholder="Full Day Conference Package|120000|Per delegate, per day|per_person"></textarea>
         </div>
       </div>
       <div class="ska-modal__footer">
-        <button type="button" class="ska-btn ska-btn--ghost" id="promoModalCancel">Cancel</button>
-        <button type="submit" class="ska-btn ska-btn--primary">Save Promotion</button>
+        <button type="button" class="ska-btn ska-btn--ghost" id="pkgModalCancel">Cancel</button>
+        <button type="submit" class="ska-btn ska-btn--primary">Save Package</button>
       </div>
     </form>
   </div>

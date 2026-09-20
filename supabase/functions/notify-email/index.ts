@@ -6,7 +6,7 @@ import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || '';
 const NOTIFY_FROM = Deno.env.get('NOTIFY_FROM') || 'SKA The Boutique <onboarding@resend.dev>';
-const NOTIFY_TO = Deno.env.get('NOTIFY_TO') || 'info@skaboutiquebnb.com';
+const NOTIFY_TO = Deno.env.get('NOTIFY_TO') || 'naguru.booking@skaboutiquebnb.com';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -50,6 +50,9 @@ serve(async (req) => {
         `Nightly: USD ${data.price || 0}`,
         `Total: USD ${data.total || 0}`,
         `Season: ${data.season || '—'}`,
+        `Package option: ${data.package_option || '—'}`,
+        `Guests: ${data.guests || '—'}`,
+        `Currency: ${data.currency || 'USD'}`,
         '',
         `Message: ${data.message || '—'}`,
       ].join('\n');

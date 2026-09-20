@@ -7,6 +7,14 @@
 
   var cfg = global.SKA_CONFIG || {};
 
+  function adminInbox(branch) {
+    var map = cfg.branchEmails || {};
+    if (branch && map[branch]) return map[branch];
+    var b = (branch || '').toLowerCase();
+    if (b.indexOf('munyonyo') >= 0) return 'munyonyo.booking@skaboutiquebnb.com';
+    return 'naguru.booking@skaboutiquebnb.com';
+  }
+
   function formspreeUrl(key) {
     var f = cfg.formspree || {};
     var id = f[key] || f.endpoint || '';
@@ -41,6 +49,7 @@
       payload = {
         _subject: 'SKA Booking Request — ' + (data.branch || 'Property'),
         _replyto: data.email,
+        _cc: adminInbox(data.branch),
         type: 'booking',
         name: data.name,
         email: data.email,
@@ -48,6 +57,9 @@
         whatsapp: data.whatsapp || '',
         branch: data.branch || '',
         room_type: data.room_type || '',
+        package_option: data.package_option || '',
+        guests: data.guests || '',
+        currency: data.currency || '',
         checkin: data.checkin || '',
         checkout: data.checkout || '',
         price: data.price || '',
@@ -84,7 +96,7 @@
 
     await postJson(url, {
       type: type,
-      to: (cfg.notify && cfg.notify.to) || cfg.siteEmail || 'info@skaboutiquebnb.com',
+      to: type === 'booking' ? adminInbox(data.branch) : ((cfg.notify && cfg.notify.to) || cfg.siteEmail || 'info@skaboutiquebnb.com'),
       data: data,
       site: cfg.siteName || 'SKA The Boutique'
     });

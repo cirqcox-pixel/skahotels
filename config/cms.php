@@ -156,6 +156,35 @@ function cms_bootstrap(): void
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
+    $c->query("CREATE TABLE IF NOT EXISTS packages (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        tag VARCHAR(120) DEFAULT NULL,
+        description TEXT,
+        inclusions TEXT,
+        options TEXT,
+        currency VARCHAR(10) NOT NULL DEFAULT 'UGX',
+        price DECIMAL(12,2) DEFAULT 0,
+        pricing_mode VARCHAR(20) NOT NULL DEFAULT 'fixed',
+        branch VARCHAR(50) NOT NULL,
+        image VARCHAR(500) DEFAULT NULL,
+        booking_url VARCHAR(500) DEFAULT NULL,
+        active TINYINT(1) NOT NULL DEFAULT 1,
+        valid_from DATE DEFAULT NULL,
+        valid_to DATE DEFAULT NULL,
+        sort_order INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_packages_branch (branch)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    @$c->query("ALTER TABLE bookings ADD COLUMN package_id INT DEFAULT NULL");
+    @$c->query("ALTER TABLE bookings ADD COLUMN package_option VARCHAR(255) DEFAULT NULL");
+    @$c->query("ALTER TABLE bookings ADD COLUMN currency VARCHAR(10) DEFAULT 'USD'");
+    @$c->query("ALTER TABLE bookings ADD COLUMN guests INT DEFAULT NULL");
+
+    cms_seed_packages($c);
+
     $c->query("CREATE TABLE IF NOT EXISTS admins (
         id INT AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(100) NOT NULL UNIQUE,
@@ -427,6 +456,100 @@ function cms_promotions(bool $activeOnly = true): array
     $sql .= " ORDER BY sort_order ASC, id ASC";
     $res = $c->query($sql);
     return $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
+}
+
+function cms_packages(bool $activeOnly = true, ?string $branch = null): array
+{
+    cms_bootstrap();
+    $c = cms_conn();
+    $sql = "SELECT * FROM packages WHERE 1=1";
+    if ($activeOnly) {
+        $sql .= " AND active = 1 AND (valid_from IS NULL OR valid_from <= CURDATE()) AND (valid_to IS NULL OR valid_to >= CURDATE())";
+    }
+    if ($branch) {
+        $esc = $c->real_escape_string($branch);
+        $sql .= " AND (branch = '$esc' OR branch IN ('Both','All'))";
+    }
+    $sql .= " ORDER BY sort_order ASC, id ASC";
+    $res = $c->query($sql);
+    return $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
+}
+
+function cms_package(int $id): ?array
+{
+    cms_bootstrap();
+    $c = cms_conn();
+    $stmt = $c->prepare("SELECT * FROM packages WHERE id = ? LIMIT 1");
+    $stmt->bind_param('i', $id);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+    return $row ?: null;
+}
+
+function cms_package_options(array $pkg): array
+{
+    $raw = $pkg['options'] ?? '';
+    if (is_array($raw)) return $raw;
+    $raw = trim((string)$raw);
+    if ($raw === '') {
+        return [[
+            'label'   => $pkg['title'] ?? 'Package',
+            'price'   => (float)($pkg['price'] ?? 0),
+            'detail'  => '',
+            'pricing' => $pkg['pricing_mode'] ?? 'fixed',
+        ]];
+    }
+    $json = json_decode($raw, true);
+    if (is_array($json)) return $json;
+    $out = [];
+    foreach (preg_split('/\r\n|\r|\n/', $raw) as $line) {
+        $line = trim($line);
+        if ($line === '') continue;
+        $p = array_map('trim', explode('|', $line));
+        $out[] = [
+            'label'   => $p[0],
+            'price'   => (float)($p[1] ?? $pkg['price'] ?? 0),
+            'detail'  => $p[2] ?? '',
+            'pricing' => $p[3] ?? ($pkg['pricing_mode'] ?? 'fixed'),
+        ];
+    }
+    return $out;
+}
+
+function cms_seed_packages(mysqli $c): void
+{
+    $check = $c->query("SELECT COUNT(*) AS n FROM packages");
+    if (!$check || (int)$check->fetch_assoc()['n'] > 0) return;
+
+    $conferenceOpts = json_encode([
+        ['label' => 'Full Day Conference Package', 'price' => 120000, 'detail' => 'Per delegate, per day', 'pricing' => 'per_person'],
+        ['label' => 'Half Day Conference Package', 'price' => 100000, 'detail' => 'Per delegate, per session', 'pricing' => 'per_person'],
+        ['label' => 'Video Conferencing', 'price' => 150000, 'detail' => 'Connect remote and hybrid attendees', 'pricing' => 'fixed'],
+        ['label' => 'Boardroom Hire — Half Day', 'price' => 300000, 'detail' => 'Exclusive morning or afternoon session', 'pricing' => 'fixed'],
+        ['label' => 'Boardroom Hire — Full Day', 'price' => 450000, 'detail' => 'Exclusive use for private meetings and interviews', 'pricing' => 'fixed'],
+    ]);
+    $weddingOpts = json_encode([
+        ['label' => 'Exclusive stay — 12 guests (all 6 rooms)', 'price' => 1680000, 'detail' => 'Dinner and breakfast included', 'pricing' => 'fixed'],
+        ['label' => 'Luxury 2 Pax', 'price' => 300000, 'detail' => '1 room, dinner and breakfast included', 'pricing' => 'fixed'],
+        ['label' => 'Luxury 4 Pax', 'price' => 560000, 'detail' => '2 rooms, dinner and breakfast included', 'pricing' => 'fixed'],
+        ['label' => 'Luxury 6 Pax', 'price' => 840000, 'detail' => '3 rooms, dinner and breakfast included', 'pricing' => 'fixed'],
+        ['label' => 'Additional room (2 guests sharing)', 'price' => 280000, 'detail' => 'Dinner and breakfast included', 'pricing' => 'fixed'],
+    ]);
+    $confInc = "Break teas (tea, coffee and assorted bites)\nHydration — mineral water per delegate\nStationery — notebook and executive pen\nLunch — main buffet or plated meal with a soda or mineral water\nEquipment — PA system set up in your meeting room";
+    $wedInc = "Exclusive use of all 6 beautifully appointed rooms (full buyout)\nAccommodation for up to 12 guests\nDinner for all guests\nBreakfast the following morning\nComplete privacy throughout your stay\nA peaceful and intimate atmosphere exclusively for your celebration";
+
+    $stmt = $c->prepare("INSERT INTO packages (title, tag, description, inclusions, options, currency, price, pricing_mode, branch, image, booking_url, active, sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?,1,?)");
+    $rows = [
+        ['Conference Package Menu', 'Corporate', 'Delegate and boardroom packages for agendas that run from the morning briefing through to closing remarks — or a focused half-day session.', $confInc, $conferenceOpts, 'UGX', 120000.0, 'per_person', 'Naguru', 'assets/images/packages/conference-package.jpg', 'naguru.php?package=conference#book', 1],
+        ['Get Wedding Ready With Your Tribe', 'Wedding', 'Sleep here, stress less, slay the wedding. Exclusive-use and luxury group stays with dinner and breakfast included.', $wedInc, $weddingOpts, 'UGX', 1680000.0, 'fixed', 'Naguru', 'assets/images/packages/wedding-package.jpg', 'naguru.php?package=wedding#book', 2],
+    ];
+    foreach ($rows as $r) {
+        [$title, $tag, $desc, $inc, $opts, $cur, $price, $mode, $br, $img, $url, $sort] = $r;
+        $stmt->bind_param('ssssssdssssi', $title, $tag, $desc, $inc, $opts, $cur, $price, $mode, $br, $img, $url, $sort);
+        $stmt->execute();
+    }
+    $stmt->close();
 }
 
 function cms_gallery(string $branch, bool $includeRoomImages = true): array

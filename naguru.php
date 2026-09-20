@@ -283,6 +283,7 @@ $stmt->bind_param('s', $branch);
 $stmt->execute();
 $allRooms = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $totalRooms = count($allRooms);
+$packages = cms_packages(true, 'Naguru');
 
 
 /* ── Fetch images and amenities, compute price_now ── */
@@ -662,6 +663,7 @@ $roomsJson = json_encode($allRooms, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT
 <script>
 const ROOMS = <?= json_encode($allRooms) ?>;
 const PROMOTIONS = <?= json_encode($promotions ?? []) ?>;
+window.SKA_PACKAGES = <?= json_encode($packages ?? []) ?>;
 
 
 
@@ -782,7 +784,7 @@ setTimeout(calculateBooking, 1200);
         <h2 class="gh-title">GETTING HERE</h2>
         <address class="gh-address">SKA The Boutique B&B — Naguru<br>Naguru, Kampala, Uganda</address>
         <p class="gh-phone"><i class="fa-solid fa-phone"></i> +256 741 186 891</p>
-        <p class="gh-email"><i class="fa-solid fa-envelope"></i><a href="mailto:bookings.naguru@skaboutiquebnb.com">bookings.naguru@skaboutiquebnb.com</a></p>
+        <p class="gh-email"><i class="fa-solid fa-envelope"></i><a href="mailto:naguru.booking@skaboutiquebnb.com">naguru.booking@skaboutiquebnb.com</a></p>
         <p class="gh-email"><i class="fa-solid fa-envelope"></i><a href="mailto:skatheboutiquenaguru@gmail.com">skatheboutiquenaguru@gmail.com</a></p>
         <div class="gh-airport">
           <i class="fa-solid fa-plane-arrival"></i>

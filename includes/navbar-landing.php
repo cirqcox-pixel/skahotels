@@ -16,6 +16,7 @@ $navActive = $navActive ?? '';
     <ul class="ska-nav-center">
       <li><a href="index.php#book-search" class="<?= $navActive === 'book' ? 'active' : '' ?>">Book</a></li>
       <li><a href="offers.php" class="<?= $navActive === 'offers' ? 'active' : '' ?>">Offers</a></li>
+      <li><a href="packages.php" class="<?= $navActive === 'packages' ? 'active' : '' ?>">Packages</a></li>
       <li><a href="index.php#properties" class="<?= $navActive === 'properties' ? 'active' : '' ?>">Properties</a></li>
       <li><a href="about-us.php" class="<?= $navActive === 'about' ? 'active' : '' ?>">About</a></li>
       <li><a href="meetings-events.php" class="<?= $navActive === 'events' ? 'active' : '' ?>">Meetings &amp; Events</a></li>
@@ -39,6 +40,7 @@ $navActive = $navActive ?? '';
     <ul class="ska-mobile-nav">
       <li><a href="index.php#book-search">Book</a></li>
       <li><a href="offers.php">Offers</a></li>
+      <li><a href="packages.php">Packages</a></li>
       <li><a href="index.php#properties">Properties</a></li>
       <li><a href="about-us.php">About</a></li>
       <li><a href="meetings-events.php">Meetings &amp; Events</a></li>

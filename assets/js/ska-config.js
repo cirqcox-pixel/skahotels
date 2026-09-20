@@ -9,6 +9,11 @@ window.SKA_CONFIG = {
   siteName: 'SKA The Boutique',
   siteEmail: 'info@skaboutiquebnb.com',
 
+  branchEmails: {
+    Naguru: 'naguru.booking@skaboutiquebnb.com',
+    Munyonyo: 'munyonyo.booking@skaboutiquebnb.com'
+  },
+
   /**
    * Formspree — email alerts for GitHub Pages forms
    * 1. Sign up at https://formspree.io
@@ -26,7 +31,7 @@ window.SKA_CONFIG = {
    */
   notify: {
     webhookUrl: '',  // e.g. 'https://nllqkepymtwwbvbjnbyz.supabase.co/functions/v1/notify-email'
-    to: 'info@skaboutiquebnb.com'
+    to: 'naguru.booking@skaboutiquebnb.com'
   },
 
   /** GitHub Pages project site base path (repo: cirqcox-pixel/skahotels) */

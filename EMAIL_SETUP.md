@@ -70,4 +70,11 @@ Submissions still appear in **Admin → Bookings / Inquiries** even if email fai
 
 ## PHP hosting
 
-On cPanel/PHP, emails already go through `forms/process_*.php` + `SkaMailer`. Formspree/Resend are only needed for the static GitHub Pages site.
+On cPanel/PHP, emails already go through `forms/process_*.php` + `SkaMailer`.
+
+Property inboxes:
+
+- Naguru bookings → `naguru.booking@skaboutiquebnb.com`
+- Munyonyo bookings → `munyonyo.booking@skaboutiquebnb.com`
+
+Formspree/Resend are still needed for the static GitHub Pages site so those same inboxes receive a copy after Supabase saves the booking.

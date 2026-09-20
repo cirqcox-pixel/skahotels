@@ -27,20 +27,20 @@ class SkaMailer
     ══════════════════════════════════════════════════════ */
     private array $branchConfig = [
         'Naguru' => [
-            'adminEmails' => 'bookings.naguru@skaboutiquebnb.com, skatheboutiquenaguru@gmail.com',
-            'replyTo'     => 'bookings.naguru@skaboutiquebnb.com',
+            'adminEmails' => 'naguru.booking@skaboutiquebnb.com',
+            'replyTo'     => 'naguru.booking@skaboutiquebnb.com',
             'phone'       => '+256 741 186 891',
             'phoneHref'   => '+256741186891',
-            'email'       => 'bookings.naguru@skaboutiquebnb.com',
+            'email'       => 'naguru.booking@skaboutiquebnb.com',
             'address'     => 'Naguru, Kampala, Uganda',
             'adminUrl'    => 'https://skaboutiquebnb.com/admin/bookings.php?status=pending&branch=Naguru',
         ],
         'Munyonyo' => [
-            'adminEmails' => 'bookings.munyonyo@skaboutiquebnb.com, skaboutiquebb@gmail.com',
-            'replyTo'     => 'bookings.munyonyo@skaboutiquebnb.com',
+            'adminEmails' => 'munyonyo.booking@skaboutiquebnb.com',
+            'replyTo'     => 'munyonyo.booking@skaboutiquebnb.com',
             'phone'       => '+256 200 904 877',
             'phoneHref'   => '+256200904877',
-            'email'       => 'bookings.munyonyo@skaboutiquebnb.com',
+            'email'       => 'munyonyo.booking@skaboutiquebnb.com',
             'address'     => 'Munyonyo, Kampala, Uganda',
             'adminUrl'    => 'https://skaboutiquebnb.com/admin/bookings.php?status=pending&branch=Munyonyo',
         ],
@@ -48,7 +48,7 @@ class SkaMailer
 
     /* ── Fallback if branch is unknown ── */
     private array $defaultConfig = [
-        'adminEmails' => 'bookings.naguru@skaboutiquebnb.com, bookings.munyonyo@skaboutiquebnb.com',
+        'adminEmails' => 'naguru.booking@skaboutiquebnb.com, munyonyo.booking@skaboutiquebnb.com',
         'replyTo'     => 'info@skaboutiquebnb.com',
         'phone'       => '+256 741 186 891',
         'phoneHref'   => '+256741186891',
@@ -275,12 +275,37 @@ class SkaMailer
             } catch (Exception $e) {}
         }
 
+        $currency   = strtoupper(trim($b['currency'] ?? 'USD')) ?: 'USD';
+        $money      = function ($n) use ($currency) {
+            return $currency . ' ' . number_format((float)$n, 0);
+        };
         $total      = !empty($b['total'])
-                        ? 'USD ' . number_format((float)$b['total'], 0)
+                        ? $money($b['total'])
                         : '—';
+        $isPackage  = !empty($b['package_id']) || !empty($b['package_option']);
         $priceNight = !empty($b['price'])
-                        ? 'USD ' . number_format((float)$b['price'], 0) . ' / night'
+                        ? $money($b['price']) . ($isPackage ? '' : ' / night')
                         : '—';
+        if ($isPackage && !empty($b['package_option'])) {
+            $optLabel = htmlspecialchars($b['package_option']);
+            $extraRows .= "
+            <tr>
+              <td style='padding:12px 20px;font-size:13px;color:#777;
+                         border-bottom:1px solid #e8e4dc;'>Package option</td>
+              <td style='padding:12px 20px;font-size:13px;font-weight:600;
+                         color:#1a1a1a;border-bottom:1px solid #e8e4dc;'>{$optLabel}</td>
+            </tr>";
+        }
+        if (!empty($b['guests'])) {
+            $g = (int)$b['guests'];
+            $extraRows .= "
+            <tr>
+              <td style='padding:12px 20px;font-size:13px;color:#777;
+                         border-bottom:1px solid #e8e4dc;'>Guests / delegates</td>
+              <td style='padding:12px 20px;font-size:13px;font-weight:600;
+                         color:#1a1a1a;border-bottom:1px solid #e8e4dc;'>{$g}</td>
+            </tr>";
+        }
         $branch      = !empty($b['branch']) ? htmlspecialchars($b['branch']) : 'SKA The Boutique';
         $bookingId   = !empty($b['id'])     ? '#' . $b['id']                : '';
         $year        = date('Y');
@@ -369,7 +394,7 @@ class SkaMailer
               </tr>
               <tr>
                 <td style="padding:12px 20px;font-size:13px;color:#777;
-                           border-bottom:1px solid #e8e4dc;">Room Type</td>
+                           border-bottom:1px solid #e8e4dc;">Room / Package</td>
                 <td style="padding:12px 20px;font-size:13px;font-weight:600;
                            color:#1a1a1a;border-bottom:1px solid #e8e4dc;">{$b['room_type']}</td>
               </tr>

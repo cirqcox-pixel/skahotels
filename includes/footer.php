@@ -59,6 +59,7 @@ $footerNaguruHref = preg_replace('/\D+/', '', $footerNaguru);
         <li><a href="naguru.php">SKA Naguru — Hillside</a></li>
         <li><a href="index.php#book-search">Book a Room</a></li>
         <li><a href="offers.php">Special Offers</a></li>
+        <li><a href="packages.php">Packages</a></li>
         <li><a href="loyalty.php">SKA Rewards</a></li>
       </ul>
     </div>
