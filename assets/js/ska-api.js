@@ -231,6 +231,12 @@
         is_read: false
       }]);
       if (res.error) throw new Error(apiError(res.error));
+      try {
+        var map = await SkaApi.fetchSettings();
+        SkaApi.applyPublicSettings(map);
+        if (map.site_email) data.site_email = map.site_email;
+      } catch (e) { /* defaults in SKA_CONFIG */ }
+      data.site_email = data.site_email || (cfg && cfg.siteEmail) || 'info@skaboutiquebnb.com';
       if (global.SkaNotify) {
         try { await SkaNotify.notify('inquiry', data); } catch (e) { /* already saved */ }
       }
@@ -443,6 +449,33 @@
       return adminRequest(function (sb) {
         return sb.from('inquiries').update({ is_read: !!isRead }).eq('id', id).select().single();
       });
+    },
+
+    adminReplyInquiry: async function (id, reply) {
+      var text = String(reply || '').trim();
+      if (!text) throw new Error('Write a reply first.');
+      var payload = {
+        is_read: true,
+        reply_message: text,
+        replied_at: new Date().toISOString()
+      };
+      var row;
+      try {
+        row = await adminRequest(function (sb) {
+          return sb.from('inquiries').update(payload).eq('id', id).select().single();
+        });
+      } catch (e) {
+        row = await adminRequest(function (sb) {
+          return sb.from('inquiries').update({ is_read: true }).eq('id', id).select().single();
+        });
+        if (row) row.reply_message = text;
+      }
+      if (global.SkaNotify && row) {
+        try {
+          await SkaNotify.notify('inquiry_reply', Object.assign({}, row, { reply: text }));
+        } catch (e) { /* saved even if mail fails */ }
+      }
+      return row;
     },
 
     adminFetchPromotions: async function () {

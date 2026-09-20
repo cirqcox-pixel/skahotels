@@ -82,10 +82,23 @@
         message: data.message || '',
         site: cfg.siteName || 'SKA The Boutique'
       };
+    } else if (type === 'inquiry_reply') {
+      var info = (cfg.siteEmail || (cfg.notify && cfg.notify.info) || 'info@skaboutiquebnb.com');
+      payload = {
+        _subject: 'Re: ' + (data.subject || 'Your SKA inquiry'),
+        _replyto: info,
+        _cc: data.email || '',
+        type: 'inquiry_reply',
+        name: data.name,
+        email: data.email,
+        message: data.reply || data.reply_message || data.message || '',
+        site: cfg.siteName || 'SKA The Boutique'
+      };
     } else {
       payload = {
         _subject: 'SKA Contact: ' + (data.subject || 'General Inquiry'),
         _replyto: data.email,
+        _cc: [cfg.siteEmail || 'info@skaboutiquebnb.com', data.email].filter(Boolean).join(','),
         type: 'inquiry',
         name: data.name,
         email: data.email,
@@ -105,6 +118,7 @@
    * Function should call Resend server-side with RESEND_API_KEY.
    */
   async function sendWebhook(type, data) {
+    cfg = cfgNow();
     var url = (cfg.notify && cfg.notify.webhookUrl) || cfg.resendWebhook || '';
     if (!url && cfg.supabaseUrl) {
       url = String(cfg.supabaseUrl).replace(/\/$/, '') + '/functions/v1/notify-email';
@@ -117,9 +131,13 @@
       headers.apikey = cfg.supabaseAnonKey;
     }
 
+    var to;
+    if (type.indexOf('booking') === 0) to = adminInbox(data.branch);
+    else to = data.site_email || cfg.siteEmail || (cfg.notify && cfg.notify.to) || 'info@skaboutiquebnb.com';
+
     await postJson(url, {
       type: type,
-      to: type.indexOf('booking') === 0 ? adminInbox(data.branch) : ((cfg.notify && cfg.notify.to) || cfg.siteEmail || 'info@skaboutiquebnb.com'),
+      to: to,
       data: data,
       site: cfg.siteName || 'SKA The Boutique'
     }, headers);

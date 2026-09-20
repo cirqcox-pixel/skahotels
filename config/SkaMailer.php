@@ -238,6 +238,61 @@ class SkaMailer
         $ok = $this->send($b['email'], $subject, $body, $cfg['replyTo']);
         $this->notifyEdge('booking_cancelled', $b);
         return $ok;
+    }
+
+    public function sendInquiryReceived(array $q): bool
+    {
+        $info = function_exists('cms_setting')
+            ? cms_setting('site_email', 'info@skaboutiquebnb.com')
+            : 'info@skaboutiquebnb.com';
+        $name = htmlspecialchars($q['name'] ?? 'Guest');
+        $subjectLine = htmlspecialchars($q['subject'] ?? 'General Inquiry');
+        $msg = nl2br(htmlspecialchars($q['message'] ?? ''));
+        $guestHtml = '<!DOCTYPE html><html><body style="font-family:Georgia,serif;background:#f6f3ee;padding:24px;">
+          <div style="max-width:560px;margin:0 auto;background:#fff;padding:32px;border-radius:12px;">
+            <p style="letter-spacing:.2em;text-transform:uppercase;font-size:11px;color:#c9a96e;">SKA The Boutique</p>
+            <h1 style="font-weight:400;color:#0d1b2e;">We received your message</h1>
+            <p>Dear <strong>' . $name . '</strong>, thank you for writing to SKA The Boutique. We have received your message and will reply within 24 hours.</p>
+            <p style="color:#666;font-size:14px;"><strong>Subject:</strong> ' . $subjectLine . '</p>
+            <p style="color:#444;line-height:1.6;">' . $msg . '</p>
+          </div></body></html>';
+        $adminHtml = '<!DOCTYPE html><html><body style="font-family:Georgia,serif;background:#f6f3ee;padding:24px;">
+          <div style="max-width:560px;margin:0 auto;background:#fff;padding:32px;border-radius:12px;">
+            <p style="letter-spacing:.2em;text-transform:uppercase;font-size:11px;color:#c9a96e;">SKA The Boutique</p>
+            <h1 style="font-weight:400;color:#0d1b2e;">New contact form message</h1>
+            <p><strong>' . $name . '</strong> &lt;' . htmlspecialchars($q['email'] ?? '') . '&gt;</p>
+            <p>Phone: ' . htmlspecialchars($q['phone'] ?? '—') . '</p>
+            <p><strong>Subject:</strong> ' . $subjectLine . '</p>
+            <p style="color:#444;line-height:1.6;">' . $msg . '</p>
+            <p style="font-size:13px;color:#888;">Reply from the admin Inquiries page so the guest is emailed.</p>
+          </div></body></html>';
+        $okGuest = $this->send($q['email'] ?? '', 'We received your message — SKA The Boutique', $guestHtml, $info);
+        $okAdmin = $this->send($info, 'SKA Contact: ' . ($q['subject'] ?? 'General Inquiry'), $adminHtml, $q['email'] ?? $info);
+        $this->notifyEdge('inquiry', array_merge($q, ['site_email' => $info]));
+        return $okGuest || $okAdmin;
+    }
+
+    public function sendInquiryReply(array $q, string $reply): bool
+    {
+        $info = function_exists('cms_setting')
+            ? cms_setting('site_email', 'info@skaboutiquebnb.com')
+            : 'info@skaboutiquebnb.com';
+        $name = htmlspecialchars($q['name'] ?? 'Guest');
+        $replyHtml = nl2br(htmlspecialchars($reply));
+        $html = '<!DOCTYPE html><html><body style="font-family:Georgia,serif;background:#f6f3ee;padding:24px;">
+          <div style="max-width:560px;margin:0 auto;background:#fff;padding:32px;border-radius:12px;">
+            <p style="letter-spacing:.2em;text-transform:uppercase;font-size:11px;color:#c9a96e;">SKA The Boutique</p>
+            <h1 style="font-weight:400;color:#0d1b2e;">Reply to your inquiry</h1>
+            <p>Dear <strong>' . $name . '</strong>,</p>
+            <p style="color:#444;line-height:1.7;">' . $replyHtml . '</p>
+            <p style="font-size:13px;color:#888;">You can reply to this email to continue the conversation.</p>
+          </div></body></html>';
+        $ok = $this->send($q['email'] ?? '', 'Re: ' . ($q['subject'] ?? 'Your SKA inquiry'), $html, $info);
+        $this->notifyEdge('inquiry_reply', array_merge($q, ['reply' => $reply, 'site_email' => $info]));
+        return $ok;
+    }
+
+    public function sendStaffInvite(
         string $to,
         string $username,
         string $roleLabel,
@@ -285,7 +340,11 @@ class SkaMailer
     {
         $url = 'https://nllqkepymtwwbvbjnbyz.supabase.co/functions/v1/notify-email';
         $key = 'sb_publishable_LCuHabxBgF-bth8zDI2mgw_7QsdljHH';
-        $payload = json_encode(['type' => $type, 'data' => $b]);
+        $payload = json_encode([
+            'type' => $type,
+            'to'   => $b['site_email'] ?? ($this->branchConfig['Naguru']['email'] ?? 'info@skaboutiquebnb.com'),
+            'data' => $b,
+        ]);
         $ctx = stream_context_create([
             'http' => [
                 'method'  => 'POST',

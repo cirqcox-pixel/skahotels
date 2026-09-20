@@ -187,27 +187,39 @@ serve(async (req) => {
         `Dear <strong>${esc(data.name)}</strong>, unfortunately we are unable to confirm your reservation at SKA The Boutique ${esc(data.branch)}.`,
         String(data.status_reason || data.reason || 'Please reply if you would like alternative dates.'),
       );
-    } else {
-      const subject = `SKA Contact: ${data.subject || 'General Inquiry'}`;
-      const text = `From: ${data.name} <${data.email}>\nPhone: ${data.phone || '—'}\n\n${data.message || ''}`;
-      if (RESEND_API_KEY) {
-        await sendResend(
-          [String(body.to || 'info@skaboutiquebnb.com')],
-          subject,
-          wrap(subject, 'A new website inquiry was submitted.', `<p>${esc(data.message)}</p>`, ''),
-          text,
-          guest || undefined,
-        );
-        sent.push('resend-admin');
+    } else if (type === 'inquiry_reply') {
+      const info = String(body.to || data.site_email || 'info@skaboutiquebnb.com');
+      const reply = String(data.reply || data.reply_message || '');
+      const subject = `Re: ${data.subject || 'Your SKA inquiry'}`;
+      const intro = `Dear <strong>${esc(data.name)}</strong>, here is our reply to your message.`;
+      const table = `<p style="line-height:1.7;color:#333;">${esc(reply).replace(/\n/g, '<br>')}</p>`;
+      const text = reply;
+      if (RESEND_API_KEY && guest) {
+        await sendResend([guest], subject, wrap(subject, intro, table, 'You can reply to this email to continue the conversation.'), text, info);
+        sent.push('resend-guest');
       } else {
         await sendFormspree({
           _subject: subject,
-          _replyto: guest,
-          type: 'inquiry',
-          ...data,
+          _replyto: info,
+          _cc: guest,
+          type: 'inquiry_reply',
+          name: data.name,
+          email: guest,
+          message: reply,
         });
         sent.push('formspree');
       }
+    } else {
+      const info = String(body.to || data.site_email || 'info@skaboutiquebnb.com');
+      await sendPair(
+        info,
+        guest,
+        `SKA Contact: ${data.subject || 'General Inquiry'}`,
+        'We received your message — SKA The Boutique',
+        'A new contact form message needs a reply in the admin Inquiries page.',
+        `Dear <strong>${esc(data.name)}</strong>, thank you for writing to SKA The Boutique. We have received your message and will reply within 24 hours.`,
+        'You can reply to this email if you need to add more detail.',
+      );
     }
 
     return json({ ok: true, sent, via: RESEND_API_KEY ? 'resend' : 'formspree' });

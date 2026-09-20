@@ -14,7 +14,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute();
         $stmt->close();
     }
-    if ($action === 'delete') {
+    if ($action === 'reply') {
+        $id = (int)$_POST['id'];
+        $reply = trim($_POST['reply'] ?? '');
+        $c = cms_conn();
+        $row = $c->query('SELECT * FROM inquiries WHERE id = ' . $id)->fetch_assoc();
+        if ($row && $reply) {
+            @$c->query("UPDATE inquiries SET is_read = 1, reply_message = '" . $c->real_escape_string($reply) . "', replied_at = NOW() WHERE id = " . $id);
+            require_once '../config/SkaMailer.php';
+            (new SkaMailer())->sendInquiryReply($row, $reply);
+        }
+        header('Location: inquiries.php?replied=1');
+        exit;
+    }
         $id = (int)$_POST['id'];
         $c = cms_conn();
         $stmt = $c->prepare("DELETE FROM inquiries WHERE id = ?");
@@ -40,6 +52,7 @@ $activePage = 'inquiries';
 $pageTitle = 'Inquiries';
 $pageBreadcrumb = $unread ? "$unread unread message(s)" : 'Contact form submissions';
 if (isset($_GET['deleted'])) { $toastMsg = 'Inquiry deleted.'; $toastType = 'success'; $includeToast = true; }
+if (isset($_GET['replied'])) { $toastMsg = 'Reply emailed to the visitor.'; $toastType = 'success'; $includeToast = true; }
 include 'includes/layout-start.php';
 ?>
 
@@ -67,7 +80,15 @@ include 'includes/layout-start.php';
             <?php if ($inq['phone']): ?><br><span class="ska-muted"><?= htmlspecialchars($inq['phone']) ?></span><?php endif; ?>
           </td>
           <td><?= htmlspecialchars($inq['subject'] ?: '—') ?></td>
-          <td style="max-width:280px"><?= nl2br(htmlspecialchars(mb_strimwidth($inq['message'], 0, 120, '…'))) ?></td>
+          <td style="max-width:320px">
+            <?= nl2br(htmlspecialchars($inq['message'])) ?>
+            <form method="POST" class="mt-2">
+              <input type="hidden" name="action" value="reply">
+              <input type="hidden" name="id" value="<?= (int)$inq['id'] ?>">
+              <textarea name="reply" class="ska-input" rows="3" required placeholder="Reply — the visitor is emailed"></textarea>
+              <button class="ska-btn ska-btn--gold ska-btn--sm mt-1" type="submit">Send reply</button>
+            </form>
+          </td>
           <td><span class="ska-badge ska-badge--<?= $inq['is_read'] ? 'muted' : 'pending' ?>"><?= $inq['is_read'] ? 'Read' : 'New' ?></span></td>
           <td>
             <div class="d-flex gap-1">

@@ -871,6 +871,30 @@
   }
 
   /* ── Inquiries page ── */
+  var inquiriesCache = [];
+
+  function openInquiry(q) {
+    document.getElementById('inquiryId').value = q.id;
+    document.getElementById('inquiryModalTitle').textContent = q.subject || 'Inquiry';
+    document.getElementById('inquiryMeta').textContent =
+      (q.name || '') + ' · ' + (q.email || '') + (q.phone ? ' · ' + q.phone : '') + ' · ' + fmtShortDate(q.created_at);
+    document.getElementById('inquiryMessage').textContent = q.message || '';
+    var prevWrap = document.getElementById('inquiryPrevReplyWrap');
+    var prev = document.getElementById('inquiryPrevReply');
+    if (q.reply_message) {
+      prevWrap.style.display = '';
+      prev.textContent = q.reply_message;
+    } else {
+      prevWrap.style.display = 'none';
+      prev.textContent = '';
+    }
+    document.getElementById('inquiryReply').value = '';
+    openModal('inquiryModal');
+    if (!q.is_read) {
+      SkaApi.adminMarkInquiryRead(q.id, true).catch(function () {});
+    }
+  }
+
   async function loadInquiriesPage() {
     var tbody = document.getElementById('inquiriesTableBody');
     if (!tbody) return;
@@ -880,42 +904,56 @@
     hideError();
     try {
       var inquiries = await withTimeout(SkaApi.adminFetchInquiries());
+      inquiriesCache = inquiries;
       if (!inquiries.length) {
         tbody.innerHTML = '<tr><td colspan="7" class="ska-table-empty">No inquiries yet.</td></tr>';
         return;
       }
       tbody.innerHTML = inquiries.map(function (q) {
-        var msg = (q.message || '').slice(0, 100);
-        if ((q.message || '').length > 100) msg += '…';
+        var msg = (q.message || '').slice(0, 80);
+        if ((q.message || '').length > 80) msg += '…';
+        var status = q.replied_at || q.reply_message
+          ? '<span class="ska-badge ska-badge--confirmed">Replied</span>'
+          : (q.is_read ? 'Read' : '<strong>New</strong>');
         return '<tr>' +
           '<td>' + esc(q.name) + '</td>' +
           '<td>' + esc(q.email) + '</td>' +
           '<td>' + esc(q.subject || '—') + '</td>' +
           '<td>' + esc(msg) + '</td>' +
           '<td>' + fmtShortDate(q.created_at) + '</td>' +
-          '<td>' + (q.is_read ? 'Read' : '<strong>New</strong>') + '</td>' +
-          '<td>' +
-          (q.is_read
-            ? '<span class="text-muted">—</span>'
-            : '<button type="button" class="ska-btn ska-btn--primary ska-btn--sm" data-mark-read="' + q.id + '">Mark read</button>') +
-          '</td></tr>';
+          '<td>' + status + '</td>' +
+          '<td><button type="button" class="ska-btn ska-btn--primary ska-btn--sm" data-open-inquiry="' + q.id + '">Open</button></td></tr>';
       }).join('');
 
-      tbody.querySelectorAll('[data-mark-read]').forEach(function (btn) {
-        btn.addEventListener('click', async function () {
-          try {
-            await SkaApi.adminMarkInquiryRead(btn.dataset.markRead, true);
-            showToast('Marked as read.');
-            loadInquiriesPage();
-          } catch (err) {
-            showError(err.message || 'Update failed');
-          }
+      tbody.querySelectorAll('[data-open-inquiry]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var q = inquiries.find(function (row) { return String(row.id) === btn.getAttribute('data-open-inquiry'); });
+          if (q) openInquiry(q);
         });
       });
     } catch (e) {
       showError('Could not load inquiries: ' + (e.message || e));
       tbody.innerHTML = '<tr><td colspan="7" class="ska-table-empty">Failed to load inquiries.</td></tr>';
     }
+  }
+
+  function initInquiriesPage() {
+    ['inquiryModalClose', 'inquiryModalCancel'].forEach(function (id) {
+      document.getElementById(id)?.addEventListener('click', function () { closeModal('inquiryModal'); });
+    });
+    document.getElementById('inquiryReplyForm')?.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var id = document.getElementById('inquiryId').value;
+      var reply = document.getElementById('inquiryReply').value;
+      try {
+        await SkaApi.adminReplyInquiry(id, reply);
+        closeModal('inquiryModal');
+        showToast('Reply emailed to the visitor.');
+        loadInquiriesPage();
+      } catch (err) {
+        showError(err.message || 'Could not send reply');
+      }
+    });
   }
 
   function staffList(data) {
@@ -1073,6 +1111,7 @@
   initPromotionsPage();
   initPackagesPage();
   initSettingsPage();
+  initInquiriesPage();
 
   function boot() {
     if (page === 'bookings') loadBookingsPage();

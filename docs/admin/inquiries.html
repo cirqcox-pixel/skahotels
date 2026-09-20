@@ -51,7 +51,7 @@
   <header class="ska-topbar">
     <div class="ska-topbar__left">
       <div class="ska-topbar__title">Inquiries</div>
-      <div class="ska-topbar__breadcrumb">Contact form messages</div>
+      <div class="ska-topbar__breadcrumb">Contact form messages — open, reply, and email the visitor</div>
     </div>
   </header>
 
@@ -85,10 +85,41 @@
   </main>
 </div>
 
+<div class="ska-modal-backdrop" id="inquiryModal">
+  <div class="ska-modal ska-modal--lg" role="dialog" aria-labelledby="inquiryModalTitle">
+    <div class="ska-modal__header">
+      <h3 class="ska-modal__title" id="inquiryModalTitle">Inquiry</h3>
+      <button type="button" class="ska-modal__close" id="inquiryModalClose" aria-label="Close">&times;</button>
+    </div>
+    <form id="inquiryReplyForm" class="ska-modal__form">
+      <div class="ska-modal__body">
+        <input type="hidden" id="inquiryId">
+        <p class="ska-hint" id="inquiryMeta"></p>
+        <div class="ska-form-field ska-form-field--full">
+          <label>Visitor message</label>
+          <div id="inquiryMessage" class="ska-inquiry-body"></div>
+        </div>
+        <div class="ska-form-field ska-form-field--full" id="inquiryPrevReplyWrap" style="display:none">
+          <label>Previous reply</label>
+          <div id="inquiryPrevReply" class="ska-inquiry-body ska-inquiry-body--reply"></div>
+        </div>
+        <div class="ska-form-field ska-form-field--full">
+          <label for="inquiryReply">Your reply (emailed to the visitor)</label>
+          <textarea id="inquiryReply" class="ska-input" rows="6" required placeholder="Write a reply the guest will receive by email…"></textarea>
+        </div>
+      </div>
+      <div class="ska-modal__footer">
+        <button type="button" class="ska-btn ska-btn--ghost" id="inquiryModalCancel">Close</button>
+        <button type="submit" class="ska-btn ska-btn--primary">Send reply</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../assets/js/ska-config.js?v=20260920j"></script>
-<script src="../assets/js/ska-notify.js?v=20260920j"></script>
-<script src="../assets/js/ska-api.js?v=20260920j"></script>
-<script src="../assets/js/ska-admin.js?v=20260920j"></script>
+<script src="../assets/js/ska-config.js?v=20260920k"></script>
+<script src="../assets/js/ska-notify.js?v=20260920k"></script>
+<script src="../assets/js/ska-api.js?v=20260920k"></script>
+<script src="../assets/js/ska-admin.js?v=20260920k"></script>
 </body>
 </html>
