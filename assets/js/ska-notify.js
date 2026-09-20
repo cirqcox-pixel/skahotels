@@ -49,9 +49,14 @@
     if (!url) return false;
 
     var payload;
-    if (type === 'booking') {
+    if (type === 'booking' || type === 'booking_confirmed' || type === 'booking_cancelled') {
+      var bookingSubject = type === 'booking_confirmed'
+        ? 'SKA Booking Confirmed — '
+        : type === 'booking_cancelled'
+          ? 'SKA Booking Cancelled — '
+          : 'SKA Booking Request — ';
       payload = {
-        _subject: 'SKA Booking Request — ' + (data.branch || 'Property'),
+        _subject: bookingSubject + (data.branch || 'Property'),
         _replyto: data.email,
         _cc: [adminInbox(data.branch), data.email].filter(Boolean).join(','),
         type: 'booking',
@@ -126,12 +131,10 @@
     } catch (e) {
       console.warn('[SKA Notify] Webhook/Resend:', e.message || e);
     }
-    if (!results.webhook) {
-      try {
-        results.formspree = await sendFormspree(type, data);
-      } catch (e) {
-        console.warn('[SKA Notify] Formspree:', e.message || e);
-      }
+    try {
+      results.formspree = await sendFormspree(type, data);
+    } catch (e) {
+      console.warn('[SKA Notify] Formspree:', e.message || e);
     }
     if (!results.formspree && !results.webhook) {
       console.info('[SKA Notify] No email went out. Deploy notify-email or check Formspree.');
