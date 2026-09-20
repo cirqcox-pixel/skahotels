@@ -431,6 +431,7 @@
         pricing_mode: pkg.pricing_mode || 'fixed',
         branch: pkg.branch || 'Naguru',
         booking_url: pkg.booking_url || null,
+        image: pkg.image || null,
         active: pkg.active === true || pkg.active === 'true' || pkg.active === '1'
       };
       if (pkg.sort_order != null) payload.sort_order = parseInt(pkg.sort_order, 10) || 0;
@@ -450,6 +451,27 @@
         return sb.from('packages').delete().eq('id', id);
       });
       return true;
+    },
+
+    adminUploadPublicFile: async function (folder, file) {
+      if (!file) throw new Error('Choose an image first.');
+      var ext = String(file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (['jpg', 'jpeg', 'png', 'webp', 'gif'].indexOf(ext) < 0) {
+        throw new Error('Use a JPG, PNG, or WebP image.');
+      }
+      if (file.size > 2.5 * 1024 * 1024) {
+        throw new Error('Image must be under 2.5 MB.');
+      }
+      var path = (folder || 'misc') + '/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+      var data = await adminRequest(function (sb) {
+        return sb.storage.from('ska-uploads').upload(path, file, {
+          upsert: true,
+          contentType: file.type || 'image/jpeg'
+        });
+      });
+      var sb = getClient();
+      var pub = sb.storage.from('ska-uploads').getPublicUrl((data && data.path) || path);
+      return (pub.data && pub.data.publicUrl) || path;
     },
 
     adminGetProfile: async function () {

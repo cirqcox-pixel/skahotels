@@ -245,10 +245,39 @@ include 'includes/layout-start.php';
             </div>
             <div class="col-12">
               <label class="ska-label">Package Image</label>
-              <?php if (!empty($e['image'])): ?>
-              <p class="ska-hint">Current: <?= htmlspecialchars($e['image']) ?></p>
+              <?php
+                $pkgImg = $e['image'] ?? '';
+                $pkgImgSrc = $pkgImg;
+                if ($pkgImg && !preg_match('#^https?://#i', $pkgImg) && strpos($pkgImg, 'data:') !== 0) {
+                    $pkgImgSrc = '../' . ltrim($pkgImg, '/');
+                }
+              ?>
+              <?php if ($pkgImg): ?>
+              <div class="ska-current-img-wrap" id="currentImgWrap">
+                <img src="<?= htmlspecialchars($pkgImgSrc) ?>" alt="Current package image">
+                <span class="ska-current-img-wrap__badge">Current Image</span>
+                <button type="button" class="ska-current-img-wrap__replace" onclick="showPkgUploadZone()">
+                  <i class="fa-solid fa-arrow-up-from-bracket" style="font-size:10px;"></i> Replace
+                </button>
+              </div>
+              <div id="uploadZoneWrap" style="display:none;">
+              <?php else: ?>
+              <div id="uploadZoneWrap">
               <?php endif; ?>
-              <input type="file" name="pkg_image" accept="image/jpeg,image/png,image/webp">
+                <div class="ska-upload-zone" id="pkgUploadZone"
+                     onclick="document.getElementById('pkgImageInput').click()">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                  <p>Click to upload or drag &amp; drop image</p>
+                  <span>JPEG · PNG · WebP · max 2 MB</span>
+                </div>
+                <input type="file" name="pkg_image" id="pkgImageInput"
+                       accept="image/jpeg,image/png,image/webp">
+                <div id="newImgThumb" class="ska-new-img-thumb" style="display:none;">
+                  <img id="newImgPreview" src="" alt="Preview">
+                  <button type="button" class="ska-new-img-thumb__del"
+                          onclick="clearNewPkgImage()" title="Remove">&times;</button>
+                </div>
+              </div>
             </div>
           </div>
           <div class="d-flex gap-3 mt-4">
@@ -279,12 +308,22 @@ include 'includes/layout-start.php';
         <table class="ska-table">
           <thead>
             <tr>
-              <th>Title</th><th>Tag</th><th>From</th><th>Branch</th><th>Status</th><th>Actions</th>
+              <th></th><th>Title</th><th>Tag</th><th>From</th><th>Branch</th><th>Status</th><th>Actions</th>
             </tr>
           </thead>
           <tbody>
           <?php foreach ($pkgs as $p): ?>
           <tr>
+            <td>
+              <?php if (!empty($p['image'])):
+                $rowImg = $p['image'];
+                if (!preg_match('#^https?://#i', $rowImg)) $rowImg = '../' . ltrim($rowImg, '/');
+              ?>
+                <img src="<?= htmlspecialchars($rowImg) ?>" alt="" class="ska-table-thumb">
+              <?php else: ?>
+                <div class="ska-table-thumb-empty"><i class="fa-regular fa-image"></i></div>
+              <?php endif; ?>
+            </td>
             <td><strong><?= htmlspecialchars($p['title']) ?></strong></td>
             <td><span class="ska-tag-chip"><?= htmlspecialchars($p['tag'] ?? '') ?></span></td>
             <td><?= htmlspecialchars($p['currency'] ?? 'UGX') ?> <?= number_format((float)$p['price'], 0) ?></td>
@@ -327,4 +366,24 @@ include 'includes/layout-start.php';
         <?php endif; ?>
       </div>
     </div>
+<script>
+function showPkgUploadZone() {
+  var wrap = document.getElementById('uploadZoneWrap');
+  if (wrap) wrap.style.display = 'block';
+}
+function clearNewPkgImage() {
+  var input = document.getElementById('pkgImageInput');
+  var thumb = document.getElementById('newImgThumb');
+  if (input) input.value = '';
+  if (thumb) thumb.style.display = 'none';
+}
+document.getElementById('pkgImageInput')?.addEventListener('change', function () {
+  var file = this.files && this.files[0];
+  if (!file) return;
+  var preview = document.getElementById('newImgPreview');
+  var thumb = document.getElementById('newImgThumb');
+  if (preview) preview.src = URL.createObjectURL(file);
+  if (thumb) thumb.style.display = 'block';
+});
+</script>
 <?php include 'includes/layout-end.php'; ?>

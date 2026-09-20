@@ -526,20 +526,65 @@
     return JSON.stringify(lines);
   }
 
+  function mediaUrl(path) {
+    if (!path) return '';
+    if (/^https?:\/\//i.test(path) || path.indexOf('data:') === 0 || path.indexOf('blob:') === 0) return path;
+    return '../' + String(path).replace(/^\.\.\//, '').replace(/^\//, '');
+  }
+
+  function setPackageImagePreview(path) {
+    var wrap = document.getElementById('pkgImagePreviewWrap');
+    var img = document.getElementById('pkgImagePreview');
+    var hidden = document.getElementById('pkgImage');
+    var pathField = document.getElementById('pkgImagePath');
+    if (hidden) hidden.value = path || '';
+    if (pathField && pathField !== document.activeElement) pathField.value = path || '';
+    if (!wrap || !img) return;
+    if (path) {
+      wrap.style.display = '';
+      img.src = mediaUrl(path);
+    } else {
+      wrap.style.display = 'none';
+      img.removeAttribute('src');
+    }
+  }
+
+  function fillPackageForm(pkg) {
+    document.getElementById('pkgModalTitle').textContent = pkg && pkg.id ? 'Edit Package' : 'Add Package';
+    document.getElementById('pkgId').value = (pkg && pkg.id) || '';
+    document.getElementById('pkgTitle').value = (pkg && pkg.title) || '';
+    document.getElementById('pkgTag').value = (pkg && pkg.tag) || '';
+    document.getElementById('pkgBranch').value = (pkg && pkg.branch) || 'Naguru';
+    document.getElementById('pkgCurrency').value = (pkg && pkg.currency) || 'UGX';
+    document.getElementById('pkgPrice').value = (pkg && pkg.price) || 0;
+    document.getElementById('pkgPricing').value = (pkg && pkg.pricing_mode) || 'fixed';
+    document.getElementById('pkgActive').value = !pkg || pkg.active ? 'true' : 'false';
+    document.getElementById('pkgDesc').value = (pkg && pkg.description) || '';
+    document.getElementById('pkgInc').value = (pkg && pkg.inclusions) || '';
+    document.getElementById('pkgOptions').value = optionsToText(pkg && pkg.options);
+    var file = document.getElementById('pkgImageFile');
+    if (file) file.value = '';
+    setPackageImagePreview((pkg && pkg.image) || '');
+  }
+
   async function loadPackagesPage() {
     var tbody = document.getElementById('packagesTableBody');
     if (!tbody) return;
-    var session = await ensureAuth('packagesTableBody', 5);
+    var session = await ensureAuth('packagesTableBody', 6);
     if (!session) return;
     hideError();
     try {
       var pkgs = await withTimeout(SkaApi.adminFetchPackages());
       if (!pkgs.length) {
-        tbody.innerHTML = '<tr><td colspan="5" class="ska-table-empty">No packages yet.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="ska-table-empty">No packages yet.</td></tr>';
         return;
       }
       tbody.innerHTML = pkgs.map(function (p) {
+        var thumb = mediaUrl(p.image);
         return '<tr>' +
+          '<td>' + (thumb
+            ? '<img src="' + esc(thumb) + '" alt="" class="ska-table-thumb">'
+            : '<div class="ska-table-thumb-empty"><i class="fa-regular fa-image"></i></div>') + '</td>' +
           '<td><strong>' + esc(p.title) + '</strong></td>' +
           '<td>' + esc(p.branch) + '</td>' +
           '<td>' + esc(p.currency || 'UGX') + ' ' + esc(Number(p.price || 0).toFixed(0)) + '</td>' +
@@ -554,18 +599,7 @@
         btn.addEventListener('click', function () {
           var pkg = pkgs.find(function (p) { return String(p.id) === btn.dataset.editPkg; });
           if (!pkg) return;
-          document.getElementById('pkgModalTitle').textContent = 'Edit Package';
-          document.getElementById('pkgId').value = pkg.id;
-          document.getElementById('pkgTitle').value = pkg.title || '';
-          document.getElementById('pkgTag').value = pkg.tag || '';
-          document.getElementById('pkgBranch').value = pkg.branch || 'Naguru';
-          document.getElementById('pkgCurrency').value = pkg.currency || 'UGX';
-          document.getElementById('pkgPrice').value = pkg.price || 0;
-          document.getElementById('pkgPricing').value = pkg.pricing_mode || 'fixed';
-          document.getElementById('pkgActive').value = pkg.active ? 'true' : 'false';
-          document.getElementById('pkgDesc').value = pkg.description || '';
-          document.getElementById('pkgInc').value = pkg.inclusions || '';
-          document.getElementById('pkgOptions').value = optionsToText(pkg.options);
+          fillPackageForm(pkg);
           openModal('pkgModal');
         });
       });
@@ -587,34 +621,64 @@
         msg = 'Packages are not in this database yet. In Supabase SQL Editor run supabase/migrations/009_packages_and_staff_roles.sql, then refresh.';
       }
       showError(msg);
-      tbody.innerHTML = '<tr><td colspan="5" class="ska-table-empty">' + esc(msg) + '</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="ska-table-empty">' + esc(msg) + '</td></tr>';
     }
   }
 
   function initPackagesPage() {
     document.getElementById('btnAddPkg')?.addEventListener('click', function () {
+      fillPackageForm(null);
       document.getElementById('pkgForm').reset();
-      document.getElementById('pkgId').value = '';
-      document.getElementById('pkgModalTitle').textContent = 'Add Package';
+      fillPackageForm(null);
       openModal('pkgModal');
     });
     ['pkgModalClose', 'pkgModalCancel'].forEach(function (id) {
       document.getElementById(id)?.addEventListener('click', function () { closeModal('pkgModal'); });
     });
+    document.getElementById('pkgUploadZone')?.addEventListener('click', function () {
+      document.getElementById('pkgImageFile')?.click();
+    });
+    document.getElementById('pkgImageReplace')?.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      document.getElementById('pkgImageFile')?.click();
+    });
+    document.getElementById('pkgImageFile')?.addEventListener('change', function () {
+      var file = this.files && this.files[0];
+      if (!file) return;
+      setPackageImagePreview(URL.createObjectURL(file));
+    });
+    document.getElementById('pkgImagePath')?.addEventListener('input', function () {
+      setPackageImagePreview(this.value.trim());
+    });
     document.getElementById('pkgForm')?.addEventListener('submit', async function (e) {
       e.preventDefault();
+      hideError();
       var fd = new FormData(e.target);
       var data = {};
-      fd.forEach(function (v, k) { data[k] = v; });
+      fd.forEach(function (v, k) {
+        if (typeof File !== 'undefined' && v instanceof File) return;
+        data[k] = v;
+      });
       data.active = data.active === 'true';
       data.options = textToOptionsJson(data.options);
+      var pathField = document.getElementById('pkgImagePath');
+      if (pathField && pathField.value.trim()) data.image = pathField.value.trim();
+      var fileInput = document.getElementById('pkgImageFile');
+      var file = fileInput && fileInput.files && fileInput.files[0];
       try {
+        if (file) {
+          data.image = await SkaApi.adminUploadPublicFile('packages', file);
+        }
         await SkaApi.adminSavePackage(data);
         closeModal('pkgModal');
         showToast('Package saved.');
         loadPackagesPage();
       } catch (err) {
-        showError(err.message || 'Save failed');
+        var msg = err.message || 'Save failed';
+        if (/bucket|not found|row-level security/i.test(msg)) {
+          msg = 'Image upload needs the ska-uploads bucket. In Supabase SQL Editor run supabase/migrations/010_storage_uploads.sql, then try again.';
+        }
+        showError(msg);
       }
     });
   }

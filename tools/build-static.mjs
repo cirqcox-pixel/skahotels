@@ -788,17 +788,30 @@ function buildAdmin() {
 }
 
 console.log('Building static site → docs/');
-rmrf(OUT);
-fs.mkdirSync(OUT, { recursive: true });
+if (process.argv.includes('--admin-only')) {
+  fs.mkdirSync(path.join(OUT, 'admin', 'assets'), { recursive: true });
+  buildAdmin();
+  copyDir(path.join(ROOT, 'admin', 'assets'), path.join(OUT, 'admin', 'assets'));
+  const jsFiles = ['ska-admin.js', 'ska-api.js', 'ska-config.js'];
+  for (const file of jsFiles) {
+    const src = path.join(ROOT, 'assets', 'js', file);
+    const dest = path.join(OUT, 'assets', 'js', file);
+    if (fs.existsSync(src)) fs.copyFileSync(src, dest);
+  }
+  console.log('Done (admin only).');
+} else {
+  rmrf(OUT);
+  fs.mkdirSync(OUT, { recursive: true });
 
-for (const [name, meta] of Object.entries(PAGES)) buildPage(name, meta);
-buildAdmin();
+  for (const [name, meta] of Object.entries(PAGES)) buildPage(name, meta);
+  buildAdmin();
 
-for (const dir of COPY_DIRS) copyDir(path.join(ROOT, dir), path.join(OUT, dir));
-copyDir(path.join(ROOT, 'admin', 'assets'), path.join(OUT, 'admin', 'assets'));
-for (const file of COPY_FILES) {
-  const src = path.join(ROOT, file);
-  if (fs.existsSync(src)) fs.copyFileSync(src, path.join(OUT, file));
+  for (const dir of COPY_DIRS) copyDir(path.join(ROOT, dir), path.join(OUT, dir));
+  copyDir(path.join(ROOT, 'admin', 'assets'), path.join(OUT, 'admin', 'assets'));
+  for (const file of COPY_FILES) {
+    const src = path.join(ROOT, file);
+    if (fs.existsSync(src)) fs.copyFileSync(src, path.join(OUT, file));
+  }
+  fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
+  console.log('Done.');
 }
-fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
-console.log('Done.');

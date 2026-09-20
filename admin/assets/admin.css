@@ -1072,7 +1072,9 @@ button.ska-sidebar__logout {
 }
 
 #imageInput,
-#promoImageInput { display: none; }
+#promoImageInput,
+#pkgImageFile,
+#pkgImageInput { display: none; }
 
 .ska-img-preview-grid {
   display: flex;
@@ -1329,9 +1331,11 @@ button.ska-sidebar__logout {
   inset: 0;
   background: rgba(0, 0, 0, 0.55);
   z-index: 900;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   backdrop-filter: blur(4px);
+  padding: 24px 16px;
+  overflow-y: auto;
 }
 
 .ska-modal-backdrop.open { display: flex; }
@@ -1341,9 +1345,24 @@ button.ska-sidebar__logout {
   border-radius: 14px;
   width: 100%;
   max-width: 500px;
+  margin: auto;
   overflow: hidden;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
   animation: skaModalIn 0.3s var(--ease);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 48px);
+}
+
+.ska-modal--lg {
+  max-width: 760px;
+}
+
+.ska-modal__form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
 }
 
 @keyframes skaModalIn {
@@ -1357,6 +1376,7 @@ button.ska-sidebar__logout {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-shrink: 0;
 }
 
 .ska-modal__title {
@@ -1376,7 +1396,13 @@ button.ska-sidebar__logout {
 
 .ska-modal__close:hover { color: var(--text); }
 
-.ska-modal__body   { padding: 24px; }
+.ska-modal__body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+}
 
 .ska-modal__footer {
   padding: 16px 24px;
@@ -1385,6 +1411,8 @@ button.ska-sidebar__logout {
   gap: 10px;
   justify-content: flex-end;
   align-items: center;
+  flex-shrink: 0;
+  background: var(--white);
 }
 
 .ska-modal-label {
