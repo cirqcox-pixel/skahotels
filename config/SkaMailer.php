@@ -61,7 +61,19 @@ class SkaMailer
     private function cfg(array $b): array
     {
         $branch = trim($b['branch'] ?? '');
-        return $this->branchConfig[$branch] ?? $this->defaultConfig;
+        $base = $this->branchConfig[$branch] ?? $this->defaultConfig;
+        $prefix = (stripos($branch, 'munyonyo') !== false) ? 'munyonyo' : 'naguru';
+        if (function_exists('cms_setting')) {
+            $notify = cms_setting($prefix . '_notify_email', $base['adminEmails']);
+            $phone = cms_setting($prefix . '_phone', $base['phone']);
+            $email = cms_setting($prefix . '_email', $base['email']);
+            $base['adminEmails'] = $notify ?: $base['adminEmails'];
+            $base['replyTo'] = $email ?: $base['replyTo'];
+            $base['phone'] = $phone ?: $base['phone'];
+            $base['email'] = $email ?: $base['email'];
+            $base['phoneHref'] = preg_replace('/\D+/', '', $base['phone']);
+        }
+        return $base;
     }
 
     /* ══════════════════════════════════════════════════════

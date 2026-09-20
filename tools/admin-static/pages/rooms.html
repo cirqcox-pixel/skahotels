@@ -2,7 +2,7 @@
   <header class="ska-topbar">
     <div class="ska-topbar__left">
       <div class="ska-topbar__title">Rooms</div>
-      <div class="ska-topbar__breadcrumb">Manage room types and pricing</div>
+      <div class="ska-topbar__breadcrumb">Room types, seasonal rates, photos and amenities</div>
     </div>
     <div class="ska-topbar__right">
       <button type="button" class="ska-btn ska-btn--primary" id="btnAddRoom">
@@ -23,6 +23,7 @@
         <table class="ska-table">
           <thead>
             <tr>
+              <th></th>
               <th>Room</th>
               <th>Branch</th>
               <th>Low</th>
@@ -32,7 +33,7 @@
             </tr>
           </thead>
           <tbody id="roomsTableBody">
-            <tr><td colspan="6" class="ska-table-empty">Loading…</td></tr>
+            <tr><td colspan="7" class="ska-table-empty">Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -40,46 +41,61 @@
   </main>
 </div>
 
-<!-- Room modal -->
 <div class="ska-modal-backdrop" id="roomModal">
-  <div class="ska-modal" role="dialog" aria-labelledby="roomModalTitle">
+  <div class="ska-modal ska-modal--lg" role="dialog" aria-labelledby="roomModalTitle">
     <div class="ska-modal__header">
       <h3 class="ska-modal__title" id="roomModalTitle">Add Room</h3>
       <button type="button" class="ska-modal__close" id="roomModalClose" aria-label="Close">&times;</button>
     </div>
-    <form id="roomForm" class="ska-modal__body">
-      <input type="hidden" id="roomId" name="id">
-      <div class="ska-form-grid">
-        <div class="ska-form-field">
-          <label for="roomName">Room name</label>
-          <input type="text" id="roomName" name="name" class="ska-input" required>
-        </div>
-        <div class="ska-form-field">
-          <label for="roomBranch">Branch</label>
-          <select id="roomBranch" name="branch" class="ska-input" required>
-            <option value="Naguru">Naguru</option>
-            <option value="Munyonyo">Munyonyo</option>
-          </select>
-        </div>
-        <div class="ska-form-field">
-          <label for="roomPrice">Base price (USD)</label>
-          <input type="number" id="roomPrice" name="price" class="ska-input" min="0" step="1" required>
-        </div>
-        <div class="ska-form-field">
-          <label for="roomPriceLow">Low season</label>
-          <input type="number" id="roomPriceLow" name="price_low" class="ska-input" min="0" step="1">
-        </div>
-        <div class="ska-form-field">
-          <label for="roomPriceShoulder">Shoulder season</label>
-          <input type="number" id="roomPriceShoulder" name="price_shoulder" class="ska-input" min="0" step="1">
-        </div>
-        <div class="ska-form-field">
-          <label for="roomPriceHigh">High season</label>
-          <input type="number" id="roomPriceHigh" name="price_high" class="ska-input" min="0" step="1">
-        </div>
-        <div class="ska-form-field ska-form-field--full">
-          <label for="roomDesc">Description</label>
-          <textarea id="roomDesc" name="description" class="ska-input" rows="3"></textarea>
+    <form id="roomForm" class="ska-modal__form">
+      <div class="ska-modal__body">
+        <input type="hidden" id="roomId" name="id">
+        <div class="ska-form-grid">
+          <div class="ska-form-field">
+            <label for="roomName">Room name</label>
+            <input type="text" id="roomName" name="name" class="ska-input" required>
+          </div>
+          <div class="ska-form-field">
+            <label for="roomBranch">Branch</label>
+            <select id="roomBranch" name="branch" class="ska-input" required>
+              <option value="Naguru">Naguru</option>
+              <option value="Munyonyo">Munyonyo</option>
+            </select>
+          </div>
+          <div class="ska-form-field">
+            <label for="roomPrice">Base price (USD)</label>
+            <input type="number" id="roomPrice" name="price" class="ska-input" min="0" step="1" required>
+          </div>
+          <div class="ska-form-field">
+            <label for="roomPriceLow">Low season</label>
+            <input type="number" id="roomPriceLow" name="price_low" class="ska-input" min="0" step="1">
+          </div>
+          <div class="ska-form-field">
+            <label for="roomPriceShoulder">Shoulder season</label>
+            <input type="number" id="roomPriceShoulder" name="price_shoulder" class="ska-input" min="0" step="1">
+          </div>
+          <div class="ska-form-field">
+            <label for="roomPriceHigh">High season</label>
+            <input type="number" id="roomPriceHigh" name="price_high" class="ska-input" min="0" step="1">
+          </div>
+          <div class="ska-form-field ska-form-field--full">
+            <label for="roomDesc">Description</label>
+            <textarea id="roomDesc" name="description" class="ska-input" rows="3"></textarea>
+          </div>
+          <div class="ska-form-field ska-form-field--full">
+            <label for="roomAmenities">Amenities (one per line)</label>
+            <textarea id="roomAmenities" name="amenities" class="ska-input" rows="3" placeholder="Air Conditioning&#10;Smart TV&#10;En-Suite Bathroom"></textarea>
+          </div>
+          <div class="ska-form-field ska-form-field--full">
+            <label>Room photos</label>
+            <div id="roomImagesGrid" class="ska-room-thumbs"></div>
+            <div id="roomUploadZone" class="ska-upload-zone">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <p>Click to upload photos (you can select several)</p>
+              <span>JPEG · PNG · WebP · max 2.5 MB each</span>
+            </div>
+            <input type="file" id="roomImageFile" accept="image/jpeg,image/png,image/webp" multiple>
+          </div>
         </div>
       </div>
       <div class="ska-modal__footer">

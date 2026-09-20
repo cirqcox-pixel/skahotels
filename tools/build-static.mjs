@@ -317,7 +317,7 @@ const PAGES = {
     property: 'naguru',
     branch: 'Naguru',
     bodyClass: '',
-    extraScripts: '<script src="assets/js/ska-rooms.js"></script>',
+    extraScripts: '<script src="assets/js/ska-rooms.js?v=20260920j"></script>',
   },
   munyonyo: {
     title: 'SKA Munyonyo | Lakeside Boutique Hotel Kampala',
@@ -328,7 +328,7 @@ const PAGES = {
     property: 'munyonyo',
     branch: 'Munyonyo',
     bodyClass: '',
-    extraScripts: '<script src="assets/js/ska-rooms.js"></script>',
+    extraScripts: '<script src="assets/js/ska-rooms.js?v=20260920j"></script>',
   },
 };
 
@@ -507,7 +507,16 @@ function readPartial(name) {
 }
 
 function rmrf(dir) {
-  if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true, force: true });
+  if (!fs.existsSync(dir)) return;
+  try {
+    fs.rmSync(dir, { recursive: true, force: true });
+  } catch (e) {
+    if (e && e.code === 'EPERM') {
+      console.warn('Could not wipe docs/; rebuilding over existing files.');
+      return;
+    }
+    throw e;
+  }
 }
 
 function copyDir(src, dest) {
@@ -670,6 +679,11 @@ function fixProperty(body, propertyKey) {
     'requestAnimationFrame(updateSlider);\n    window.__skaUpdateSlider = updateSlider;'
   );
 
+  const modalsPath = path.join(PARTIALS, 'room-modals.html');
+  if (!body.includes('id="lbxBackdrop"') && fs.existsSync(modalsPath)) {
+    body += '\n' + fs.readFileSync(modalsPath, 'utf8');
+  }
+
   return body;
 }
 
@@ -681,6 +695,7 @@ function propertyNav(slug) {
       <a href="${base}" class="active">Overview</a>
       <a href="${base}#gallery">Photos</a>
       <a href="${base}#rooms">Rooms</a>
+      <a href="${base}#propertyDeals">Offers</a>
       <a href="${base}#services">Drink + Eat</a>
       <a href="${base}#book">Book</a>
     </nav></div></div></div>`;
@@ -756,6 +771,7 @@ function buildAdmin() {
     { file: 'packages.html', page: 'packages', title: 'Packages' },
     { file: 'inquiries.html', page: 'inquiries', title: 'Inquiries' },
     { file: 'users.html', page: 'users', title: 'Users & Roles' },
+    { file: 'settings.html', page: 'settings', title: 'Property settings' },
   ];
 
   for (const meta of adminPages) {
@@ -769,7 +785,8 @@ function buildAdmin() {
       .replace(/\{\{ACTIVE_PACKAGES\}\}/g, meta.page === 'packages' ? ' active' : '')
       .replace(/\{\{ACTIVE_BOOKINGS\}\}/g, meta.page === 'bookings' ? ' active' : '')
       .replace(/\{\{ACTIVE_INQUIRIES\}\}/g, meta.page === 'inquiries' ? ' active' : '')
-      .replace(/\{\{ACTIVE_USERS\}\}/g, meta.page === 'users' ? ' active' : '');
+      .replace(/\{\{ACTIVE_USERS\}\}/g, meta.page === 'users' ? ' active' : '')
+      .replace(/\{\{ACTIVE_SETTINGS\}\}/g, meta.page === 'settings' ? ' active' : '');
 
     const html = headTpl
       .replace(/\{\{TITLE\}\}/g, meta.title)
@@ -792,7 +809,7 @@ if (process.argv.includes('--admin-only')) {
   fs.mkdirSync(path.join(OUT, 'admin', 'assets'), { recursive: true });
   buildAdmin();
   copyDir(path.join(ROOT, 'admin', 'assets'), path.join(OUT, 'admin', 'assets'));
-  const jsFiles = ['ska-admin.js', 'ska-api.js', 'ska-config.js', 'ska-notify.js'];
+  const jsFiles = ['ska-admin.js', 'ska-api.js', 'ska-config.js', 'ska-notify.js', 'ska-rooms.js', 'ska-site.js'];
   for (const file of jsFiles) {
     const src = path.join(ROOT, 'assets', 'js', file);
     const dest = path.join(OUT, 'assets', 'js', file);

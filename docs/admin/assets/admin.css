@@ -1075,7 +1075,41 @@ button.ska-sidebar__logout {
 #promoImageInput,
 #pkgImageFile,
 #pkgImageInput,
-#promoImageFile { display: none; }
+#promoImageFile,
+#roomImageFile { display: none; }
+
+.ska-room-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.ska-room-thumb {
+  position: relative;
+  width: 92px;
+  height: 72px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.ska-room-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ska-room-thumb__del {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(20,20,20,.7);
+  color: #fff;
+  cursor: pointer;
+  line-height: 20px;
+}
 
 .ska-img-preview-grid {
   display: flex;

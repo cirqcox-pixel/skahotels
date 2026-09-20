@@ -394,6 +394,22 @@ a { text-decoration: none; }
    GETTING HERE
 ═══════════════════════════════════════════════════════════ */
 .getting-here-section { background: var(--dark); padding: 70px 0; }
+
+.ska-property-extras { padding: 64px 0 40px; background: #f7f3ee; }
+.ska-property-extras__eyebrow {
+  font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: #c9a96e; margin: 0 0 8px;
+}
+.ska-property-extras__title {
+  font-family: var(--ff-display, Georgia, serif); font-size: 2.2rem; font-weight: 400; margin: 0 0 28px;
+}
+.ska-property-extras__sub {
+  font-size: 14px; letter-spacing: .08em; text-transform: uppercase; margin: 28px 0 16px; color: #5a5a5a;
+}
+.ska-property-extras .ska-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+@media (max-width: 860px) {
+  .ska-property-extras .ska-grid-3 { grid-template-columns: 1fr; }
+}
+.ska-muted { color: #888; padding: 8px 0; }
 .getting-here-inner { display: flex; gap: 60px; align-items: flex-start; flex-wrap: wrap; }
 .gh-text { flex: 0 0 340px; color: #fff; }
 .gh-eyebrow {

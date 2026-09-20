@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $settings = cms_all_settings();
-$groups = ['contact' => 'Contact Details', 'social' => 'Social Media', 'homepage' => 'Homepage Hero'];
+$groups = ['contact' => 'Contact & properties', 'social' => 'Social Media', 'homepage' => 'Homepage Hero'];
 
 $activePage = 'settings';
 $pageTitle = 'Site Settings';

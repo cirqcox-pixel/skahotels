@@ -427,6 +427,16 @@ $roomsJson = json_encode($allRooms, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT
   </div>
 </section>
 
+<section class="section ska-property-extras" id="propertyDeals">
+  <div class="container">
+    <p class="ska-property-extras__eyebrow">Stay longer, save more</p>
+    <h2 class="ska-property-extras__title">Offers &amp; packages</h2>
+    <h3 class="ska-property-extras__sub">Current offers</h3>
+    <div class="ska-grid-3" id="propertyOffers"><p class="ska-muted">Loading offers…</p></div>
+    <h3 class="ska-property-extras__sub">Event packages</h3>
+    <div class="ska-grid-3" id="propertyPackages"><p class="ska-muted">Loading packages…</p></div>
+  </div>
+</section>
 
 
 <!-- ══════════════════════════════════════════
@@ -776,23 +786,23 @@ setTimeout(calculateBooking, 1200);
 <!-- ══════════════════════════════════════════
      GETTING HERE
 ══════════════════════════════════════════ -->
-<section class="getting-here-section" id="contact">
+<section class="getting-here-section" id="contact" data-ska-location="Naguru">
   <div class="container">
     <div class="getting-here-inner">
       <div class="gh-text">
         <span class="gh-eyebrow">OUR LOCATION</span>
         <h2 class="gh-title">GETTING HERE</h2>
-        <address class="gh-address">SKA The Boutique B&B — Naguru<br>Naguru, Kampala, Uganda</address>
-        <p class="gh-phone"><i class="fa-solid fa-phone"></i> +256 741 186 891</p>
-        <p class="gh-email"><i class="fa-solid fa-envelope"></i><a href="mailto:naguru.booking@skaboutiquebnb.com">naguru.booking@skaboutiquebnb.com</a></p>
-        <p class="gh-email"><i class="fa-solid fa-envelope"></i><a href="mailto:skatheboutiquenaguru@gmail.com">skatheboutiquenaguru@gmail.com</a></p>
+        <address class="gh-address" data-ska-field="address">SKA The Boutique B&B — Naguru<br>Naguru, Kampala, Uganda</address>
+        <p class="gh-phone" data-ska-field="phone"><i class="fa-solid fa-phone"></i> +256 741 186 891</p>
+        <p class="gh-email" data-ska-field="email"><i class="fa-solid fa-envelope"></i><a href="mailto:naguru.booking@skaboutiquebnb.com">naguru.booking@skaboutiquebnb.com</a></p>
+        <p class="gh-email" data-ska-field="email_alt"><i class="fa-solid fa-envelope"></i><a href="mailto:skatheboutiquenaguru@gmail.com">skatheboutiquenaguru@gmail.com</a></p>
         <div class="gh-airport">
           <i class="fa-solid fa-plane-arrival"></i>
           <div><strong>Entebbe International Airport</strong> <span class="gh-chevron">›</span></div>
         </div>
       </div>
       <div class="gh-map">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.7474914464715!2d32.604376874723435!3d0.34140269965525194!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x177dbb00112dc205%3A0xb5497e995a83a3c9!2sSKA%20The%20Boutique%20Naguru!5e0!3m2!1sen!2sug!4v1774681497576!5m2!1sen!2sug"
+        <iframe data-ska-field="map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.7474914464715!2d32.604376874723435!3d0.34140269965525194!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x177dbb00112dc205%3A0xb5497e995a83a3c9!2sSKA%20The%20Boutique%20Naguru!5e0!3m2!1sen!2sug!4v1774681497576!5m2!1sen!2sug"
           width="100%" height="350px" style="border:0;" allowfullscreen loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"></iframe>
       </div>
@@ -891,79 +901,6 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(updateSlider);
   }
 
-  /* ───────── MODALS ───────── */
-  function openModal(id) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.classList.add('visible');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeModal(id) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.classList.remove('visible');
-    document.body.style.overflow = '';
-  }
-
-  document.querySelectorAll('.ska-backdrop').forEach(el => {
-    el.addEventListener('click', e => {
-      if (e.target === el) closeModal(el.id);
-    });
-  });
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      document.querySelectorAll('.ska-backdrop.visible')
-        .forEach(m => m.classList.remove('visible'));
-      document.body.style.overflow = '';
-    }
-  });
-
-  /* ───────── LIGHTBOX ───────── */
-  let lbRoom = 0, lbImg = 0;
-
-  window.openLbx = function(i, img = 0) {
-    lbRoom = i;
-    lbImg = img;
-    renderLbx();
-    openModal('lbxBackdrop');
-  };
-
-  function renderLbx() {
-    const r = ROOMS[lbRoom];
-    if (!r) return;
-
-    const img = document.getElementById('lbxImg');
-    img.src = r.images[lbImg] || '';
-    document.getElementById('lbxName').textContent = r.name;
-    document.getElementById('lbxCount').textContent =
-      `${lbImg + 1} of ${r.images.length}`;
-  }
-
-  /* ───────── DETAIL MODAL ───────── */
-  window.openDetail = function(i) {
-    const r = ROOMS[i];
-    if (!r) return;
-
-    document.getElementById('dmTitle').textContent = r.name;
-    document.getElementById('dmDesc').textContent = r.description || '';
-
-    openModal('dmBackdrop');
-  };
-
-  /* ───────── RATES MODAL ───────── */
-  let activeRoom = 0;
-
-  window.openRates = function(i) {
-    activeRoom = i;
-    const r = ROOMS[i];
-    if (!r) return;
-
-    document.getElementById('ratesTitle').textContent = r.name;
-    openModal('ratesBackdrop');
-  };
-
   /* ───────── BOOKING CALC ───────── */
   function calcTotal() {
     const ci = document.getElementById('checkin')?.value;
@@ -992,37 +929,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 });
-
-
-
-
-
-/* ───────── ATTACH BUTTONS TO MODALS ───────── */
-document.querySelectorAll('.rs-expand').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const idx = parseInt(btn.dataset.idx);
-    openLbx(idx, 0); // open lightbox, first image
-  });
-});
-
-document.querySelectorAll('.rs-room-name').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const idx = parseInt(btn.dataset.idx);
-    openDetail(idx); // open detail modal
-  });
-});
-
-document.querySelectorAll('.rs-vr-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const idx = parseInt(btn.dataset.idx);
-    openRates(idx); // open rates modal
-  });
-});
-
-/* ───────── MODAL CLOSE BUTTONS ───────── */
-document.getElementById('lbxClose')?.addEventListener('click', () => closeModal('lbxBackdrop'));
-document.getElementById('dmClose')?.addEventListener('click', () => closeModal('dmBackdrop'));
-document.getElementById('ratesClose')?.addEventListener('click', () => closeModal('ratesBackdrop'));
 </script>
 
 <?php include 'includes/page-end.php'; ?>

@@ -5,9 +5,14 @@
 (function (global) {
   'use strict';
 
-  var cfg = global.SKA_CONFIG || {};
+  function cfgNow() {
+    return global.SKA_CONFIG || {};
+  }
+
+  var cfg = cfgNow();
 
   function adminInbox(branch) {
+    cfg = cfgNow();
     var map = cfg.branchEmails || {};
     if (branch && map[branch]) return map[branch];
     var b = (branch || '').toLowerCase();

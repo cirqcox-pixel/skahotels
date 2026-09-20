@@ -319,9 +319,72 @@
 
     adminFetchRooms: async function () {
       var data = await adminRequest(function (sb) {
-        return sb.from('rooms').select('*').order('branch').order('id');
+        return sb.from('rooms')
+          .select('*, room_images(id,image_path), room_amenities(id,icon_class,name)')
+          .order('branch')
+          .order('id');
+      });
+      return (data || []).map(function (room) {
+        room.images = (room.room_images || []).map(function (r) { return r.image_path; });
+        room.amenities = room.room_amenities || [];
+        return room;
+      });
+    },
+
+    adminFetchRoomImages: async function (roomId) {
+      var data = await adminRequest(function (sb) {
+        return sb.from('room_images').select('id,image_path').eq('room_id', roomId).order('id');
       });
       return data || [];
+    },
+
+    adminAddRoomImage: async function (roomId, imagePath) {
+      return adminRequest(function (sb) {
+        return sb.from('room_images').insert([{ room_id: roomId, image_path: imagePath }]).select().single();
+      });
+    },
+
+    adminDeleteRoomImage: async function (imageId) {
+      await adminRequest(function (sb) {
+        return sb.from('room_images').delete().eq('id', imageId);
+      });
+      return true;
+    },
+
+    adminReplaceRoomAmenities: async function (roomId, names) {
+      await adminRequest(function (sb) {
+        return sb.from('room_amenities').delete().eq('room_id', roomId);
+      });
+      var rows = (names || []).map(function (name) {
+        return { room_id: roomId, name: name, icon_class: 'fa-solid fa-check' };
+      }).filter(function (r) { return r.name; });
+      if (!rows.length) return [];
+      return adminRequest(function (sb) {
+        return sb.from('room_amenities').insert(rows).select();
+      });
+    },
+
+    applyPublicSettings: function (map) {
+      if (!map || !cfg) return map || {};
+      if (map.site_email) cfg.siteEmail = map.site_email;
+      cfg.branchEmails = cfg.branchEmails || {};
+      if (map.naguru_notify_email || map.naguru_email) {
+        cfg.branchEmails.Naguru = map.naguru_notify_email || map.naguru_email;
+      }
+      if (map.munyonyo_notify_email || map.munyonyo_email) {
+        cfg.branchEmails.Munyonyo = map.munyonyo_notify_email || map.munyonyo_email;
+      }
+      if (cfg.notify && (map.naguru_notify_email || map.site_email)) {
+        cfg.notify.to = map.naguru_notify_email || map.site_email;
+      }
+      return map;
+    },
+
+    adminSaveSettings: async function (rows) {
+      if (!rows || !rows.length) return [];
+      return adminRequest(function (sb) {
+        return sb.from('site_settings').upsert(rows, { onConflict: 'setting_key' }).select();
+      });
     },
 
     adminSaveRoom: async function (room) {

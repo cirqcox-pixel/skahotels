@@ -79,8 +79,8 @@
     marketing: 'Marketing'
   };
   var ROLE_PAGES = {
-    super_admin: ['dashboard', 'rooms', 'promotions', 'packages', 'bookings', 'inquiries', 'users'],
-    manager: ['dashboard', 'rooms', 'promotions', 'packages', 'bookings', 'inquiries'],
+    super_admin: ['dashboard', 'rooms', 'promotions', 'packages', 'bookings', 'inquiries', 'users', 'settings'],
+    manager: ['dashboard', 'rooms', 'promotions', 'packages', 'bookings', 'inquiries', 'settings'],
     reservations: ['dashboard', 'bookings', 'inquiries'],
     marketing: ['dashboard', 'promotions', 'packages']
   };
@@ -314,21 +314,99 @@
     if (el) el.classList.remove('open');
   }
 
+  var pendingRoomFiles = [];
+  var currentRoomImages = [];
+
+  function parseAmenityLines(text) {
+    return String(text || '').split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean);
+  }
+
+  function renderRoomThumbs() {
+    var grid = document.getElementById('roomImagesGrid');
+    if (!grid) return;
+    var html = currentRoomImages.map(function (img) {
+      return '<div class="ska-room-thumb">' +
+        '<img src="' + esc(mediaUrl(img.image_path)) + '" alt="">' +
+        '<button type="button" class="ska-room-thumb__del" data-del-img="' + img.id + '" title="Remove">&times;</button>' +
+        '</div>';
+    }).join('');
+    html += pendingRoomFiles.map(function (file, i) {
+      return '<div class="ska-room-thumb ska-room-thumb--pending">' +
+        '<img src="' + esc(URL.createObjectURL(file)) + '" alt="">' +
+        '<button type="button" class="ska-room-thumb__del" data-del-pending="' + i + '" title="Remove">&times;</button>' +
+        '</div>';
+    }).join('');
+    grid.innerHTML = html || '<p class="ska-hint">No photos yet.</p>';
+    grid.querySelectorAll('[data-del-img]').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        if (!confirm('Remove this photo?')) return;
+        try {
+          await SkaApi.adminDeleteRoomImage(btn.getAttribute('data-del-img'));
+          currentRoomImages = currentRoomImages.filter(function (img) {
+            return String(img.id) !== btn.getAttribute('data-del-img');
+          });
+          renderRoomThumbs();
+        } catch (err) {
+          showError(err.message || 'Could not remove photo');
+        }
+      });
+    });
+    grid.querySelectorAll('[data-del-pending]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        pendingRoomFiles.splice(parseInt(btn.getAttribute('data-del-pending'), 10), 1);
+        renderRoomThumbs();
+      });
+    });
+  }
+
+  async function fillRoomForm(room) {
+    document.getElementById('roomModalTitle').textContent = room && room.id ? 'Edit Room' : 'Add Room';
+    document.getElementById('roomId').value = (room && room.id) || '';
+    document.getElementById('roomName').value = (room && room.name) || '';
+    document.getElementById('roomBranch').value = (room && room.branch) || 'Naguru';
+    document.getElementById('roomPrice').value = (room && room.price) || '';
+    document.getElementById('roomPriceLow').value = (room && room.price_low) || '';
+    document.getElementById('roomPriceShoulder').value = (room && room.price_shoulder) || '';
+    document.getElementById('roomPriceHigh').value = (room && room.price_high) || '';
+    document.getElementById('roomDesc').value = (room && room.description) || '';
+    document.getElementById('roomAmenities').value = ((room && room.amenities) || []).map(function (a) {
+      return a.name || a;
+    }).join('\n');
+    var file = document.getElementById('roomImageFile');
+    if (file) file.value = '';
+    pendingRoomFiles = [];
+    currentRoomImages = [];
+    if (room && room.id) {
+      try {
+        currentRoomImages = await SkaApi.adminFetchRoomImages(room.id);
+      } catch (e) {
+        currentRoomImages = (room.room_images || []).map(function (r, i) {
+          return { id: r.id || i, image_path: r.image_path || r };
+        });
+      }
+    }
+    renderRoomThumbs();
+  }
+
   async function loadRoomsPage() {
     var tbody = document.getElementById('roomsTableBody');
     if (!tbody) return;
-    var session = await ensureAuth('roomsTableBody', 6);
+    var session = await ensureAuth('roomsTableBody', 7);
     if (!session) return;
 
     hideError();
     try {
       var rooms = await withTimeout(SkaApi.adminFetchRooms());
       if (!rooms.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="ska-table-empty">No rooms yet. Click Add Room to create one.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="ska-table-empty">No rooms yet. Click Add Room to create one.</td></tr>';
         return;
       }
       tbody.innerHTML = rooms.map(function (r) {
+        var thumb = (r.images && r.images[0]) || '';
         return '<tr>' +
+          '<td>' + (thumb
+            ? '<img src="' + esc(mediaUrl(thumb)) + '" alt="" class="ska-table-thumb">'
+            : '<div class="ska-table-thumb-empty"><i class="fa-regular fa-image"></i></div>') + '</td>' +
           '<td><strong>' + esc(r.name) + '</strong></td>' +
           '<td>' + esc(r.branch) + '</td>' +
           '<td>$' + esc(Number(r.price_low || r.price || 0).toFixed(0)) + '</td>' +
@@ -341,18 +419,10 @@
       }).join('');
 
       tbody.querySelectorAll('[data-edit-room]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', async function () {
           var room = rooms.find(function (r) { return String(r.id) === btn.dataset.editRoom; });
           if (!room) return;
-          document.getElementById('roomModalTitle').textContent = 'Edit Room';
-          document.getElementById('roomId').value = room.id;
-          document.getElementById('roomName').value = room.name || '';
-          document.getElementById('roomBranch').value = room.branch || 'Naguru';
-          document.getElementById('roomPrice').value = room.price || '';
-          document.getElementById('roomPriceLow').value = room.price_low || '';
-          document.getElementById('roomPriceShoulder').value = room.price_shoulder || '';
-          document.getElementById('roomPriceHigh').value = room.price_high || '';
-          document.getElementById('roomDesc').value = room.description || '';
+          await fillRoomForm(room);
           openModal('roomModal');
         });
       });
@@ -371,20 +441,28 @@
       });
     } catch (e) {
       showError('Could not load rooms: ' + (e.message || e));
-      tbody.innerHTML = '<tr><td colspan="6" class="ska-table-empty">Failed to load rooms.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="ska-table-empty">Failed to load rooms.</td></tr>';
     }
   }
 
   function initRoomsPage() {
-    document.getElementById('btnAddRoom')?.addEventListener('click', function () {
+    document.getElementById('btnAddRoom')?.addEventListener('click', async function () {
       document.getElementById('roomForm').reset();
-      document.getElementById('roomId').value = '';
-      document.getElementById('roomModalTitle').textContent = 'Add Room';
+      await fillRoomForm(null);
       openModal('roomModal');
     });
 
     ['roomModalClose', 'roomModalCancel'].forEach(function (id) {
       document.getElementById(id)?.addEventListener('click', function () { closeModal('roomModal'); });
+    });
+
+    document.getElementById('roomUploadZone')?.addEventListener('click', function () {
+      document.getElementById('roomImageFile')?.click();
+    });
+    document.getElementById('roomImageFile')?.addEventListener('change', function () {
+      var files = this.files ? Array.prototype.slice.call(this.files) : [];
+      pendingRoomFiles = pendingRoomFiles.concat(files);
+      renderRoomThumbs();
     });
 
     document.getElementById('roomForm')?.addEventListener('submit', async function (e) {
@@ -393,12 +471,63 @@
       var data = {};
       fd.forEach(function (v, k) { data[k] = v; });
       try {
-        await SkaApi.adminSaveRoom(data);
+        var saved = await SkaApi.adminSaveRoom(data);
+        var roomId = (saved && saved.id) || data.id;
+        if (roomId && pendingRoomFiles.length) {
+          for (var i = 0; i < pendingRoomFiles.length; i++) {
+            var url = await SkaApi.adminUploadPublicFile('rooms', pendingRoomFiles[i]);
+            await SkaApi.adminAddRoomImage(roomId, url);
+          }
+        }
+        if (roomId) {
+          await SkaApi.adminReplaceRoomAmenities(roomId, parseAmenityLines(data.amenities));
+        }
         closeModal('roomModal');
         showToast('Room saved.');
         loadRoomsPage();
       } catch (err) {
         showError(err.message || 'Save failed');
+      }
+    });
+  }
+
+  async function loadSettingsPage() {
+    var form = document.getElementById('settingsForm');
+    if (!form) return;
+    var session = await requireAuth();
+    if (!session) return;
+    hideError();
+    try {
+      var map = await withTimeout(SkaApi.fetchSettings());
+      Array.prototype.forEach.call(form.elements, function (el) {
+        if (!el.name) return;
+        if (map[el.name] != null) el.value = map[el.name];
+      });
+    } catch (e) {
+      showError('Could not load settings: ' + (e.message || e));
+    }
+  }
+
+  function initSettingsPage() {
+    var form = document.getElementById('settingsForm');
+    if (!form || form.dataset.bound === '1') return;
+    form.dataset.bound = '1';
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var rows = [];
+      Array.prototype.forEach.call(form.elements, function (el) {
+        if (!el.name) return;
+        rows.push({
+          setting_key: el.name,
+          setting_value: el.value,
+          setting_group: el.getAttribute('data-group') || 'contact'
+        });
+      });
+      try {
+        await SkaApi.adminSaveSettings(rows);
+        showToast('Settings saved. The website will use these contacts and inboxes.');
+      } catch (err) {
+        showError(err.message || 'Could not save settings');
       }
     });
   }
@@ -943,6 +1072,7 @@
   initRoomsPage();
   initPromotionsPage();
   initPackagesPage();
+  initSettingsPage();
 
   function boot() {
     if (page === 'bookings') loadBookingsPage();
@@ -951,6 +1081,7 @@
     else if (page === 'packages') loadPackagesPage();
     else if (page === 'inquiries') loadInquiriesPage();
     else if (page === 'users') loadUsersPage();
+    else if (page === 'settings') loadSettingsPage();
     else loadDashboard();
   }
 
