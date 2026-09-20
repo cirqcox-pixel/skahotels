@@ -132,6 +132,11 @@ body {
   transition: transform 0.25s var(--ease);
 }
 
+.ska-nav-link.is-hidden,
+.ska-nav-link[hidden] {
+  display: none !important;
+}
+
 .ska-nav-link:hover,
 .ska-nav-link.active {
   color: var(--white);

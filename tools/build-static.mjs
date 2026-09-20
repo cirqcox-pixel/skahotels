@@ -755,6 +755,7 @@ function buildAdmin() {
     { file: 'promotions.html', page: 'promotions', title: 'Promotions' },
     { file: 'packages.html', page: 'packages', title: 'Packages' },
     { file: 'inquiries.html', page: 'inquiries', title: 'Inquiries' },
+    { file: 'users.html', page: 'users', title: 'Users & Roles' },
   ];
 
   for (const meta of adminPages) {
@@ -767,7 +768,8 @@ function buildAdmin() {
       .replace(/\{\{ACTIVE_PROMOTIONS\}\}/g, meta.page === 'promotions' ? ' active' : '')
       .replace(/\{\{ACTIVE_PACKAGES\}\}/g, meta.page === 'packages' ? ' active' : '')
       .replace(/\{\{ACTIVE_BOOKINGS\}\}/g, meta.page === 'bookings' ? ' active' : '')
-      .replace(/\{\{ACTIVE_INQUIRIES\}\}/g, meta.page === 'inquiries' ? ' active' : '');
+      .replace(/\{\{ACTIVE_INQUIRIES\}\}/g, meta.page === 'inquiries' ? ' active' : '')
+      .replace(/\{\{ACTIVE_USERS\}\}/g, meta.page === 'users' ? ' active' : '');
 
     const html = headTpl
       .replace(/\{\{TITLE\}\}/g, meta.title)

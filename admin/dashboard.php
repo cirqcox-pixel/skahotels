@@ -30,14 +30,19 @@ $rooms = $conn->query("SELECT id, name, price, branch FROM rooms ORDER BY id DES
 $activePage     = 'dashboard';
 $pageTitle      = 'Dashboard';
 $pageBreadcrumb = "Welcome back — here's what's happening today";
-$topbarAction   = [
+$topbarAction   = ska_admin_can('rooms') ? [
     'label' => 'Add Room',
     'href'  => 'add_room.php',
     'icon'  => 'fa-plus',
-];
+] : null;
 if (isset($_GET['created'])) {
     $toastMsg = 'Room created successfully.';
     $toastType = 'success';
+    $includeToast = true;
+}
+if (isset($_GET['denied'])) {
+    $toastMsg = 'Your role cannot open that page.';
+    $toastType = 'danger';
     $includeToast = true;
 }
 include 'includes/layout-start.php';

@@ -14,13 +14,69 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+function ska_admin_role_pages(string $role): array
+{
+    switch ($role) {
+        case 'super_admin':
+            return ['dashboard', 'rooms', 'promotions', 'packages', 'bookings', 'inquiries', 'pages', 'gallery', 'settings', 'staff'];
+        case 'manager':
+            return ['dashboard', 'rooms', 'promotions', 'packages', 'bookings', 'inquiries'];
+        case 'reservations':
+            return ['dashboard', 'bookings', 'inquiries'];
+        case 'marketing':
+            return ['dashboard', 'promotions', 'packages'];
+        default:
+            return ['dashboard', 'bookings'];
+    }
+}
+
+function ska_admin_role_label(string $role): string
+{
+    $labels = [
+        'super_admin' => 'Super Admin',
+        'manager' => 'Manager',
+        'reservations' => 'Reservations',
+        'marketing' => 'Marketing',
+    ];
+    return $labels[$role] ?? $role;
+}
+
+function ska_admin_page_key(): string
+{
+    $file = basename($_SERVER['SCRIPT_NAME'] ?? '', '.php');
+    $map = [
+        'add_room' => 'rooms',
+        'edit_room' => 'rooms',
+        'delete_room' => 'rooms',
+        'delete_image' => 'rooms',
+        'booking_action' => 'bookings',
+    ];
+    return $map[$file] ?? $file;
+}
+
+function ska_admin_can(string $page): bool
+{
+    $role = (string) ($_SESSION['admin_role'] ?? 'super_admin');
+    $pages = ska_admin_role_pages($role);
+    return in_array($page, $pages, true);
+}
+
 /**
  * Redirect to login if the admin session is not active.
+ * Optionally gate by dashboard section (rooms, bookings, staff, …).
  */
-function ska_admin_require(): void
+function ska_admin_require(?string $page = null): void
 {
     if (empty($_SESSION['admin'])) {
         header('Location: login.php');
+        exit;
+    }
+    if (empty($_SESSION['admin_role'])) {
+        $_SESSION['admin_role'] = 'super_admin';
+    }
+    $page = $page ?? ska_admin_page_key();
+    if ($page && $page !== 'login' && $page !== 'logout' && $page !== 'setup' && !ska_admin_can($page)) {
+        header('Location: dashboard.php?denied=1');
         exit;
     }
 }
@@ -44,9 +100,12 @@ function ska_admin_login(string $username, string $password): bool
         return false;
     }
 
-    $stmt = $conn->prepare('SELECT id, username, password FROM admins WHERE username = ? LIMIT 1');
+    $stmt = $conn->prepare('SELECT id, username, password, role FROM admins WHERE username = ? LIMIT 1');
     if (!$stmt) {
-        return false;
+        $stmt = $conn->prepare('SELECT id, username, password FROM admins WHERE username = ? LIMIT 1');
+        if (!$stmt) {
+            return false;
+        }
     }
 
     $stmt->bind_param('s', $username);
@@ -89,5 +148,9 @@ function ska_admin_login(string $username, string $password): bool
     }
 
     $_SESSION['admin'] = $admin['username'];
+    $_SESSION['admin_role'] = $admin['role'] ?? 'super_admin';
+    if ($_SESSION['admin_role'] === '') {
+        $_SESSION['admin_role'] = 'super_admin';
+    }
     return true;
 }

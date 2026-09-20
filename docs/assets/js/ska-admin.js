@@ -71,6 +71,39 @@
     }
   }
 
+  var adminProfile = null;
+  var ROLE_LABELS = {
+    super_admin: 'Super Admin',
+    manager: 'Manager',
+    reservations: 'Reservations',
+    marketing: 'Marketing'
+  };
+  var ROLE_PAGES = {
+    super_admin: ['dashboard', 'rooms', 'promotions', 'packages', 'bookings', 'inquiries', 'users'],
+    manager: ['dashboard', 'rooms', 'promotions', 'packages', 'bookings', 'inquiries'],
+    reservations: ['dashboard', 'bookings', 'inquiries'],
+    marketing: ['dashboard', 'promotions', 'packages']
+  };
+
+  function canAccess(pageKey) {
+    var pages = (adminProfile && adminProfile.pages) || ROLE_PAGES.manager;
+    if (!pages || !pages.length) return true;
+    return pages.indexOf(pageKey) >= 0;
+  }
+
+  function applyNavAccess() {
+    var pages = (adminProfile && adminProfile.pages) || null;
+    document.querySelectorAll('[data-nav-page]').forEach(function (a) {
+      var key = a.getAttribute('data-nav-page');
+      if (!pages) return;
+      a.classList.toggle('is-hidden', pages.indexOf(key) < 0);
+    });
+    var roleEl = document.getElementById('adminUserRole');
+    if (roleEl && adminProfile && adminProfile.role) {
+      roleEl.textContent = ROLE_LABELS[adminProfile.role] || adminProfile.role;
+    }
+  }
+
   async function requireAuth() {
     if (!window.SkaApi) {
       showError('Admin scripts failed to load. Refresh the page.');
@@ -85,6 +118,28 @@
       var emailEl = document.getElementById('adminUserEmail');
       if (emailEl && session.user && session.user.email) {
         emailEl.textContent = session.user.email;
+      }
+      try {
+        if (SkaApi.adminGetProfile) {
+          adminProfile = await withTimeout(SkaApi.adminGetProfile(), 12000);
+        }
+      } catch (pe) {
+        adminProfile = null;
+      }
+      if (adminProfile && adminProfile.ok === false) {
+        await SkaApi.adminSignOut();
+        location.href = 'login.html?reason=forbidden';
+        return null;
+      }
+      if (adminProfile && adminProfile.pages) {
+        applyNavAccess();
+        if (page && !canAccess(page)) {
+          var first = (adminProfile.pages || [])[0] || 'dashboard';
+          location.href = first + '.html';
+          return null;
+        }
+      } else {
+        applyNavAccess();
       }
       return session;
     } catch (e) {
@@ -527,8 +582,12 @@
         });
       });
     } catch (e) {
-      showError('Could not load packages: ' + (e.message || e));
-      tbody.innerHTML = '<tr><td colspan="5" class="ska-table-empty">Failed to load packages.</td></tr>';
+      var msg = e.message || String(e);
+      if (/does not exist|schema cache|PGRST205|Could not find the table/i.test(msg)) {
+        msg = 'Packages are not in this database yet. In Supabase SQL Editor run supabase/migrations/009_packages_and_staff_roles.sql, then refresh.';
+      }
+      showError(msg);
+      tbody.innerHTML = '<tr><td colspan="5" class="ska-table-empty">' + esc(msg) + '</td></tr>';
     }
   }
 
@@ -608,6 +667,120 @@
     }
   }
 
+  function staffList(data) {
+    if (!data) return [];
+    if (Array.isArray(data)) return data;
+    if (typeof data === 'string') {
+      try { return staffList(JSON.parse(data)); } catch (e) { return []; }
+    }
+    return [];
+  }
+
+  function pageLabels(pages) {
+    if (!pages || !pages.length) return '—';
+    return pages.map(function (p) {
+      return p.charAt(0).toUpperCase() + p.slice(1);
+    }).join(', ');
+  }
+
+  function roleSelectHtml(email, role, disabled) {
+    var opts = ['super_admin', 'manager', 'reservations', 'marketing'];
+    return '<select class="ska-input" data-staff-role="' + esc(email) + '"' + (disabled ? ' disabled' : '') + '>' +
+      opts.map(function (r) {
+        return '<option value="' + r + '"' + (r === role ? ' selected' : '') + '>' + esc(ROLE_LABELS[r] || r) + '</option>';
+      }).join('') + '</select>';
+  }
+
+  async function loadUsersPage() {
+    var tbody = document.getElementById('staffTableBody');
+    if (!tbody) return;
+    var session = await ensureAuth('staffTableBody', 5);
+    if (!session) return;
+
+    hideError();
+    var isSuper = adminProfile && adminProfile.role === 'super_admin';
+    var form = document.getElementById('staffForm');
+    if (form) form.style.display = isSuper ? '' : 'none';
+    var hint = document.getElementById('roleHint');
+    if (hint && !isSuper) {
+      hint.textContent = 'Only a Super Admin can add or change staff access.';
+    }
+
+    try {
+      var rows = staffList(await withTimeout(SkaApi.adminListStaff()));
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="ska-table-empty">No staff yet.</td></tr>';
+        return;
+      }
+      var me = (session.user && session.user.email || '').toLowerCase();
+      tbody.innerHTML = rows.map(function (u) {
+        var email = u.email || '';
+        var status = u.status === 'invited' ? 'Invited' : 'Active';
+        var canRemove = isSuper && email.toLowerCase() !== me;
+        return '<tr>' +
+          '<td>' + esc(email) + '</td>' +
+          '<td>' + roleSelectHtml(email, u.role || 'manager', !isSuper) + '</td>' +
+          '<td>' + esc(pageLabels(u.pages)) + '</td>' +
+          '<td>' + esc(status) + '</td>' +
+          '<td>' + (canRemove
+            ? '<button type="button" class="ska-btn ska-btn--ghost-del" data-staff-remove="' + esc(email) + '" title="Remove"><i class="fa-regular fa-trash-can"></i></button>'
+            : '—') +
+          '</td></tr>';
+      }).join('');
+
+      tbody.querySelectorAll('[data-staff-role]').forEach(function (sel) {
+        sel.addEventListener('change', async function () {
+          try {
+            await SkaApi.adminUpdateStaff(sel.getAttribute('data-staff-role'), sel.value);
+            showToast('Role updated.');
+            loadUsersPage();
+          } catch (err) {
+            showError(err.message || 'Could not update role');
+          }
+        });
+      });
+      tbody.querySelectorAll('[data-staff-remove]').forEach(function (btn) {
+        btn.addEventListener('click', async function () {
+          if (!confirm('Remove this staff member from the admin dashboard?')) return;
+          try {
+            await SkaApi.adminRemoveStaff(btn.getAttribute('data-staff-remove'));
+            showToast('Staff removed.');
+            loadUsersPage();
+          } catch (err) {
+            showError(err.message || 'Could not remove staff');
+          }
+        });
+      });
+    } catch (e) {
+      var msg = e.message || String(e);
+      if (/does not exist|schema cache|PGRST|function/i.test(msg)) {
+        msg = 'Staff roles are not in this database yet. In Supabase SQL Editor run supabase/migrations/009_packages_and_staff_roles.sql, then refresh.';
+      }
+      showError(msg);
+      tbody.innerHTML = '<tr><td colspan="5" class="ska-table-empty">' + esc(msg) + '</td></tr>';
+    }
+
+    if (form && !form.dataset.bound) {
+      form.dataset.bound = '1';
+      form.addEventListener('submit', async function (ev) {
+        ev.preventDefault();
+        var email = (document.getElementById('staffEmail') || {}).value || '';
+        var role = (document.getElementById('staffRole') || {}).value || 'manager';
+        try {
+          var res = await SkaApi.adminAddStaff(email.trim(), role);
+          var status = res && res.status === 'invited'
+            ? 'Invited — they will get access on first sign-in with this email.'
+            : 'User added.';
+          showToast(status);
+          form.reset();
+          loadUsersPage();
+        } catch (err) {
+          showError(err.message || 'Could not add user');
+        }
+      });
+    }
+  }
+
   /* ── Init ── */
   document.getElementById('adminLogout')?.addEventListener('click', async function () {
     await SkaApi.adminSignOut();
@@ -628,6 +801,7 @@
     else if (page === 'promotions') loadPromotionsPage();
     else if (page === 'packages') loadPackagesPage();
     else if (page === 'inquiries') loadInquiriesPage();
+    else if (page === 'users') loadUsersPage();
     else loadDashboard();
   }
 

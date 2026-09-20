@@ -192,6 +192,8 @@ function cms_bootstrap(): void
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
+    @$c->query("ALTER TABLE admins ADD COLUMN role VARCHAR(32) NOT NULL DEFAULT 'super_admin'");
+
     cms_seed_defaults($c);
 }
 

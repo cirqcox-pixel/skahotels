@@ -105,6 +105,12 @@ SkaApi.adminSession().then(function (s) {
     noticeTxt.textContent = 'Your session expired. Please sign in again.';
     notice.style.display = 'flex';
   }
+  if (p.get('reason') === 'forbidden') {
+    var notice2 = document.getElementById('loginNotice');
+    var noticeTxt2 = document.getElementById('loginNoticeText');
+    noticeTxt2.textContent = 'This account is not on the admin list. Ask a Super Admin to add you under Users & Roles.';
+    notice2.style.display = 'flex';
+  }
 })();
 </script>
 </body>

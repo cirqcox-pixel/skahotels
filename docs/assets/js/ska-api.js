@@ -450,6 +450,38 @@
         return sb.from('packages').delete().eq('id', id);
       });
       return true;
+    },
+
+    adminGetProfile: async function () {
+      var data = await adminRequest(function (sb) {
+        return sb.rpc('ska_admin_profile');
+      });
+      return data || { ok: false };
+    },
+
+    adminListStaff: async function () {
+      var data = await adminRequest(function (sb) {
+        return sb.rpc('ska_list_staff');
+      });
+      return data || [];
+    },
+
+    adminAddStaff: async function (email, role) {
+      return adminRequest(function (sb) {
+        return sb.rpc('ska_add_staff', { p_email: email, p_role: role });
+      });
+    },
+
+    adminUpdateStaff: async function (email, role) {
+      return adminRequest(function (sb) {
+        return sb.rpc('ska_update_staff', { p_email: email, p_role: role });
+      });
+    },
+
+    adminRemoveStaff: async function (email) {
+      return adminRequest(function (sb) {
+        return sb.rpc('ska_remove_staff', { p_email: email });
+      });
     }
   };
 

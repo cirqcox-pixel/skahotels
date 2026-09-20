@@ -1,0 +1,63 @@
+<div class="ska-main">
+  <header class="ska-topbar">
+    <div class="ska-topbar__left">
+      <div class="ska-topbar__title">Users &amp; Roles</div>
+      <div class="ska-topbar__breadcrumb">Invite staff and choose what they can open in this dashboard</div>
+    </div>
+  </header>
+
+  <main class="ska-content">
+    <div id="adminError" class="ska-alert ska-alert--danger" style="display:none;margin-bottom:20px;" role="alert"></div>
+    <div id="adminToast" class="ska-alert ska-alert--success" style="display:none;margin-bottom:20px;" role="status"></div>
+
+    <div class="ska-card" style="margin-bottom:24px">
+      <div class="ska-card__header">
+        <h2 class="ska-card__title">Add <span>staff</span></h2>
+      </div>
+      <div class="ska-card__body">
+        <p class="ska-hint" style="margin-bottom:16px">Create their login first in Supabase → Authentication → Users (or they sign in once), then add the same email here. Super Admin sees everything; other roles only see the pages listed below.</p>
+        <form id="staffForm" class="ska-form-grid">
+          <div class="ska-form-field">
+            <label for="staffEmail">Email</label>
+            <input type="email" id="staffEmail" name="email" class="ska-input" required placeholder="front.desk@skahotels.com">
+          </div>
+          <div class="ska-form-field">
+            <label for="staffRole">Role</label>
+            <select id="staffRole" name="role" class="ska-input">
+              <option value="manager">Manager — rooms, offers, packages, bookings</option>
+              <option value="reservations">Reservations — bookings and inquiries</option>
+              <option value="marketing">Marketing — promotions and packages</option>
+              <option value="super_admin">Super Admin — everything including users</option>
+            </select>
+          </div>
+          <div class="ska-form-field" style="align-self:end">
+            <button type="submit" class="ska-btn ska-btn--primary"><i class="fa-solid fa-user-plus"></i> Add user</button>
+          </div>
+        </form>
+        <p class="ska-hint" id="roleHint" style="margin-top:12px"></p>
+      </div>
+    </div>
+
+    <div class="ska-card">
+      <div class="ska-card__header">
+        <h2 class="ska-card__title">Team <span>access</span></h2>
+      </div>
+      <div class="ska-card__body">
+        <table class="ska-table">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Can access</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="staffTableBody">
+            <tr><td colspan="5" class="ska-table-empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
