@@ -449,9 +449,16 @@
     },
 
     adminDeleteBooking: async function (id) {
-      return adminRequest(function (sb) {
-        return sb.rpc('ska_delete_booking', { p_id: parseInt(id, 10) });
+      var profile = await SkaApi.adminGetProfile();
+      if (!profile || profile.role !== 'super_admin') {
+        throw new Error('Only Super Admin can delete bookings.');
+      }
+      var bookingId = parseInt(id, 10);
+      if (!bookingId) throw new Error('Invalid booking id.');
+      await adminRequest(function (sb) {
+        return sb.from('bookings').delete().eq('id', bookingId);
       });
+      return true;
     },
 
     adminUpdateBookingStatus: async function (id, status) {
