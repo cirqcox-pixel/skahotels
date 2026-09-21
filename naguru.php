@@ -671,9 +671,7 @@ $roomsJson = json_encode($allRooms, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT
 </style>
 
 <script>
-const ROOMS = <?= json_encode($allRooms) ?>;
-const PROMOTIONS = <?= json_encode($promotions ?? []) ?>;
-window.SKA_PACKAGES = <?= json_encode($packages ?? []) ?>;
+window.SKA_PACKAGES = window.SKA_PACKAGES || [];
 
 
 
@@ -730,32 +728,6 @@ function calculateBooking() {
   }
 
   let total = basePrice * nights;
-  let discount = 0;
-
-  /* ══════════════════════════════════════
-     APPLY PROMOTIONS (if available globally)
-  ══════════════════════════════════════ */
-  if (typeof PROMOTIONS !== 'undefined') {
-    PROMOTIONS.forEach(promo => {
-
-      if (promo.min_nights && nights < promo.min_nights) return;
-
-      if (promo.discount_type === 'percent') {
-        discount += total * (promo.discount_value / 100);
-      }
-
-      if (promo.discount_type === 'fixed') {
-        discount += promo.discount_value;
-      }
-
-      if (promo.discount_type === 'free_night') {
-        discount += basePrice * promo.discount_value;
-      }
-
-    });
-  }
-
-  total = Math.max(0, total - discount);
 
   /* Update UI */
   document.getElementById('totalPrice').innerHTML =

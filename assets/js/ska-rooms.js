@@ -250,7 +250,73 @@
       }
     }
 
+    bindBookingCalc();
+    calculateBooking();
+
     await loadPropertyExtras(branch);
+  }
+
+  function nightsBetween(ci, co) {
+    if (!ci || !co) return 0;
+    var a = new Date(String(ci) + 'T12:00:00');
+    var b = new Date(String(co) + 'T12:00:00');
+    if (isNaN(a.getTime()) || isNaN(b.getTime())) return 0;
+    return Math.max(0, Math.round((b.getTime() - a.getTime()) / 86400000));
+  }
+
+  function nightlyFromSelect(sel) {
+    if (!sel) return 0;
+    var opt = sel.options[sel.selectedIndex];
+    if (!opt || !opt.value) return 0;
+    var p = parseFloat(opt.getAttribute('data-price') || 0);
+    if (p > 0) return p;
+    var m = String(opt.textContent || '').match(/USD\s*([\d,.]+)/i);
+    if (m) return parseFloat(m[1].replace(/,/g, '')) || 0;
+    var rooms = global.SKA_ROOMS || global.ROOMS || [];
+    var room = rooms.find(function (r) { return r.name === opt.value; });
+    if (!room) return 0;
+    return parseFloat(room.price_now != null ? room.price_now : (seasonPrice(room) || room.price || 0)) || 0;
+  }
+
+  function calculateBooking() {
+    var ciEl = document.getElementById('checkin');
+    var coEl = document.getElementById('checkout');
+    var sel = document.getElementById('room_type');
+    var disp = document.getElementById('totalPrice');
+    if (!sel) return;
+    var nights = nightsBetween(ciEl && ciEl.value, coEl && coEl.value);
+    var nightly = nightlyFromSelect(sel);
+    var total = nights > 0 && nightly > 0 ? nightly * nights : 0;
+    if (disp) disp.innerHTML = 'Total: <strong>USD ' + Number(total).toLocaleString() + '</strong>';
+    var fp = document.getElementById('formPrice');
+    if (fp) fp.value = nightly || '';
+    var form = document.getElementById('bookingForm');
+    var totalField = document.getElementById('formTotal');
+    if (!totalField && form) {
+      totalField = document.createElement('input');
+      totalField.type = 'hidden';
+      totalField.name = 'total';
+      totalField.id = 'formTotal';
+      form.appendChild(totalField);
+    }
+    if (totalField) totalField.value = total;
+    var fs = document.getElementById('formSeason');
+    if (fs && ciEl && ciEl.value) {
+      var month = new Date(String(ciEl.value) + 'T12:00:00').getMonth() + 1;
+      fs.value = getSeason(month);
+    }
+  }
+
+  function bindBookingCalc() {
+    if (document.documentElement.dataset.skaCalcBound === '1') return;
+    document.documentElement.dataset.skaCalcBound = '1';
+    ['checkin', 'checkout', 'room_type'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('change', calculateBooking);
+      el.addEventListener('input', calculateBooking);
+    });
+    global.calculateBooking = calculateBooking;
   }
 
   if (document.readyState === 'loading') {
@@ -259,5 +325,5 @@
     loadPropertyRooms();
   }
 
-  global.SkaRooms = { load: loadPropertyRooms, fallback: FALLBACK_ROOMS };
+  global.SkaRooms = { load: loadPropertyRooms, fallback: FALLBACK_ROOMS, calculateBooking: calculateBooking };
 })(window);

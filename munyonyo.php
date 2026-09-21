@@ -802,7 +802,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ───────── ROOM DATA ───────── */
   const ROOMS = <?= $roomsJson ?> || [];
-  window.SKA_PACKAGES = <?= json_encode($packages ?? []) ?>;
+  window.SKA_PACKAGES = window.SKA_PACKAGES || [];
   let currentIndex = 0;
 
   const HIGH_MONTHS     = [6,7,8,12,1];

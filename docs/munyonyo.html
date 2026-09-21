@@ -248,13 +248,13 @@
 
     <!-- RIGHT: Map + Phone -->
     <div class="pib-right">
-      <a href="" target="_blank" rel="noopener noreferrer" class="pib-action">
+      <a href="null" target="_blank" rel="noopener noreferrer" class="pib-action">
         <i class="fa-solid fa-location-dot pib-action-icon"></i>
         <span>VIEW MAP</span>
       </a>
-      <a href="tel:" class="pib-action">
+      <a href="tel:null" class="pib-action">
         <i class="fa-solid fa-phone pib-action-icon"></i>
-        <span></span>
+        <span>null</span>
       </a>
     </div>
 
@@ -268,7 +268,7 @@
 ══════════════════════════════════════════ -->
 <header class="hero">
   <video autoplay muted loop playsinline>
-    <source src="assets/video/ska_munyonyo.mp4" type="video/mp4">
+    <source src="null" type="video/mp4">
   </video>
   <div class="overlay"></div>
   <div class="hero-content">
@@ -328,14 +328,14 @@
             <div class="rs-track-fill" id="rrFill"></div>
             <div class="rs-track-thumb" id="rrThumb"></div>
           </div>
-          <span class="rs-num" id="rrTotal"></span>
+          <span class="rs-num" id="rrTotal">null</span>
         </div>
       </div>
 
       <div class="rs-header-right">
-        <div class="rs-season-pill" style="--sp-color:#c9a96e">
-          <span class="rs-season-dot" style="background:#c9a96e"></span>
-          <span class="rs-season-label">High Season</span>
+        <div class="rs-season-pill" style="--sp-color:null">
+          <span class="rs-season-dot"></span>
+          <span class="rs-season-label">null — null</span>
         </div>
         <div class="rs-nav">
           <button class="rs-nav-btn" id="roomsPrev" disabled>
@@ -582,8 +582,8 @@
           <select name="room_type" id="room_type" class="form-select ska-input" required>
             <option value="">Select Room Type</option>
             
-              <option value="">
-                
+              <option value="null">
+                null
               </option>
             
           </select>
@@ -595,7 +595,7 @@
         </div>
 
         <input type="hidden" name="price"  id="formPrice"  value="">
-        <input type="hidden" name="season" id="formSeason" value="">
+        <input type="hidden" name="season" id="formSeason" value="null">
 
         <div class="col-12">
           <label class="form-label-ska">Special Requests</label>
@@ -754,8 +754,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (params.get('checkout') && coEl) coEl.value = params.get('checkout');
 
   /* ───────── ROOM DATA ───────── */
-  /* rooms via ska-rooms.js */
-  window.SKA_PACKAGES = ;
+  const ROOMS = null || [];
+  window.SKA_PACKAGES = window.SKA_PACKAGES || [];
   let currentIndex = 0;
 
   const HIGH_MONTHS     = [6,7,8,12,1];
@@ -1969,6 +1969,6 @@ body.modal-open { overflow: hidden; }
 <script src="assets/js/ska-forms.js?v=20260921j"></script>
 <script src="assets/js/ska-live.js"></script>
 <script src="assets/js/ska-packages.js"></script>
-<script src="assets/js/ska-rooms.js?v=20260921j"></script>
+<script src="assets/js/ska-rooms.js?v=20260921k"></script>
 </body>
 </html>
