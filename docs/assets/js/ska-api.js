@@ -394,8 +394,11 @@
       if (map.munyonyo_notify_email && /@/.test(map.munyonyo_notify_email)) {
         cfg.branchEmails.Munyonyo = map.munyonyo_notify_email;
       }
+      cfg.formspree = cfg.formspree || {};
+      if (map.munyonyo_formspree_project && String(map.munyonyo_formspree_project).trim()) {
+        cfg.formspree.munyonyoProject = String(map.munyonyo_formspree_project).trim();
+      }
       if (map.munyonyo_formspree && String(map.munyonyo_formspree).trim()) {
-        cfg.formspree = cfg.formspree || {};
         cfg.formspree.bookingMunyonyo = String(map.munyonyo_formspree).trim();
       }
       if (cfg.notify && (map.naguru_notify_email || map.site_email)) {

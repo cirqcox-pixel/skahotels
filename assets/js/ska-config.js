@@ -21,14 +21,11 @@ window.SKA_CONFIG = {
    * 3. Paste IDs below. Same ID for both is fine if you prefer one inbox.
    */
   formspree: {
-    /** Naguru — notification email naguru.booking@skaboutiquebnb.com */
+    /** Naguru — legacy form hash (notification → naguru.booking@) */
     booking: 'myegbgjy',
-    /**
-     * Munyonyo — duplicate the Ska Hotels form in Formspree, set notification
-     * email to munyonyo.booking@skaboutiquebnb.com, verify, paste new ID here.
-     * Same payload as Naguru; must be a separate form (shared form → spam).
-     */
-    bookingMunyonyo: '',
+    /** Munyonyo Formspree CLI project + form key (see formspree.json) */
+    munyonyoProject: '3095670307009069001',
+    bookingMunyonyo: 'skaMunyonyoBooking',
     inquiry: 'myegbgjy'
   },
 

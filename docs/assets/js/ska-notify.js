@@ -2,12 +2,8 @@
  * SKA Hotels — email notifications (Formspree + optional Resend webhook)
  * Runs after a successful Supabase save on GitHub Pages.
  *
- * Naguru: Formspree form myegbgjy is owned by naguru.booking@ — one post,
- * _cc = property inbox + guest (identical payload every time).
- *
- * Munyonyo: must use formspree.bookingMunyonyo (duplicate form in Formspree
- * with notification email munyonyo.booking@). CC'ing munyonyo.booking@ on the
- * Naguru form lands in Formspree spam and never delivers.
+ * Naguru: legacy form myegbgjy → naguru.booking@ (one post, property + guest CC).
+ * Munyonyo: Formspree CLI project → POST /p/{projectId}/f/{formKey}
  */
 (function (global) {
   'use strict';
@@ -19,29 +15,35 @@
     return global.SKA_CONFIG || {};
   }
 
-  var cfg = cfgNow();
-
   function isMunyonyo(branch) {
     return /muny/i.test(String(branch || ''));
   }
 
   function adminInbox(branch) {
-    cfg = cfgNow();
     if (isMunyonyo(branch)) return MUNYONYO_BOOKING;
     return NAGURU_BOOKING;
   }
 
-  function formspreeIdForBranch(branch) {
-    cfg = cfgNow();
-    var f = cfg.formspree || {};
-    if (isMunyonyo(branch)) {
-      return f.bookingMunyonyo || f.munyonyo || '';
-    }
-    return f.booking || f.endpoint || '';
+  function munyonyoFormspreeEndpoint() {
+    var f = cfgNow().formspree || {};
+    var project = String(f.munyonyoProject || '').trim();
+    var formKey = String(f.bookingMunyonyo || '').trim();
+    if (!project || !formKey) return '';
+    return 'https://formspree.io/p/' + encodeURIComponent(project) + '/f/' + encodeURIComponent(formKey);
   }
 
   function formspreeUrlForBranch(branch) {
-    var id = formspreeIdForBranch(branch);
+    if (isMunyonyo(branch)) {
+      var cliUrl = munyonyoFormspreeEndpoint();
+      if (cliUrl) return cliUrl;
+      var f = cfgNow().formspree || {};
+      var legacy = String(f.bookingMunyonyo || f.munyonyo || '').trim();
+      if (legacy && legacy.indexOf('http') === 0) return legacy;
+      if (legacy) return 'https://formspree.io/f/' + legacy;
+      return '';
+    }
+    var f = cfgNow().formspree || {};
+    var id = f.booking || f.endpoint || '';
     if (!id) return '';
     if (id.indexOf('http') === 0) return id;
     return 'https://formspree.io/f/' + id;
@@ -75,7 +77,7 @@
     return true;
   }
 
-  /** Identical booking payload Naguru has used successfully since e113ffc. */
+  /** Same booking payload Naguru has used successfully. */
   function bookingFormspreePayload(type, data) {
     var bookingSubject = type === 'booking_confirmed'
       ? 'SKA Booking Confirmed — '
@@ -107,27 +109,19 @@
   }
 
   async function sendFormspree(type, data) {
-    cfg = cfgNow();
     if (type === 'booking' || type === 'booking_confirmed' || type === 'booking_cancelled') {
       var branch = data.branch || '';
       var url = formspreeUrlForBranch(branch);
-      var payload = bookingFormspreePayload(type, data);
-      if (isMunyonyo(branch) && !url) {
-        /* Naguru form owner still receives the submission; CC munyonyo.booking@ → spam. */
-        url = formspreeUrl(type) || formspreeUrl('inquiry');
-        payload._cc = String(data.email || '').trim();
-        console.warn(
-          '[SKA Notify] Add formspree.bookingMunyonyo (duplicate Ska Hotels form → munyonyo.booking@) ' +
-          'for Munyonyo admin + guest delivery like Naguru.'
-        );
+      if (!url) {
+        throw new Error('Munyonyo Formspree is not configured (project ID + form key).');
       }
-      if (!url) return false;
-      await postJson(url, payload);
+      await postJson(url, bookingFormspreePayload(type, data));
       return true;
     }
 
     var url = formspreeUrl(type) || formspreeUrl('inquiry');
     if (!url) return false;
+    var cfg = cfgNow();
 
     var payload;
     if (type === 'inquiry_reply') {
@@ -162,7 +156,7 @@
   }
 
   async function sendWebhook(type, data) {
-    cfg = cfgNow();
+    var cfg = cfgNow();
     var url = (cfg.notify && cfg.notify.webhookUrl) || cfg.resendWebhook || '';
     if (!url && cfg.supabaseUrl) {
       url = String(cfg.supabaseUrl).replace(/\/$/, '') + '/functions/v1/notify-email';
@@ -219,7 +213,7 @@
       console.warn('[SKA Notify] Webhook/Resend:', e.message || e);
     }
     if (!results.formspree && !results.webhook) {
-      console.info('[SKA Notify] No email went out. Check Formspree bookingMunyonyo form ID or deploy notify-email.');
+      console.info('[SKA Notify] No email went out. Check Munyonyo Formspree project/form key or deploy notify-email.');
     }
     return results;
   }

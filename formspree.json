@@ -1,0 +1,13 @@
+{
+  "forms": {
+    "skaMunyonyoBooking": {
+      "name": "SKA Munyonyo Booking",
+      "actions": [
+        {
+          "type": "email",
+          "to": "munyonyo.booking@skaboutiquebnb.com"
+        }
+      ]
+    }
+  }
+}

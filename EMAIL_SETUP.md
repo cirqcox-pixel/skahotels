@@ -13,13 +13,14 @@ On GitHub Pages, forms save to **Supabase** and can also email you via **Formspr
 
 ```js
 formspree: {
-  booking: 'YOUR_NAGURU_FORM_ID',          // notification → naguru.booking@
-  bookingMunyonyo: 'YOUR_MUNYONYO_FORM_ID', // duplicate form → munyonyo.booking@
+  booking: 'YOUR_NAGURU_FORM_ID',
+  munyonyoProject: 'YOUR_MUNYONYO_CLI_PROJECT_ID',
+  bookingMunyonyo: 'skaMunyonyoBooking',
   inquiry: 'YOUR_FORM_ID'
 },
 ```
 
-**Munyonyo must use its own Formspree form** (same fields as Naguru). If Munyonyo bookings only CC `munyonyo.booking@` on the Naguru form, Formspree marks them as spam and nothing is delivered. Duplicate the form, set the notification email to `munyonyo.booking@skaboutiquebnb.com`, verify it, and paste the new ID into `bookingMunyonyo` (or **Admin → Property settings → Formspree form ID**).
+**Munyonyo** uses a Formspree CLI project (`formspree.json` in repo). Submissions POST to `https://formspree.io/p/{projectId}/f/{formKey}`. Deploy with `npx @formspree/cli deploy -k YOUR_DEPLOY_KEY`. Project ID, form key, and deploy key can also be edited under **Admin → Property settings → Munyonyo**.
 
 5. Rebuild / push so `docs/` updates (or wait for GitHub Actions)
 
