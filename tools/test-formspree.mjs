@@ -1,11 +1,6 @@
 #!/usr/bin/env node
-/** Quick Formspree endpoint smoke test */
-const forms = [
-  { name: 'Naguru', id: 'myegbgjy', branch: 'Naguru', cc: 'naguru.booking@skaboutiquebnb.com' },
-  { name: 'Munyonyo', id: 'xzezenyo', branch: 'Munyonyo', cc: 'munyonyo.booking@skaboutiquebnb.com' },
-];
-
-const payload = (branch, cc) => ({
+/** Formspree smoke test — Naguru must pass; Munyonyo tries xzezenyo then myegbgjy fallback */
+const payload = (branch, cc, formId) => ({
   _subject: `SKA Booking Request — ${branch}`,
   _replyto: 'smoke-test@example.com',
   _cc: `${cc},smoke-test@example.com`,
@@ -20,22 +15,33 @@ const payload = (branch, cc) => ({
   price: 150,
   total: 150,
   site: 'SKA The Boutique',
+  formspree_form: formId,
 });
 
-let ok = true;
-for (const f of forms) {
-  const url = `https://formspree.io/f/${f.id}`;
+async function post(id, branch, cc) {
+  const url = `https://formspree.io/f/${id}`;
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify(payload(f.branch, f.cc)),
+    body: JSON.stringify(payload(branch, cc, id)),
   });
-  const text = await res.text();
-  const pass = res.ok || res.status === 200 || res.status === 302;
-  console.log(`${f.name} (${f.id}): HTTP ${res.status} ${pass ? 'OK' : 'FAIL'}`);
-  if (!pass) {
-    console.log('  ', text.slice(0, 200));
-    ok = false;
-  }
+  return { id, status: res.status, ok: res.ok || res.status === 200 || res.status === 302 };
 }
+
+let ok = true;
+
+const naguru = await post('myegbgjy', 'Naguru', 'naguru.booking@skaboutiquebnb.com');
+console.log(`Naguru (myegbgjy): HTTP ${naguru.status} ${naguru.ok ? 'OK' : 'FAIL'}`);
+if (!naguru.ok) ok = false;
+
+const muny = await post('xzezenyo', 'Munyonyo', 'munyonyo.booking@skaboutiquebnb.com');
+if (muny.ok) {
+  console.log(`Munyonyo (xzezenyo): HTTP ${muny.status} OK`);
+} else {
+  console.log(`Munyonyo (xzezenyo): HTTP ${muny.status} — trying myegbgjy fallback`);
+  const fb = await post('myegbgjy', 'Munyonyo', 'munyonyo.booking@skaboutiquebnb.com');
+  console.log(`Munyonyo fallback (myegbgjy): HTTP ${fb.status} ${fb.ok ? 'OK' : 'FAIL'}`);
+  if (!fb.ok) ok = false;
+}
+
 process.exit(ok ? 0 : 1);

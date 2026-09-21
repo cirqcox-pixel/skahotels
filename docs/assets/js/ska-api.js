@@ -283,19 +283,11 @@
       var res = await sb.from('bookings').insert([payload]);
       if (res.error) throw new Error(apiError(res.error));
       if (global.SkaNotify) {
-        try {
-          try {
-            var map = await SkaApi.fetchSettings();
-            SkaApi.applyPublicSettings(map);
-          } catch (e) { /* SKA_CONFIG defaults */ }
-          await SkaNotify.notify('booking', Object.assign({}, data, {
-            total: total,
-            price: price,
-            branch: branchName || data.branch || payload.branch
-          }));
-        } catch (e) {
-          console.error('[SKA] booking notify:', e.message || e);
-        }
+        await SkaNotify.notify('booking', Object.assign({}, data, {
+          total: total,
+          price: price,
+          branch: branchName || data.branch || payload.branch
+        }));
       }
       return true;
     },
@@ -400,10 +392,13 @@
         cfg.branchEmails.Munyonyo = map.munyonyo_notify_email;
       }
       cfg.formspree = cfg.formspree || {};
-      if (map.naguru_formspree && String(map.naguru_formspree).trim()) {
+      var validId = global.SkaNotify && SkaNotify.validFormId
+        ? SkaNotify.validFormId.bind(SkaNotify)
+        : function (v) { return /^[a-z0-9]{6,10}$/i.test(String(v || '').trim()); };
+      if (map.naguru_formspree && validId(map.naguru_formspree)) {
         cfg.formspree.booking = String(map.naguru_formspree).trim();
       }
-      if (map.munyonyo_formspree && String(map.munyonyo_formspree).trim()) {
+      if (map.munyonyo_formspree && validId(map.munyonyo_formspree)) {
         cfg.formspree.bookingMunyonyo = String(map.munyonyo_formspree).trim();
       }
       if (cfg.notify && (map.naguru_notify_email || map.site_email)) {
@@ -465,13 +460,7 @@
       });
       if (global.SkaNotify && row) {
         var type = status === 'confirmed' ? 'booking_confirmed' : 'booking_cancelled';
-        try {
-          try {
-            var map = await SkaApi.fetchSettings();
-            SkaApi.applyPublicSettings(map);
-          } catch (e) { /* SKA_CONFIG defaults */ }
-          await SkaNotify.notify(type, row);
-        } catch (e) { /* status already saved */ }
+        try { await SkaNotify.notify(type, row); } catch (e) { /* status already saved */ }
       }
       return row;
     },

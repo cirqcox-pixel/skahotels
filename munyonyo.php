@@ -726,13 +726,22 @@ document.getElementById('checkout')?.addEventListener('change', calcFormTotal);
 function setFormPriceFromRoom() {
   const sel = document.getElementById('room_type');
   if (!sel || !sel.value) return;
+  const opt = sel.selectedOptions && sel.selectedOptions[0];
+  let nightly = parseFloat(opt?.dataset?.price || 0);
+  if (!nightly && opt?.textContent) {
+    const m = opt.textContent.match(/USD\s*(\d+)/i);
+    if (m) nightly = parseFloat(m[1]);
+  }
   const roomsList = window.SKA_ROOMS || window.ROOMS || [];
   const room = roomsList.find(r => r.name === sel.value);
-  if (!room) return;
-  const month = new Date().getMonth() + 1;
-  const sk = typeof getSeasonKey === 'function' ? getSeasonKey(month) : 'low';
-  const col = sk === 'high' ? 'price_high' : sk === 'shoulder' ? 'price_shoulder' : 'price_low';
-  const nightly = parseFloat(room[col] || room.price || 0);
+  let sk = 'low';
+  if (room) {
+    const month = new Date().getMonth() + 1;
+    sk = typeof getSeasonKey === 'function' ? getSeasonKey(month) : 'low';
+    const col = sk === 'high' ? 'price_high' : sk === 'shoulder' ? 'price_shoulder' : 'price_low';
+    const fromRoom = parseFloat(room[col] || room.price || room.price_now || 0);
+    if (fromRoom) nightly = fromRoom;
+  }
   document.getElementById('formPrice').value = nightly;
   document.getElementById('formSeason').value = sk;
   calcFormTotal();

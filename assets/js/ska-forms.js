@@ -60,6 +60,37 @@
     }
   }
 
+  function enrichBookingPrice(form, d) {
+    var price = parseFloat(d.price || 0);
+    var total = parseFloat(d.total || 0);
+    var roomSel = form.querySelector('[name="room_type"]');
+    if (!price && roomSel && roomSel.selectedOptions && roomSel.selectedOptions[0]) {
+      var opt = roomSel.selectedOptions[0];
+      price = parseFloat(opt.dataset.price || 0);
+      if (!price && opt.textContent) {
+        var m = opt.textContent.match(/USD\s*(\d+)/i);
+        if (m) price = parseFloat(m[1]);
+      }
+    }
+    if (!price && d.room_type && global.SkaApi) {
+      var rooms = global.SKA_ROOMS || global.ROOMS || [];
+      var match = rooms.find(function (r) { return r.name === d.room_type; });
+      if (match) price = SkaApi.seasonPrice(match);
+    }
+    if (price) d.price = price;
+    if (!total && price && d.checkin && d.checkout) {
+      try {
+        var nights = Math.max(1, Math.round((new Date(d.checkout) - new Date(d.checkin)) / 86400000));
+        d.total = price * nights;
+      } catch (e) { d.total = price; }
+    }
+    var fp = form.querySelector('#formPrice');
+    if (fp && price) fp.value = price;
+    var ft = form.querySelector('#formTotal');
+    if (ft && d.total) ft.value = d.total;
+    return d;
+  }
+
   async function handleBooking(form) {
     var d = formData(form);
     if (!d.branch) {
@@ -70,6 +101,7 @@
       showAlert(form, 'danger', 'Please complete all required fields.');
       return;
     }
+    d = enrichBookingPrice(form, d);
     if (d.checkin && d.checkout && d.checkout <= d.checkin) {
       var next = new Date(d.checkin);
       next.setDate(next.getDate() + 1);

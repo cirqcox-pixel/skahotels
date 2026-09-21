@@ -699,34 +699,34 @@ function getNights(ci, co) {
 function calculateBooking() {
   const ci = document.getElementById('checkin')?.value;
   const co = document.getElementById('checkout')?.value;
-  const roomName = document.getElementById('room_type')?.value;
+  const sel = document.getElementById('room_type');
+  const roomName = sel?.value;
 
   if (!ci || !co || !roomName) return;
 
   const nights = getNights(ci, co);
   if (nights <= 0) return;
 
+  const opt = sel.selectedOptions && sel.selectedOptions[0];
+  let basePrice = parseFloat(opt?.dataset?.price || 0);
+  if (!basePrice && opt?.textContent) {
+    const m = opt.textContent.match(/USD\s*(\d+)/i);
+    if (m) basePrice = parseFloat(m[1]);
+  }
+
   const roomsList = window.SKA_ROOMS || window.ROOMS || [];
   const room = roomsList.find(r => r.name === roomName);
-  if (!room) return;
+  let season = 'low';
 
-  const month = new Date(ci).getMonth() + 1;
-  const season = getSeasonKey(month);
-
-  let basePrice = 0;
-
-  if (season === 'high') basePrice = room.price_high;
-  else if (season === 'shoulder') basePrice = room.price_shoulder;
-  else basePrice = room.price_low;
-
-  basePrice = parseFloat(basePrice || room.price || room.price_now || 0);
-
-  if (!basePrice) {
-    const sel = document.getElementById('room_type');
-    const opt = sel && sel.selectedOptions && sel.selectedOptions[0];
-    if (opt && opt.dataset && opt.dataset.price) {
-      basePrice = parseFloat(opt.dataset.price) || 0;
-    }
+  if (room) {
+    const month = new Date(ci).getMonth() + 1;
+    season = getSeasonKey(month);
+    let seasonPrice = 0;
+    if (season === 'high') seasonPrice = room.price_high;
+    else if (season === 'shoulder') seasonPrice = room.price_shoulder;
+    else seasonPrice = room.price_low;
+    seasonPrice = parseFloat(seasonPrice || room.price || room.price_now || 0);
+    if (seasonPrice) basePrice = seasonPrice;
   }
 
   let total = basePrice * nights;
