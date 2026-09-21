@@ -279,18 +279,18 @@
       if (res.error) throw new Error(apiError(res.error));
       if (global.SkaNotify) {
         try {
-          var inbox = (cfg.branchEmails && (
-            /muny/i.test(branchName) ? cfg.branchEmails.Munyonyo : cfg.branchEmails.Naguru
-          )) || '';
-          if (/muny/i.test(branchName)) inbox = 'munyonyo.booking@skaboutiquebnb.com';
-          else inbox = inbox || 'naguru.booking@skaboutiquebnb.com';
+          try {
+            var map = await SkaApi.fetchSettings();
+            SkaApi.applyPublicSettings(map);
+          } catch (e) { /* SKA_CONFIG defaults */ }
           await SkaNotify.notify('booking', Object.assign({}, data, {
             total: total,
             price: price,
-            branch: branchName,
-            notify_email: inbox
+            branch: branchName || data.branch || payload.branch
           }));
-        } catch (e) { /* already saved */ }
+        } catch (e) {
+          console.error('[SKA] booking notify:', e.message || e);
+        }
       }
       return true;
     },
@@ -395,6 +395,9 @@
         cfg.branchEmails.Munyonyo = map.munyonyo_notify_email;
       }
       cfg.formspree = cfg.formspree || {};
+      if (map.naguru_formspree && String(map.naguru_formspree).trim()) {
+        cfg.formspree.booking = String(map.naguru_formspree).trim();
+      }
       if (map.munyonyo_formspree_project && String(map.munyonyo_formspree_project).trim()) {
         cfg.formspree.munyonyoProject = String(map.munyonyo_formspree_project).trim();
       }
@@ -454,7 +457,13 @@
       });
       if (global.SkaNotify && row) {
         var type = status === 'confirmed' ? 'booking_confirmed' : 'booking_cancelled';
-        try { await SkaNotify.notify(type, row); } catch (e) { /* status already saved */ }
+        try {
+          try {
+            var map = await SkaApi.fetchSettings();
+            SkaApi.applyPublicSettings(map);
+          } catch (e) { /* SKA_CONFIG defaults */ }
+          await SkaNotify.notify(type, row);
+        } catch (e) { /* status already saved */ }
       }
       return row;
     },

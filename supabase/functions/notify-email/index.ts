@@ -6,7 +6,9 @@ import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || '';
 const NOTIFY_FROM = Deno.env.get('NOTIFY_FROM') || 'SKA The Boutique <onboarding@resend.dev>';
-const FORMSPREE_ID = Deno.env.get('FORMSPREE_ID') || 'myegbgjy';
+const FORMSPREE_NAGURU = Deno.env.get('FORMSPREE_NAGURU') || 'myegbgjy';
+const FORMSPREE_MUNYONYO_PROJECT = Deno.env.get('FORMSPREE_MUNYONYO_PROJECT') || '3095670307009069001';
+const FORMSPREE_MUNYONYO_FORM = Deno.env.get('FORMSPREE_MUNYONYO_FORM') || 'skaMunyonyoBooking';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -113,8 +115,51 @@ async function sendResend(to: string[], subject: string, html: string, text: str
   return result;
 }
 
-async function sendFormspree(payload: Record<string, unknown>) {
-  const res = await fetch('https://formspree.io/f/' + FORMSPREE_ID, {
+function formspreeBookingUrl(branch: string) {
+  if (looksMunyonyo(branch)) {
+    return `https://formspree.io/p/${FORMSPREE_MUNYONYO_PROJECT}/f/${FORMSPREE_MUNYONYO_FORM}`;
+  }
+  return `https://formspree.io/f/${FORMSPREE_NAGURU}`;
+}
+
+function bookingFormspreePayload(type: string, data: Record<string, unknown>) {
+  const branch = String(data.branch || 'Property');
+  const guest = String(data.email || '').trim();
+  const prefix = type === 'booking_confirmed'
+    ? 'SKA Booking Confirmed — '
+    : type === 'booking_cancelled'
+      ? 'SKA Booking Cancelled — '
+      : 'SKA Booking Request — ';
+  const cc = looksMunyonyo(branch)
+    ? guest
+    : [adminInbox(branch), guest].filter(Boolean).join(',');
+  return {
+    _subject: prefix + branch,
+    _replyto: guest,
+    _cc: cc,
+    type: 'booking',
+    name: data.name,
+    email: data.email,
+    phone: data.phone || '',
+    whatsapp: data.whatsapp || '',
+    branch,
+    room_type: data.room_type || '',
+    package_option: data.package_option || '',
+    guests: data.guests || '',
+    currency: data.currency || '',
+    checkin: data.checkin || '',
+    checkout: data.checkout || '',
+    price: data.price || '',
+    total: data.total || '',
+    season: data.season || '',
+    message: data.message || '',
+    site: 'SKA The Boutique',
+  };
+}
+
+async function sendFormspree(payload: Record<string, unknown>, branch = '') {
+  const url = branch ? formspreeBookingUrl(branch) : `https://formspree.io/f/${FORMSPREE_NAGURU}`;
+  const res = await fetch(url, {
     method: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -199,7 +244,7 @@ serve(async (req) => {
                 type,
                 ...data,
                 message: `${adminIntro}\n\n${text}`,
-              });
+              }, String(data.branch || ''));
               sent.push('formspree-admin');
             } catch {
               /* last resort already attempted */
@@ -229,9 +274,18 @@ serve(async (req) => {
         type,
         ...data,
         message: `${adminIntro}\n\n${text}`,
-      });
+      }, String(data.branch || ''));
       sent.push('formspree');
     };
+
+    if (type === 'booking' || type === 'booking_confirmed' || type === 'booking_cancelled') {
+      try {
+        await sendFormspree(bookingFormspreePayload(type, data), String(data.branch || ''));
+        sent.push('formspree-booking');
+      } catch (e) {
+        sent.push('formspree-booking-failed');
+      }
+    }
 
     if (type === 'booking') {
       await sendPair(

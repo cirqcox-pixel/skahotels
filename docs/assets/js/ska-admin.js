@@ -491,6 +491,12 @@
     });
   }
 
+  var FORMSPREE_DEFAULTS = {
+    naguru_formspree: 'myegbgjy',
+    munyonyo_formspree_project: '3095670307009069001',
+    munyonyo_formspree: 'skaMunyonyoBooking'
+  };
+
   async function loadSettingsPage() {
     var form = document.getElementById('settingsForm');
     if (!form) return;
@@ -501,7 +507,11 @@
       var map = await withTimeout(SkaApi.fetchSettings());
       Array.prototype.forEach.call(form.elements, function (el) {
         if (!el.name) return;
-        if (map[el.name] != null) el.value = map[el.name];
+        if (map[el.name] != null && String(map[el.name]).trim() !== '') {
+          el.value = map[el.name];
+        } else if (FORMSPREE_DEFAULTS[el.name]) {
+          el.value = FORMSPREE_DEFAULTS[el.name];
+        }
       });
     } catch (e) {
       showError('Could not load settings: ' + (e.message || e));
