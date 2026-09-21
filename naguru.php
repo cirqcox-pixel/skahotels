@@ -719,7 +719,15 @@ function calculateBooking() {
   else if (season === 'shoulder') basePrice = room.price_shoulder;
   else basePrice = room.price_low;
 
-  basePrice = parseFloat(basePrice || 0);
+  basePrice = parseFloat(basePrice || room.price || room.price_now || 0);
+
+  if (!basePrice) {
+    const sel = document.getElementById('room_type');
+    const opt = sel && sel.selectedOptions && sel.selectedOptions[0];
+    if (opt && opt.dataset && opt.dataset.price) {
+      basePrice = parseFloat(opt.dataset.price) || 0;
+    }
+  }
 
   let total = basePrice * nights;
   let discount = 0;

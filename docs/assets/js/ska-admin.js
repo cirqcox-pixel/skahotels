@@ -248,6 +248,7 @@
 
     tbody.innerHTML = filtered.map(function (b) {
       var st = (b.status || 'pending').toLowerCase();
+      var isSuper = adminProfile && adminProfile.role === 'super_admin';
       var actions = '';
       if (st === 'pending') {
         actions = '<button type="button" class="ska-btn ska-btn--success ska-btn--sm" data-action="confirm" data-id="' + b.id + '">Confirm</button> ' +
@@ -256,6 +257,9 @@
         actions = '<button type="button" class="ska-btn ska-btn--danger ska-btn--sm" data-action="cancel" data-id="' + b.id + '">Cancel</button>';
       } else {
         actions = '<span class="text-muted">—</span>';
+      }
+      if (isSuper) {
+        actions += ' <button type="button" class="ska-btn ska-btn--outline ska-btn--sm" data-action="delete" data-id="' + b.id + '" title="Delete permanently">Delete</button>';
       }
 
       return '<tr>' +
@@ -291,6 +295,23 @@
     if (!btn) return;
     var id = btn.dataset.id;
     var action = btn.dataset.action;
+
+    if (action === 'delete') {
+      if (!adminProfile || adminProfile.role !== 'super_admin') {
+        showError('Only Super Admin can delete bookings.');
+        return;
+      }
+      if (!confirm('Permanently delete this booking? This cannot be undone.')) return;
+      try {
+        await SkaApi.adminDeleteBooking(id);
+        showToast('Booking deleted.');
+        await loadBookingsPage();
+      } catch (err) {
+        showError(err.message || 'Delete failed');
+      }
+      return;
+    }
+
     var status = action === 'confirm' ? 'confirmed' : 'cancelled';
     if (!confirm('Mark this booking as ' + status + '?')) return;
 
@@ -493,8 +514,7 @@
 
   var FORMSPREE_DEFAULTS = {
     naguru_formspree: 'myegbgjy',
-    munyonyo_formspree_project: '3095670307009069001',
-    munyonyo_formspree: 'skaMunyonyoBooking'
+    munyonyo_formspree: 'xzezenyo'
   };
 
   async function loadSettingsPage() {

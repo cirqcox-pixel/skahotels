@@ -252,7 +252,12 @@
         if (co > ci) nights = Math.round((co - ci) / 86400000);
       } catch (e) {}
       var price = parseFloat(data.price || 0);
-      var total = data.total != null && data.total !== ''
+      if (!price && data.room_type) {
+        var rooms = global.SKA_ROOMS || global.ROOMS || [];
+        var match = rooms.find(function (r) { return r.name === data.room_type; });
+        if (match) price = SkaApi.seasonPrice(match);
+      }
+      var total = data.total != null && data.total !== '' && parseFloat(data.total) > 0
         ? parseFloat(data.total)
         : price * nights;
       var payload = {
@@ -398,9 +403,6 @@
       if (map.naguru_formspree && String(map.naguru_formspree).trim()) {
         cfg.formspree.booking = String(map.naguru_formspree).trim();
       }
-      if (map.munyonyo_formspree_project && String(map.munyonyo_formspree_project).trim()) {
-        cfg.formspree.munyonyoProject = String(map.munyonyo_formspree_project).trim();
-      }
       if (map.munyonyo_formspree && String(map.munyonyo_formspree).trim()) {
         cfg.formspree.bookingMunyonyo = String(map.munyonyo_formspree).trim();
       }
@@ -449,6 +451,12 @@
         return sb.from('bookings').select('*').order('created_at', { ascending: false });
       });
       return data || [];
+    },
+
+    adminDeleteBooking: async function (id) {
+      return adminRequest(function (sb) {
+        return sb.rpc('ska_delete_booking', { p_id: parseInt(id, 10) });
+      });
     },
 
     adminUpdateBookingStatus: async function (id, status) {

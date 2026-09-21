@@ -21,11 +21,10 @@ window.SKA_CONFIG = {
    * 3. Paste IDs below. Same ID for both is fine if you prefer one inbox.
    */
   formspree: {
-    /** Naguru — legacy form hash (notification → naguru.booking@) */
+    /** Naguru — https://formspree.io/f/myegbgjy */
     booking: 'myegbgjy',
-    /** Munyonyo Formspree CLI project + form key (see formspree.json) */
-    munyonyoProject: '3095670307009069001',
-    bookingMunyonyo: 'skaMunyonyoBooking',
+    /** Munyonyo — https://formspree.io/f/xzezenyo */
+    bookingMunyonyo: 'xzezenyo',
     inquiry: 'myegbgjy'
   },
 
