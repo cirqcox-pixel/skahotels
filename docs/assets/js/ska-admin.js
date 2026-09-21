@@ -315,13 +315,16 @@
     var status = action === 'confirm' ? 'confirmed' : 'cancelled';
     if (!confirm('Mark this booking as ' + status + '?')) return;
 
-    try {
-      await SkaApi.adminUpdateBookingStatus(id, status);
-      showToast('Booking updated to ' + status + '.');
-      await loadBookingsPage();
-    } catch (err) {
-      showError(err.message || 'Update failed');
+    var row = allBookings.find(function (b) { return String(b.id) === String(id); });
+    if (row) {
+      row.status = status;
+      renderBookingsTable();
     }
+    showToast('Booking updated to ' + status + '.');
+    SkaApi.adminUpdateBookingStatus(id, status).catch(function (err) {
+      showError(err.message || 'Update failed');
+      loadBookingsPage();
+    });
   }
 
   /* ── Rooms page ── */
@@ -973,13 +976,17 @@
         return;
       }
       closeModal('inquiryModal');
-      showToast('Reply sent.');
-      try {
-        await SkaApi.adminReplyInquiry(id, reply);
-        loadInquiriesPage();
-      } catch (err) {
-        showError(err.message || 'Could not send reply');
+      showToast('Reply sent. The visitor will receive it by email.');
+      var cached = inquiriesCache.find(function (row) { return String(row.id) === String(id); });
+      if (cached) {
+        cached.reply_message = String(reply).trim();
+        cached.replied_at = new Date().toISOString();
+        cached.is_read = true;
       }
+      loadInquiriesPage();
+      SkaApi.adminReplyInquiry(id, reply).catch(function (err) {
+        showError(err.message || 'Could not send reply');
+      });
     });
   }
 

@@ -231,14 +231,9 @@
         is_read: false
       }]);
       if (res.error) throw new Error(apiError(res.error));
-      try {
-        var map = await SkaApi.fetchSettings();
-        SkaApi.applyPublicSettings(map);
-        if (map.site_email) data.site_email = map.site_email;
-      } catch (e) { /* defaults in SKA_CONFIG */ }
       data.site_email = data.site_email || (cfg && cfg.siteEmail) || 'info@skaboutiquebnb.com';
       if (global.SkaNotify) {
-        SkaNotify.notify('inquiry', data).catch(function () {});
+        SkaNotify.notify('inquiry', data);
       }
       return true;
     },
@@ -287,9 +282,7 @@
           total: total,
           price: price,
           branch: branchName || data.branch || payload.branch
-        })).catch(function (e) {
-          console.error('[SKA] booking notify:', e.message || e);
-        });
+        }));
       }
       return true;
     },
@@ -456,7 +449,7 @@
       });
       if (global.SkaNotify && row) {
         var type = status === 'confirmed' ? 'booking_confirmed' : 'booking_cancelled';
-        SkaNotify.notify(type, row).catch(function () { /* status already saved */ });
+        SkaNotify.notify(type, row);
       }
       return row;
     },
@@ -494,7 +487,7 @@
         if (row) row.reply_message = text;
       }
       if (global.SkaNotify && row) {
-        SkaNotify.notify('inquiry_reply', Object.assign({}, row, { reply: text })).catch(function () {});
+        SkaNotify.notify('inquiry_reply', Object.assign({}, row, { reply: text }));
       }
       return row;
     },

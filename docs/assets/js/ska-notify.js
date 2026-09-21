@@ -1,9 +1,9 @@
 /**
- * SKA Hotels — booking / inquiry email (no Formspree)
- * Naguru bookings  → naguru.booking@skaboutiquebnb.com
- * Munyonyo bookings → munyonyo.booking@skaboutiquebnb.com
- * Inquiries         → info@skaboutiquebnb.com
- * Staff replies     → visitor email
+ * SKA Hotels — email notifications
+ * Staff inboxes: naguru.booking@ / munyonyo.booking@ / info@
+ * Visitors are CC'd on every mail, and also receive their own copy
+ * (booking, confirm, cancel, inquiry reply). Fire-and-forget so the UI
+ * never waits on FormSubmit.
  */
 (function (global) {
   'use strict';
@@ -11,7 +11,6 @@
   var NAGURU_BOOKING = 'naguru.booking@skaboutiquebnb.com';
   var MUNYONYO_BOOKING = 'munyonyo.booking@skaboutiquebnb.com';
   var INFO_INBOX = 'info@skaboutiquebnb.com';
-  var MAIL_TIMEOUT_MS = 8000;
 
   function cfgNow() {
     return global.SKA_CONFIG || {};
@@ -21,16 +20,14 @@
     return /muny/i.test(String(branch || ''));
   }
 
-  function adminInbox(type, branch) {
-    if (type === 'inquiry') {
+  function staffInbox(type, branch) {
+    if (type === 'inquiry' || type === 'inquiry_reply') {
       return (cfgNow().siteEmail && /@/.test(cfgNow().siteEmail))
         ? cfgNow().siteEmail
         : INFO_INBOX;
     }
     var emails = cfgNow().branchEmails || {};
-    if (isMunyonyo(branch)) {
-      return emails.Munyonyo || MUNYONYO_BOOKING;
-    }
+    if (isMunyonyo(branch)) return emails.Munyonyo || MUNYONYO_BOOKING;
     return emails.Naguru || NAGURU_BOOKING;
   }
 
@@ -43,17 +40,32 @@
     return 'SKA Contact: ' + (data.subject || 'General Inquiry');
   }
 
-  function payloadFor(type, data, to) {
+  function messageFor(type, data, reply) {
+    if (type === 'inquiry_reply') {
+      var body = 'SKA The Boutique replied:\n\n' + reply;
+      if (data.message) body += '\n\n--- Your original message ---\n' + data.message;
+      return body;
+    }
+    if (type === 'booking_confirmed') {
+      return 'Your booking has been confirmed. We look forward to welcoming you.';
+    }
+    if (type === 'booking_cancelled') {
+      return 'Your booking has been cancelled. Contact us if you have questions.';
+    }
+    return data.message || '';
+  }
+
+  function payloadFor(type, data, to, cc) {
     var guest = String(data.email || '').trim();
-    var reply = data.reply || data.reply_message || '';
+    var reply = String(data.reply || data.reply_message || '').trim();
+    var staff = staffInbox(type, data.branch || '');
     return {
       _subject: subjectFor(type, data),
       _captcha: 'false',
       _template: 'table',
-      _replyto: type === 'inquiry_reply' ? (cfgNow().siteEmail || INFO_INBOX) : (guest || to),
-      _cc: type === 'inquiry_reply' ? (cfgNow().siteEmail || INFO_INBOX) : (guest || ''),
-      type: type,
-      name: data.name,
+      _replyto: type === 'inquiry_reply' ? staff : (guest || staff),
+      _cc: cc || '',
+      name: data.name || '',
       email: guest,
       phone: data.phone || '',
       whatsapp: data.whatsapp || '',
@@ -61,67 +73,41 @@
       room_type: data.room_type || '',
       package_option: data.package_option || '',
       guests: data.guests || '',
-      currency: data.currency || 'USD',
       checkin: data.checkin || '',
       checkout: data.checkout || '',
-      price: data.price || '',
-      total: data.total || '',
-      season: data.season || '',
-      message: reply || data.message || '',
+      total: (data.currency || 'USD') + ' ' + (data.total || data.price || ''),
+      staff_reply: reply,
+      message: messageFor(type, data, reply),
       notify_inbox: to,
       site: cfgNow().siteName || 'SKA The Boutique'
     };
   }
 
-  async function postJson(url, body, extraHeaders) {
-    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
-    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, MAIL_TIMEOUT_MS) : null;
-    var headers = {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    };
-    if (extraHeaders) {
-      Object.keys(extraHeaders).forEach(function (k) { headers[k] = extraHeaders[k]; });
-    }
-    try {
-      var res = await fetch(url, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(body),
-        signal: ctrl ? ctrl.signal : undefined
-      });
-      var text = await res.text().catch(function () { return ''; });
-      var parsed = null;
-      try { parsed = JSON.parse(text); } catch (e) { /* not json */ }
-      if (!res.ok) {
-        throw new Error('Notify failed (' + res.status + '): ' + text.slice(0, 180));
-      }
-      if (parsed && String(parsed.success) === 'false') {
-        throw new Error(parsed.message || 'Mailer needs inbox activation');
-      }
-      if (parsed && parsed.ok === false) {
-        throw new Error(parsed.error || 'Notify failed');
-      }
-      return true;
-    } finally {
-      if (timer) clearTimeout(timer);
-    }
+  function postMail(to, payload) {
+    if (!to || String(to).indexOf('@') < 0) return;
+    fetch('https://formsubmit.co/ajax/' + encodeURIComponent(to), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify(payload),
+      keepalive: true
+    }).catch(function () { /* background mail */ });
   }
 
-  async function sendDirect(type, data) {
-    var guest = String(data.email || '').trim();
-    var to = type === 'inquiry_reply' && guest ? guest : adminInbox(type, data.branch || '');
-    var url = 'https://formsubmit.co/ajax/' + encodeURIComponent(to);
-    await postJson(url, payloadFor(type, data, to));
-    return true;
-  }
-
-  async function notify(type, data) {
-    return sendDirect(type, data);
+  function notify(type, data) {
+    var guest = String((data && data.email) || '').trim();
+    var staff = staffInbox(type, (data && data.branch) || '');
+    postMail(staff, payloadFor(type, data, staff, guest));
+    if (guest && guest.toLowerCase() !== String(staff).toLowerCase()) {
+      postMail(guest, payloadFor(type, data, guest, staff));
+    }
+    return Promise.resolve({ ok: true });
   }
 
   global.SkaNotify = {
     notify: notify,
-    adminInbox: function (branch) { return adminInbox('booking', branch); }
+    adminInbox: function (branch) { return staffInbox('booking', branch); }
   };
 })(window);

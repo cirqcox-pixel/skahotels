@@ -113,6 +113,8 @@
     try {
       await SkaApi.submitBooking(d);
       form.reset();
+      var totalEl = form.querySelector('#totalPrice');
+      if (totalEl) totalEl.innerHTML = 'Total: <strong>USD 0</strong>';
       showAlert(form, 'success', 'Thank you! Your booking request has been sent successfully. We\'ll be in touch shortly.');
     } catch (err) {
       showAlert(form, 'danger', err.message || 'Could not submit booking. Please call us directly.');

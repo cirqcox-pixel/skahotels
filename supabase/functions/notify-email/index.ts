@@ -147,33 +147,43 @@ serve(async (req) => {
 
     const text = type === 'inquiry_reply' ? intro : details(data);
     const html = htmlWrap(subject, type === 'inquiry_reply' ? 'Reply from SKA The Boutique:' : intro, text);
+    const formPayload = {
+      _subject: subject,
+      _captcha: 'false',
+      _template: 'table',
+      _replyto: type === 'inquiry_reply' ? to : (guest || to),
+      _cc: guest || '',
+      name: data.name,
+      email: guest,
+      phone: data.phone,
+      whatsapp: data.whatsapp,
+      branch,
+      room_type: data.room_type,
+      package_option: data.package_option,
+      guests: data.guests,
+      checkin: data.checkin,
+      checkout: data.checkout,
+      total: `${data.currency || 'USD'} ${data.total || data.price || 0}`,
+      staff_reply: String(data.reply || data.reply_message || ''),
+      message: type === 'inquiry_reply' ? intro : (data.message || intro),
+      type,
+      notify_inbox: to,
+    };
 
     if (RESEND_API_KEY) {
       await sendResend(to, subject, html, text, guest || undefined, guest || undefined);
       sent.push('resend:' + to);
+      if (guest && guest.toLowerCase() !== to.toLowerCase()) {
+        await sendResend(guest, subject, html, text, to);
+        sent.push('resend:' + guest);
+      }
     } else {
-      await sendFormSubmit(to, {
-        _subject: subject,
-        _captcha: 'false',
-        _template: 'table',
-        _replyto: guest || to,
-        _cc: guest || '',
-        name: data.name,
-        email: guest,
-        phone: data.phone,
-        whatsapp: data.whatsapp,
-        branch,
-        room_type: data.room_type,
-        package_option: data.package_option,
-        guests: data.guests,
-        checkin: data.checkin,
-        checkout: data.checkout,
-        total: `${data.currency || 'USD'} ${data.total || data.price || 0}`,
-        message: data.message || intro,
-        type,
-        notify_inbox: to,
-      });
+      await sendFormSubmit(to, formPayload);
       sent.push('formsubmit:' + to);
+      if (guest && guest.toLowerCase() !== to.toLowerCase()) {
+        await sendFormSubmit(guest, { ...formPayload, _cc: to, notify_inbox: guest });
+        sent.push('formsubmit:' + guest);
+      }
     }
 
     return json({ ok: true, to, sent });

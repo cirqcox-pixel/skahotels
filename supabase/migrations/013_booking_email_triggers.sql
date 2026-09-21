@@ -121,3 +121,50 @@ CREATE TRIGGER ska_notify_inquiry_insert
   AFTER INSERT ON public.inquiries
   FOR EACH ROW
   EXECUTE PROCEDURE public.ska_notify_inquiry_row();
+
+CREATE OR REPLACE FUNCTION public.ska_notify_inquiry_reply_row()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, net
+AS $$
+DECLARE
+  inbox TEXT := 'info@skaboutiquebnb.com';
+  body JSONB;
+BEGIN
+  IF NEW.reply_message IS NULL OR btrim(NEW.reply_message) = '' THEN
+    RETURN NEW;
+  END IF;
+  IF TG_OP = 'UPDATE' AND NEW.reply_message IS NOT DISTINCT FROM OLD.reply_message THEN
+    RETURN NEW;
+  END IF;
+
+  body := jsonb_build_object(
+    '_subject', 'Re: ' || COALESCE(NEW.subject, 'Your SKA inquiry'),
+    '_captcha', 'false',
+    '_template', 'table',
+    '_replyto', inbox,
+    'type', 'inquiry_reply',
+    'name', NEW.name,
+    'email', NEW.email,
+    'phone', NEW.phone,
+    'subject', NEW.subject,
+    'staff_reply', NEW.reply_message,
+    'message', 'SKA The Boutique replied:' || E'\n\n' || NEW.reply_message,
+    'notify_inbox', inbox,
+    'site', 'SKA The Boutique'
+  );
+
+  PERFORM public.ska_http_notify(inbox, body || jsonb_build_object('_cc', COALESCE(NEW.email, '')));
+  IF NEW.email IS NOT NULL AND NEW.email <> '' THEN
+    PERFORM public.ska_http_notify(NEW.email, body || jsonb_build_object('_cc', inbox, 'notify_inbox', NEW.email));
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS ska_notify_inquiry_reply ON public.inquiries;
+CREATE TRIGGER ska_notify_inquiry_reply
+  AFTER UPDATE OF reply_message ON public.inquiries
+  FOR EACH ROW
+  EXECUTE PROCEDURE public.ska_notify_inquiry_reply_row();
