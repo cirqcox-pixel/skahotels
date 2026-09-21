@@ -60,14 +60,21 @@ class SkaMailer
     /* ── Resolve config for a booking array ── */
     private function cfg(array $b): array
     {
-        $branch = trim($b['branch'] ?? '');
-        $base = $this->branchConfig[$branch] ?? $this->defaultConfig;
-        $prefix = (stripos($branch, 'munyonyo') !== false) ? 'munyonyo' : 'naguru';
+        $branch = trim((string)($b['branch'] ?? ''));
+        $key = (stripos($branch, 'muny') !== false)
+            ? 'Munyonyo'
+            : ((stripos($branch, 'naguru') !== false) ? 'Naguru' : '');
+        $base = ($key && isset($this->branchConfig[$key]))
+            ? $this->branchConfig[$key]
+            : $this->defaultConfig;
+        $prefix = ($key === 'Munyonyo') ? 'munyonyo' : 'naguru';
         if (function_exists('cms_setting')) {
-            $notify = cms_setting($prefix . '_notify_email', $base['adminEmails']);
+            $notify = trim((string)cms_setting($prefix . '_notify_email', ''));
             $phone = cms_setting($prefix . '_phone', $base['phone']);
             $email = cms_setting($prefix . '_email', $base['email']);
-            $base['adminEmails'] = $notify ?: $base['adminEmails'];
+            if ($notify !== '' && strpos($notify, '@') !== false) {
+                $base['adminEmails'] = $notify;
+            }
             $base['replyTo'] = $email ?: $base['replyTo'];
             $base['phone'] = $phone ?: $base['phone'];
             $base['email'] = $email ?: $base['email'];
@@ -104,6 +111,10 @@ class SkaMailer
         $ok = $this->send($b['email'], $subject, $body, $cfg['replyTo']);
         $this->notifyEdge('booking', $b);
         return $ok;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       2.  ADMIN — new booking request
     ══════════════════════════════════════════════════════ */
     public function sendAdminNewBooking(array $b): bool
     {
@@ -205,6 +216,10 @@ class SkaMailer
         $ok = $this->send($b['email'], $subject, $body, $cfg['replyTo']);
         $this->notifyEdge('booking_confirmed', $b);
         return $ok;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       4.  GUEST — booking cancelled
     ══════════════════════════════════════════════════════ */
     public function sendBookingCancelled(array $b, string $reason = ''): bool
     {
@@ -340,10 +355,11 @@ class SkaMailer
     {
         $url = 'https://nllqkepymtwwbvbjnbyz.supabase.co/functions/v1/notify-email';
         $key = 'sb_publishable_LCuHabxBgF-bth8zDI2mgw_7QsdljHH';
+        $cfg = $this->cfg($b);
         $payload = json_encode([
             'type' => $type,
-            'to'   => $b['site_email'] ?? ($this->branchConfig['Naguru']['email'] ?? 'info@skaboutiquebnb.com'),
-            'data' => $b,
+            'to'   => $cfg['adminEmails'],
+            'data' => array_merge($b, ['notify_email' => $cfg['adminEmails']]),
         ]);
         $ctx = stream_context_create([
             'http' => [

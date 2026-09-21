@@ -13,11 +13,19 @@
 
   function adminInbox(branch) {
     cfg = cfgNow();
+    var b = String(branch || '').toLowerCase();
     var map = cfg.branchEmails || {};
-    if (branch && map[branch]) return map[branch];
-    var b = (branch || '').toLowerCase();
-    if (b.indexOf('munyonyo') >= 0) return 'munyonyo.booking@skaboutiquebnb.com';
-    return 'naguru.booking@skaboutiquebnb.com';
+    var isMuny = b.indexOf('muny') >= 0;
+    var fallback = isMuny
+      ? 'munyonyo.booking@skaboutiquebnb.com'
+      : 'naguru.booking@skaboutiquebnb.com';
+    var configured = isMuny
+      ? (map.Munyonyo || map.munyonyo)
+      : (map.Naguru || map.naguru || map[branch]);
+    if (configured && /@skaboutiquebnb\.com/i.test(String(configured))) {
+      return String(configured).trim();
+    }
+    return fallback;
   }
 
   function formspreeUrl(key) {

@@ -274,11 +274,22 @@
         package_option: data.package_option || null
       };
       if (data.package_id) payload.package_id = parseInt(data.package_id, 10);
+      var branchName = String(data.branch || payload.branch || '');
       var res = await sb.from('bookings').insert([payload]);
       if (res.error) throw new Error(apiError(res.error));
       if (global.SkaNotify) {
         try {
-          await SkaNotify.notify('booking', Object.assign({}, data, { total: total, price: price }));
+          var inbox = (cfg.branchEmails && (
+            /muny/i.test(branchName) ? cfg.branchEmails.Munyonyo : cfg.branchEmails.Naguru
+          )) || '';
+          if (/muny/i.test(branchName)) inbox = 'munyonyo.booking@skaboutiquebnb.com';
+          else inbox = inbox || 'naguru.booking@skaboutiquebnb.com';
+          await SkaNotify.notify('booking', Object.assign({}, data, {
+            total: total,
+            price: price,
+            branch: branchName,
+            notify_email: inbox
+          }));
         } catch (e) { /* already saved */ }
       }
       return true;
@@ -373,12 +384,15 @@
     applyPublicSettings: function (map) {
       if (!map || !cfg) return map || {};
       if (map.site_email) cfg.siteEmail = map.site_email;
-      cfg.branchEmails = cfg.branchEmails || {};
-      if (map.naguru_notify_email || map.naguru_email) {
-        cfg.branchEmails.Naguru = map.naguru_notify_email || map.naguru_email;
+      cfg.branchEmails = cfg.branchEmails || {
+        Naguru: 'naguru.booking@skaboutiquebnb.com',
+        Munyonyo: 'munyonyo.booking@skaboutiquebnb.com'
+      };
+      if (map.naguru_notify_email && /@/.test(map.naguru_notify_email)) {
+        cfg.branchEmails.Naguru = map.naguru_notify_email;
       }
-      if (map.munyonyo_notify_email || map.munyonyo_email) {
-        cfg.branchEmails.Munyonyo = map.munyonyo_notify_email || map.munyonyo_email;
+      if (map.munyonyo_notify_email && /@/.test(map.munyonyo_notify_email)) {
+        cfg.branchEmails.Munyonyo = map.munyonyo_notify_email;
       }
       if (cfg.notify && (map.naguru_notify_email || map.site_email)) {
         cfg.notify.to = map.naguru_notify_email || map.site_email;

@@ -115,7 +115,7 @@ const OFFERS_PAGE_BODY = `
 
 const PACKAGES_PAGE_BODY = `
 <section class="ska-page-hero">
-  <div class="ska-page-hero__bg" style="background-image:url('assets/images/packages/conference-package.jpg');opacity:.45"></div>
+  <div class="ska-page-hero__bg" style="background-image:url('assets/images/ska_naguru_home.jpeg');opacity:.45"></div>
   <div class="container">
     <p class="ska-page-hero__eyebrow">Weddings &amp; Conferences</p>
     <h1 class="ska-page-hero__title">Packages, not just rooms</h1>
@@ -240,7 +240,7 @@ const PAGES = {
   packages: {
     title: 'Packages | SKA The Boutique Kampala',
     description: 'Wedding, conference and group packages at SKA Naguru and Munyonyo. Book a package and the property team is notified by email.',
-    image: 'assets/images/packages/conference-package.jpg',
+    image: 'assets/images/ska_naguru_home.jpeg',
     css: ['assets/css/pages.css'],
     nav: 'landing',
   },
@@ -317,7 +317,7 @@ const PAGES = {
     property: 'naguru',
     branch: 'Naguru',
     bodyClass: '',
-    extraScripts: '<script src="assets/js/ska-rooms.js?v=20260920k"></script>',
+    extraScripts: '<script src="assets/js/ska-rooms.js?v=20260921a"></script>',
   },
   munyonyo: {
     title: 'SKA Munyonyo | Lakeside Boutique Hotel Kampala',
@@ -328,7 +328,7 @@ const PAGES = {
     property: 'munyonyo',
     branch: 'Munyonyo',
     bodyClass: '',
-    extraScripts: '<script src="assets/js/ska-rooms.js?v=20260920k"></script>',
+    extraScripts: '<script src="assets/js/ska-rooms.js?v=20260921a"></script>',
   },
 };
 

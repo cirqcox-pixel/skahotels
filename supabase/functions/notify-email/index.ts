@@ -20,10 +20,32 @@ function json(body: unknown, status = 200) {
   });
 }
 
-function adminInbox(branch: string) {
-  const b = (branch || '').toLowerCase();
-  if (b.indexOf('munyonyo') >= 0) return 'munyonyo.booking@skaboutiquebnb.com';
-  return 'naguru.booking@skaboutiquebnb.com';
+const MUNYONYO_BOOKING = 'munyonyo.booking@skaboutiquebnb.com';
+const NAGURU_BOOKING = 'naguru.booking@skaboutiquebnb.com';
+const INFO_INBOX = 'info@skaboutiquebnb.com';
+
+function looksMunyonyo(value: string) {
+  return /muny/i.test(value || '');
+}
+
+function adminInbox(branch: string, hint = '') {
+  const blob = `${branch || ''} ${hint || ''}`;
+  if (looksMunyonyo(blob)) return MUNYONYO_BOOKING;
+  return NAGURU_BOOKING;
+}
+
+function uniqEmails(list: string[]) {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const raw of list) {
+    const email = String(raw || '').trim();
+    if (!email || email.indexOf('@') < 0) continue;
+    const key = email.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(email);
+  }
+  return out;
 }
 
 function esc(v: unknown) {
@@ -68,21 +90,23 @@ function detailsTable(data: Record<string, unknown>) {
   return `<table style="width:100%;border-collapse:collapse;margin:16px 0;">${body}</table>`;
 }
 
-async function sendResend(to: string[], subject: string, html: string, text: string, replyTo?: string) {
+async function sendResend(to: string[], subject: string, html: string, text: string, replyTo?: string, cc?: string[]) {
+  const payload: Record<string, unknown> = {
+    from: NOTIFY_FROM,
+    to,
+    reply_to: replyTo || undefined,
+    subject,
+    html,
+    text,
+  };
+  if (cc && cc.length) payload.cc = cc;
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${RESEND_API_KEY}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      from: NOTIFY_FROM,
-      to,
-      reply_to: replyTo || undefined,
-      subject,
-      html,
-      text,
-    }),
+    body: JSON.stringify(payload),
   });
   const result = await res.json();
   if (!res.ok) throw new Error(JSON.stringify(result));
@@ -124,32 +148,84 @@ serve(async (req) => {
     const body = await req.json();
     const type = String(body.type || 'inquiry');
     const data = (body.data || {}) as Record<string, unknown>;
-    const branchInbox = adminInbox(String(data.branch || body.to || ''));
+    const branchInbox = adminInbox(
+      String(data.branch || ''),
+      String(data.notify_email || body.to || ''),
+    );
     const guest = String(data.email || '').trim();
     const sent: string[] = [];
 
     const sendPair = async (adminTo: string, guestTo: string, adminSubject: string, guestSubject: string, adminIntro: string, guestIntro: string, guestFooter: string) => {
       const table = detailsTable(data);
       const text = bookingText(data);
+      const muny = looksMunyonyo(String(data.branch || adminTo || ''));
+      const adminRecipients = uniqEmails([
+        adminTo,
+        muny ? MUNYONYO_BOOKING : '',
+      ]);
       if (RESEND_API_KEY) {
-        await sendResend([adminTo], adminSubject, wrap(adminSubject, adminIntro, table, 'Reply to this email to contact the guest.'), text, guest || undefined);
-        sent.push('resend-admin');
+        let adminOk = false;
+        for (const addr of adminRecipients) {
+          try {
+            await sendResend(
+              [addr],
+              adminSubject,
+              wrap(adminSubject, adminIntro, table, 'Reply to this email to contact the guest.'),
+              text,
+              guest || undefined,
+            );
+            sent.push('resend-admin:' + addr);
+            adminOk = true;
+          } catch {
+            sent.push('resend-admin-failed:' + addr);
+          }
+        }
+        if (!adminOk && muny) {
+          try {
+            await sendResend(
+              [INFO_INBOX],
+              `${adminSubject} — deliver to ${MUNYONYO_BOOKING}`,
+              wrap(adminSubject, `Please forward this Munyonyo booking to ${esc(MUNYONYO_BOOKING)}.<br><br>${adminIntro}`, table, 'Reply to this email to contact the guest.'),
+              text,
+              guest || undefined,
+            );
+            sent.push('resend-admin-fallback');
+          } catch {
+            try {
+              await sendFormspree({
+                _subject: adminSubject,
+                _replyto: guest || adminTo,
+                _cc: uniqEmails([adminTo, MUNYONYO_BOOKING, guestTo]).join(','),
+                type,
+                ...data,
+                message: `${adminIntro}\n\n${text}`,
+              });
+              sent.push('formspree-admin');
+            } catch {
+              /* last resort already attempted */
+            }
+          }
+        }
         if (guestTo) {
-          await sendResend(
-            [guestTo],
-            guestSubject,
-            wrap(guestSubject, guestIntro, table, guestFooter),
-            text,
-            adminTo,
-          );
-          sent.push('resend-guest');
+          try {
+            await sendResend(
+              [guestTo],
+              guestSubject,
+              wrap(guestSubject, guestIntro, table, guestFooter),
+              text,
+              adminTo,
+            );
+            sent.push('resend-guest');
+          } catch {
+            sent.push('resend-guest-failed');
+          }
         }
         return;
       }
       await sendFormspree({
         _subject: adminSubject,
         _replyto: guest || adminTo,
-        _cc: [adminTo, guestTo].filter(Boolean).join(','),
+        _cc: uniqEmails([adminTo, muny ? MUNYONYO_BOOKING : '', guestTo]).join(','),
         type,
         ...data,
         message: `${adminIntro}\n\n${text}`,
