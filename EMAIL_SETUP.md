@@ -13,10 +13,13 @@ On GitHub Pages, forms save to **Supabase** and can also email you via **Formspr
 
 ```js
 formspree: {
-  booking: 'YOUR_FORM_ID',
-  inquiry: 'YOUR_FORM_ID'   // same ID is fine for both
+  booking: 'YOUR_NAGURU_FORM_ID',          // notification → naguru.booking@
+  bookingMunyonyo: 'YOUR_MUNYONYO_FORM_ID', // duplicate form → munyonyo.booking@
+  inquiry: 'YOUR_FORM_ID'
 },
 ```
+
+**Munyonyo must use its own Formspree form** (same fields as Naguru). If Munyonyo bookings only CC `munyonyo.booking@` on the Naguru form, Formspree marks them as spam and nothing is delivered. Duplicate the form, set the notification email to `munyonyo.booking@skaboutiquebnb.com`, verify it, and paste the new ID into `bookingMunyonyo` (or **Admin → Property settings → Formspree form ID**).
 
 5. Rebuild / push so `docs/` updates (or wait for GitHub Actions)
 

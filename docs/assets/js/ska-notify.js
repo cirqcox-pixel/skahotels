@@ -2,10 +2,12 @@
  * SKA Hotels — email notifications (Formspree + optional Resend webhook)
  * Runs after a successful Supabase save on GitHub Pages.
  *
- * Naguru mail works today because Formspree form myegbgjy delivers to
- * naguru.booking@ and sends a confirmation to the guest `email` field.
- * Munyonyo failed when `_cc` included munyonyo.booking@ (Formspree rejects
- * the whole post). Guest + property copies are sent as separate posts.
+ * Naguru: Formspree form myegbgjy is owned by naguru.booking@ — one post,
+ * _cc = property inbox + guest (identical payload every time).
+ *
+ * Munyonyo: must use formspree.bookingMunyonyo (duplicate form in Formspree
+ * with notification email munyonyo.booking@). CC'ing munyonyo.booking@ on the
+ * Naguru form lands in Formspree spam and never delivers.
  */
 (function (global) {
   'use strict';
@@ -19,23 +21,34 @@
 
   var cfg = cfgNow();
 
+  function isMunyonyo(branch) {
+    return /muny/i.test(String(branch || ''));
+  }
+
   function adminInbox(branch) {
     cfg = cfgNow();
-    var b = String(branch || '').toLowerCase();
-    var map = cfg.branchEmails || {};
-    var isMuny = b.indexOf('muny') >= 0;
-    var fallback = isMuny ? MUNYONYO_BOOKING : NAGURU_BOOKING;
-    var configured = isMuny
-      ? (map.Munyonyo || map.munyonyo)
-      : (map.Naguru || map.naguru || map[branch]);
-    if (configured && /@skaboutiquebnb\.com/i.test(String(configured))) {
-      return String(configured).trim();
+    if (isMunyonyo(branch)) return MUNYONYO_BOOKING;
+    return NAGURU_BOOKING;
+  }
+
+  function formspreeIdForBranch(branch) {
+    cfg = cfgNow();
+    var f = cfg.formspree || {};
+    if (isMunyonyo(branch)) {
+      return f.bookingMunyonyo || f.munyonyo || '';
     }
-    return fallback;
+    return f.booking || f.endpoint || '';
+  }
+
+  function formspreeUrlForBranch(branch) {
+    var id = formspreeIdForBranch(branch);
+    if (!id) return '';
+    if (id.indexOf('http') === 0) return id;
+    return 'https://formspree.io/f/' + id;
   }
 
   function formspreeUrl(key) {
-    var f = cfg.formspree || {};
+    var f = cfgNow().formspree || {};
     var id = f[key] || f.endpoint || '';
     if (!id) return '';
     if (id.indexOf('http') === 0) return id;
@@ -62,18 +75,18 @@
     return true;
   }
 
-  function bookingSubject(type, branch) {
-    var prefix = type === 'booking_confirmed'
+  /** Identical booking payload Naguru has used successfully since e113ffc. */
+  function bookingFormspreePayload(type, data) {
+    var bookingSubject = type === 'booking_confirmed'
       ? 'SKA Booking Confirmed — '
       : type === 'booking_cancelled'
         ? 'SKA Booking Cancelled — '
         : 'SKA Booking Request — ';
-    return prefix + (branch || 'Property');
-  }
-
-  function bookingFields(type, data) {
     return {
-      type: type.indexOf('booking') === 0 ? 'booking' : type,
+      _subject: bookingSubject + (data.branch || 'Property'),
+      _replyto: data.email,
+      _cc: [adminInbox(data.branch), data.email].filter(Boolean).join(','),
+      type: 'booking',
       name: data.name,
       email: data.email,
       phone: data.phone || '',
@@ -89,67 +102,37 @@
       total: data.total || '',
       season: data.season || '',
       message: data.message || '',
-      site: cfg.siteName || 'SKA The Boutique'
+      site: cfgNow().siteName || 'SKA The Boutique'
     };
-  }
-
-  /**
-   * Same payload Naguru already receives: Formspree owner + guest confirmation.
-   * `_cc` is only the guest — extra inboxes are separate posts.
-   */
-  function guestFormspreePayload(type, data) {
-    var fields = bookingFields(type, data);
-    return Object.assign({}, fields, {
-      _subject: bookingSubject(type, data.branch),
-      _replyto: data.email,
-      _cc: data.email || '',
-      email: data.email
-    });
-  }
-
-  /** Second post so Formspree confirmation goes to the property inbox. */
-  function deskFormspreePayload(type, data, inbox) {
-    var fields = bookingFields(type, data);
-    return Object.assign({}, fields, {
-      _subject: bookingSubject(type, data.branch),
-      _replyto: data.email,
-      _cc: inbox,
-      email: inbox,
-      name: (data.name || 'Guest') + ' (notify ' + (data.branch || 'property') + ')',
-      message: [
-        'Property inbox copy for ' + inbox,
-        'Guest: ' + (data.name || '') + ' <' + (data.email || '') + '>',
-        'Phone: ' + (data.phone || '—'),
-        'Room / package: ' + (data.room_type || '—'),
-        'Dates: ' + (data.checkin || '') + ' → ' + (data.checkout || ''),
-        'Total: ' + (data.currency || '') + ' ' + (data.total || data.price || ''),
-        data.message ? ('Message: ' + data.message) : ''
-      ].filter(Boolean).join('\n')
-    });
   }
 
   async function sendFormspree(type, data) {
     cfg = cfgNow();
-    var url = formspreeUrl(type) || formspreeUrl('inquiry');
-    if (!url) return false;
-
     if (type === 'booking' || type === 'booking_confirmed' || type === 'booking_cancelled') {
-      await postJson(url, guestFormspreePayload(type, data));
-      var inbox = adminInbox(data.branch);
-      var guest = String(data.email || '').toLowerCase();
-      if (inbox && inbox.toLowerCase() !== guest) {
-        try {
-          await postJson(url, deskFormspreePayload(type, data, inbox));
-        } catch (e) {
-          console.warn('[SKA Notify] Property Formspree copy:', e.message || e);
-        }
+      var branch = data.branch || '';
+      var url = formspreeUrlForBranch(branch);
+      var payload = bookingFormspreePayload(type, data);
+      if (isMunyonyo(branch) && !url) {
+        /* Naguru form owner still receives the submission; CC munyonyo.booking@ → spam. */
+        url = formspreeUrl(type) || formspreeUrl('inquiry');
+        payload._cc = String(data.email || '').trim();
+        console.warn(
+          '[SKA Notify] Add formspree.bookingMunyonyo (duplicate Ska Hotels form → munyonyo.booking@) ' +
+          'for Munyonyo admin + guest delivery like Naguru.'
+        );
       }
+      if (!url) return false;
+      await postJson(url, payload);
       return true;
     }
 
+    var url = formspreeUrl(type) || formspreeUrl('inquiry');
+    if (!url) return false;
+
+    var payload;
     if (type === 'inquiry_reply') {
       var info = (cfg.siteEmail || (cfg.notify && cfg.notify.info) || 'info@skaboutiquebnb.com');
-      await postJson(url, {
+      payload = {
         _subject: 'Re: ' + (data.subject || 'Your SKA inquiry'),
         _replyto: info,
         _cc: data.email || '',
@@ -158,22 +141,23 @@
         email: data.email,
         message: data.reply || data.reply_message || data.message || '',
         site: cfg.siteName || 'SKA The Boutique'
-      });
-      return true;
+      };
+    } else {
+      payload = {
+        _subject: 'SKA Contact: ' + (data.subject || 'General Inquiry'),
+        _replyto: data.email,
+        _cc: [cfg.siteEmail || 'info@skaboutiquebnb.com', data.email].filter(Boolean).join(','),
+        type: 'inquiry',
+        name: data.name,
+        email: data.email,
+        phone: data.phone || '',
+        subject: data.subject || 'General Inquiry',
+        message: data.message || '',
+        site: cfg.siteName || 'SKA The Boutique'
+      };
     }
 
-    await postJson(url, {
-      _subject: 'SKA Contact: ' + (data.subject || 'General Inquiry'),
-      _replyto: data.email,
-      _cc: data.email || '',
-      type: 'inquiry',
-      name: data.name,
-      email: data.email,
-      phone: data.phone || '',
-      subject: data.subject || 'General Inquiry',
-      message: data.message || '',
-      site: cfg.siteName || 'SKA The Boutique'
-    });
+    await postJson(url, payload);
     return true;
   }
 
@@ -196,7 +180,7 @@
     else to = data.site_email || cfg.siteEmail || (cfg.notify && cfg.notify.to) || 'info@skaboutiquebnb.com';
 
     var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
-    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 8000) : null;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 6000) : null;
     try {
       var res = await fetch(url, {
         method: 'POST',
@@ -235,7 +219,7 @@
       console.warn('[SKA Notify] Webhook/Resend:', e.message || e);
     }
     if (!results.formspree && !results.webhook) {
-      console.info('[SKA Notify] No email went out. Deploy notify-email or check Formspree.');
+      console.info('[SKA Notify] No email went out. Check Formspree bookingMunyonyo form ID or deploy notify-email.');
     }
     return results;
   }
