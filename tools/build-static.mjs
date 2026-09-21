@@ -317,7 +317,7 @@ const PAGES = {
     property: 'naguru',
     branch: 'Naguru',
     bodyClass: '',
-    extraScripts: '<script src="assets/js/ska-rooms.js?v=20260921a"></script>',
+    extraScripts: '<script src="assets/js/ska-rooms.js?v=20260921b"></script>',
   },
   munyonyo: {
     title: 'SKA Munyonyo | Lakeside Boutique Hotel Kampala',
@@ -328,7 +328,7 @@ const PAGES = {
     property: 'munyonyo',
     branch: 'Munyonyo',
     bodyClass: '',
-    extraScripts: '<script src="assets/js/ska-rooms.js?v=20260921a"></script>',
+    extraScripts: '<script src="assets/js/ska-rooms.js?v=20260921b"></script>',
   },
 };
 

@@ -62,6 +62,10 @@
 
   async function handleBooking(form) {
     var d = formData(form);
+    if (!d.branch) {
+      var branchField = form.querySelector('[name="branch"]');
+      d.branch = (branchField && branchField.value) || '';
+    }
     if (!d.name || !d.email || !d.phone || !d.checkin || !d.checkout) {
       showAlert(form, 'danger', 'Please complete all required fields.');
       return;
