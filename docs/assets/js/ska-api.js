@@ -238,7 +238,7 @@
       } catch (e) { /* defaults in SKA_CONFIG */ }
       data.site_email = data.site_email || (cfg && cfg.siteEmail) || 'info@skaboutiquebnb.com';
       if (global.SkaNotify) {
-        try { await SkaNotify.notify('inquiry', data); } catch (e) { /* already saved */ }
+        SkaNotify.notify('inquiry', data).catch(function () {});
       }
       return true;
     },
@@ -283,15 +283,13 @@
       var res = await sb.from('bookings').insert([payload]);
       if (res.error) throw new Error(apiError(res.error));
       if (global.SkaNotify) {
-        try {
-          await SkaNotify.notify('booking', Object.assign({}, data, {
-            total: total,
-            price: price,
-            branch: branchName || data.branch || payload.branch
-          }));
-        } catch (e) {
+        SkaNotify.notify('booking', Object.assign({}, data, {
+          total: total,
+          price: price,
+          branch: branchName || data.branch || payload.branch
+        })).catch(function (e) {
           console.error('[SKA] booking notify:', e.message || e);
-        }
+        });
       }
       return true;
     },
@@ -458,7 +456,7 @@
       });
       if (global.SkaNotify && row) {
         var type = status === 'confirmed' ? 'booking_confirmed' : 'booking_cancelled';
-        try { await SkaNotify.notify(type, row); } catch (e) { /* status already saved */ }
+        SkaNotify.notify(type, row).catch(function () { /* status already saved */ });
       }
       return row;
     },
@@ -496,9 +494,7 @@
         if (row) row.reply_message = text;
       }
       if (global.SkaNotify && row) {
-        try {
-          await SkaNotify.notify('inquiry_reply', Object.assign({}, row, { reply: text }));
-        } catch (e) { /* saved even if mail fails */ }
+        SkaNotify.notify('inquiry_reply', Object.assign({}, row, { reply: text })).catch(function () {});
       }
       return row;
     },

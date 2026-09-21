@@ -968,10 +968,14 @@
       e.preventDefault();
       var id = document.getElementById('inquiryId').value;
       var reply = document.getElementById('inquiryReply').value;
+      if (!String(reply || '').trim()) {
+        showError('Write a reply first.');
+        return;
+      }
+      closeModal('inquiryModal');
+      showToast('Reply sent.');
       try {
         await SkaApi.adminReplyInquiry(id, reply);
-        closeModal('inquiryModal');
-        showToast('Reply emailed to the visitor.');
         loadInquiriesPage();
       } catch (err) {
         showError(err.message || 'Could not send reply');

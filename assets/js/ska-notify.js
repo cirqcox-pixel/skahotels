@@ -3,6 +3,7 @@
  * Naguru bookings  → naguru.booking@skaboutiquebnb.com
  * Munyonyo bookings → munyonyo.booking@skaboutiquebnb.com
  * Inquiries         → info@skaboutiquebnb.com
+ * Staff replies     → visitor email
  */
 (function (global) {
   'use strict';
@@ -10,6 +11,7 @@
   var NAGURU_BOOKING = 'naguru.booking@skaboutiquebnb.com';
   var MUNYONYO_BOOKING = 'munyonyo.booking@skaboutiquebnb.com';
   var INFO_INBOX = 'info@skaboutiquebnb.com';
+  var MAIL_TIMEOUT_MS = 8000;
 
   function cfgNow() {
     return global.SKA_CONFIG || {};
@@ -20,7 +22,7 @@
   }
 
   function adminInbox(type, branch) {
-    if (type === 'inquiry' || type === 'inquiry_reply') {
+    if (type === 'inquiry') {
       return (cfgNow().siteEmail && /@/.test(cfgNow().siteEmail))
         ? cfgNow().siteEmail
         : INFO_INBOX;
@@ -43,12 +45,13 @@
 
   function payloadFor(type, data, to) {
     var guest = String(data.email || '').trim();
+    var reply = data.reply || data.reply_message || '';
     return {
       _subject: subjectFor(type, data),
       _captcha: 'false',
       _template: 'table',
-      _replyto: guest || to,
-      _cc: guest || '',
+      _replyto: type === 'inquiry_reply' ? (cfgNow().siteEmail || INFO_INBOX) : (guest || to),
+      _cc: type === 'inquiry_reply' ? (cfgNow().siteEmail || INFO_INBOX) : (guest || ''),
       type: type,
       name: data.name,
       email: guest,
@@ -64,13 +67,15 @@
       price: data.price || '',
       total: data.total || '',
       season: data.season || '',
-      message: data.reply || data.reply_message || data.message || '',
+      message: reply || data.message || '',
       notify_inbox: to,
       site: cfgNow().siteName || 'SKA The Boutique'
     };
   }
 
   async function postJson(url, body, extraHeaders) {
+    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, MAIL_TIMEOUT_MS) : null;
     var headers = {
       'Content-Type': 'application/json',
       Accept: 'application/json'
@@ -78,71 +83,41 @@
     if (extraHeaders) {
       Object.keys(extraHeaders).forEach(function (k) { headers[k] = extraHeaders[k]; });
     }
-    var res = await fetch(url, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(body)
-    });
-    var text = await res.text().catch(function () { return ''; });
-    var parsed = null;
-    try { parsed = JSON.parse(text); } catch (e) { /* not json */ }
-    if (!res.ok) {
-      throw new Error('Notify failed (' + res.status + '): ' + text.slice(0, 180));
+    try {
+      var res = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(body),
+        signal: ctrl ? ctrl.signal : undefined
+      });
+      var text = await res.text().catch(function () { return ''; });
+      var parsed = null;
+      try { parsed = JSON.parse(text); } catch (e) { /* not json */ }
+      if (!res.ok) {
+        throw new Error('Notify failed (' + res.status + '): ' + text.slice(0, 180));
+      }
+      if (parsed && String(parsed.success) === 'false') {
+        throw new Error(parsed.message || 'Mailer needs inbox activation');
+      }
+      if (parsed && parsed.ok === false) {
+        throw new Error(parsed.error || 'Notify failed');
+      }
+      return true;
+    } finally {
+      if (timer) clearTimeout(timer);
     }
-    if (parsed && String(parsed.success) === 'false') {
-      throw new Error(parsed.message || 'Mailer needs inbox activation');
-    }
-    if (parsed && parsed.ok === false) {
-      throw new Error(parsed.error || 'Notify failed');
-    }
-    return true;
   }
 
   async function sendDirect(type, data) {
-    var to = adminInbox(type, data.branch || '');
+    var guest = String(data.email || '').trim();
+    var to = type === 'inquiry_reply' && guest ? guest : adminInbox(type, data.branch || '');
     var url = 'https://formsubmit.co/ajax/' + encodeURIComponent(to);
     await postJson(url, payloadFor(type, data, to));
     return true;
   }
 
-  async function sendWebhook(type, data) {
-    var cfg = cfgNow();
-    var url = (cfg.notify && cfg.notify.webhookUrl) || '';
-    if (!url && cfg.supabaseUrl) {
-      url = String(cfg.supabaseUrl).replace(/\/$/, '') + '/functions/v1/notify-email';
-    }
-    if (!url) return false;
-    var headers = {};
-    if (cfg.supabaseAnonKey) {
-      headers.Authorization = 'Bearer ' + cfg.supabaseAnonKey;
-      headers.apikey = cfg.supabaseAnonKey;
-    }
-    await postJson(url, {
-      type: type,
-      to: adminInbox(type, data.branch || ''),
-      data: data,
-      site: cfg.siteName || 'SKA The Boutique'
-    }, headers);
-    return true;
-  }
-
   async function notify(type, data) {
-    var results = { inbox: false, webhook: false };
-    var errors = [];
-    try {
-      results.inbox = await sendDirect(type, data);
-    } catch (e) {
-      errors.push(e.message || String(e));
-    }
-    try {
-      results.webhook = await sendWebhook(type, data);
-    } catch (e) {
-      errors.push(e.message || String(e));
-    }
-    if (!results.inbox && !results.webhook) {
-      throw new Error(errors[0] || 'Could not send notification email');
-    }
-    return results;
+    return sendDirect(type, data);
   }
 
   global.SkaNotify = {
