@@ -461,6 +461,19 @@
       return data || [];
     },
 
+    adminDeleteInquiry: async function (id) {
+      var profile = await SkaApi.adminGetProfile();
+      if (!profile || profile.role !== 'super_admin') {
+        throw new Error('Only Super Admin can delete inquiries.');
+      }
+      var inquiryId = parseInt(id, 10);
+      if (!inquiryId) throw new Error('Invalid inquiry id.');
+      await adminRequest(function (sb) {
+        return sb.from('inquiries').delete().eq('id', inquiryId);
+      });
+      return true;
+    },
+
     adminMarkInquiryRead: async function (id, isRead) {
       return adminRequest(function (sb) {
         return sb.from('inquiries').update({ is_read: !!isRead }).eq('id', id).select().single();

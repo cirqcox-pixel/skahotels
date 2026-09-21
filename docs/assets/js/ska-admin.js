@@ -915,9 +915,60 @@
       prev.textContent = '';
     }
     document.getElementById('inquiryReply').value = '';
+    var delBtn = document.getElementById('inquiryModalDelete');
+    if (delBtn) {
+      delBtn.style.display = (adminProfile && adminProfile.role === 'super_admin') ? '' : 'none';
+    }
     openModal('inquiryModal');
     if (!q.is_read) {
       SkaApi.adminMarkInquiryRead(q.id, true).catch(function () {});
+    }
+  }
+
+  function renderInquiriesTable() {
+    var tbody = document.getElementById('inquiriesTableBody');
+    if (!tbody) return;
+    var isSuper = adminProfile && adminProfile.role === 'super_admin';
+    if (!inquiriesCache.length) {
+      tbody.innerHTML = '<tr><td colspan="7" class="ska-table-empty">No inquiries yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = inquiriesCache.map(function (q) {
+      var msg = (q.message || '').slice(0, 80);
+      if ((q.message || '').length > 80) msg += '…';
+      var status = q.replied_at || q.reply_message
+        ? '<span class="ska-badge ska-badge--confirmed">Replied</span>'
+        : (q.is_read ? 'Read' : '<strong>New</strong>');
+      var actions = '<button type="button" class="ska-btn ska-btn--primary ska-btn--sm" data-open-inquiry="' + q.id + '">Open</button>';
+      if (isSuper) {
+        actions += ' <button type="button" class="ska-btn ska-btn--outline ska-btn--sm" data-delete-inquiry="' + q.id + '" title="Delete permanently">Delete</button>';
+      }
+      return '<tr>' +
+        '<td>' + esc(q.name) + '</td>' +
+        '<td>' + esc(q.email) + '</td>' +
+        '<td>' + esc(q.subject || '—') + '</td>' +
+        '<td>' + esc(msg) + '</td>' +
+        '<td>' + fmtShortDate(q.created_at) + '</td>' +
+        '<td>' + status + '</td>' +
+        '<td><div class="d-flex gap-2">' + actions + '</div></td></tr>';
+    }).join('');
+  }
+
+  async function deleteInquiry(id) {
+    if (!adminProfile || adminProfile.role !== 'super_admin') {
+      showError('Only Super Admin can delete inquiries.');
+      return;
+    }
+    if (!confirm('Permanently delete this inquiry and its replies? This cannot be undone.')) return;
+    closeModal('inquiryModal');
+    inquiriesCache = inquiriesCache.filter(function (row) { return String(row.id) !== String(id); });
+    renderInquiriesTable();
+    showToast('Inquiry deleted.');
+    try {
+      await SkaApi.adminDeleteInquiry(id);
+    } catch (err) {
+      showError(err.message || 'Delete failed');
+      loadInquiriesPage();
     }
   }
 
@@ -929,34 +980,8 @@
 
     hideError();
     try {
-      var inquiries = await withTimeout(SkaApi.adminFetchInquiries());
-      inquiriesCache = inquiries;
-      if (!inquiries.length) {
-        tbody.innerHTML = '<tr><td colspan="7" class="ska-table-empty">No inquiries yet.</td></tr>';
-        return;
-      }
-      tbody.innerHTML = inquiries.map(function (q) {
-        var msg = (q.message || '').slice(0, 80);
-        if ((q.message || '').length > 80) msg += '…';
-        var status = q.replied_at || q.reply_message
-          ? '<span class="ska-badge ska-badge--confirmed">Replied</span>'
-          : (q.is_read ? 'Read' : '<strong>New</strong>');
-        return '<tr>' +
-          '<td>' + esc(q.name) + '</td>' +
-          '<td>' + esc(q.email) + '</td>' +
-          '<td>' + esc(q.subject || '—') + '</td>' +
-          '<td>' + esc(msg) + '</td>' +
-          '<td>' + fmtShortDate(q.created_at) + '</td>' +
-          '<td>' + status + '</td>' +
-          '<td><button type="button" class="ska-btn ska-btn--primary ska-btn--sm" data-open-inquiry="' + q.id + '">Open</button></td></tr>';
-      }).join('');
-
-      tbody.querySelectorAll('[data-open-inquiry]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          var q = inquiries.find(function (row) { return String(row.id) === btn.getAttribute('data-open-inquiry'); });
-          if (q) openInquiry(q);
-        });
-      });
+      inquiriesCache = await withTimeout(SkaApi.adminFetchInquiries());
+      renderInquiriesTable();
     } catch (e) {
       showError('Could not load inquiries: ' + (e.message || e));
       tbody.innerHTML = '<tr><td colspan="7" class="ska-table-empty">Failed to load inquiries.</td></tr>';
@@ -966,6 +991,22 @@
   function initInquiriesPage() {
     ['inquiryModalClose', 'inquiryModalCancel'].forEach(function (id) {
       document.getElementById(id)?.addEventListener('click', function () { closeModal('inquiryModal'); });
+    });
+    document.getElementById('inquiriesTableBody')?.addEventListener('click', function (e) {
+      var openBtn = e.target.closest('[data-open-inquiry]');
+      if (openBtn) {
+        var q = inquiriesCache.find(function (row) {
+          return String(row.id) === openBtn.getAttribute('data-open-inquiry');
+        });
+        if (q) openInquiry(q);
+        return;
+      }
+      var delBtn = e.target.closest('[data-delete-inquiry]');
+      if (delBtn) deleteInquiry(delBtn.getAttribute('data-delete-inquiry'));
+    });
+    document.getElementById('inquiryModalDelete')?.addEventListener('click', function () {
+      var id = document.getElementById('inquiryId').value;
+      if (id) deleteInquiry(id);
     });
     document.getElementById('inquiryReplyForm')?.addEventListener('submit', async function (e) {
       e.preventDefault();
