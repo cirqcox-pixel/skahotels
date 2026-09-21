@@ -512,11 +512,6 @@
     });
   }
 
-  var FORMSPREE_DEFAULTS = {
-    naguru_formspree: 'myegbgjy',
-    munyonyo_formspree: 'xzezenyo'
-  };
-
   async function loadSettingsPage() {
     var form = document.getElementById('settingsForm');
     if (!form) return;
@@ -529,8 +524,6 @@
         if (!el.name) return;
         if (map[el.name] != null && String(map[el.name]).trim() !== '') {
           el.value = map[el.name];
-        } else if (FORMSPREE_DEFAULTS[el.name]) {
-          el.value = FORMSPREE_DEFAULTS[el.name];
         }
       });
     } catch (e) {

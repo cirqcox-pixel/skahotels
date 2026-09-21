@@ -14,27 +14,8 @@ window.SKA_CONFIG = {
     Munyonyo: 'munyonyo.booking@skaboutiquebnb.com'
   },
 
-  /**
-   * Formspree — email alerts for GitHub Pages forms
-   * 1. Sign up at https://formspree.io
-   * 2. Create two forms (or one) → copy the form ID (e.g. xyzeabcd)
-   * 3. Paste IDs below. Same ID for both is fine if you prefer one inbox.
-   */
-  formspree: {
-    /** Naguru — https://formspree.io/f/myegbgjy */
-    booking: 'myegbgjy',
-    /** Munyonyo — https://formspree.io/f/xzezenyo */
-    bookingMunyonyo: 'xzezenyo',
-    inquiry: 'myegbgjy'
-  },
-
-  /**
-   * Optional Resend via Supabase Edge Function (see supabase/functions/notify-email)
-   * Leave empty if using Formspree only.
-   */
   notify: {
-    webhookUrl: 'https://nllqkepymtwwbvbjnbyz.supabase.co/functions/v1/notify-email',
-    to: 'naguru.booking@skaboutiquebnb.com'
+    webhookUrl: 'https://nllqkepymtwwbvbjnbyz.supabase.co/functions/v1/notify-email'
   },
 
   /** GitHub Pages project site base path (repo: cirqcox-pixel/skahotels) */

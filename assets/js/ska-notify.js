@@ -1,17 +1,15 @@
 /**
- * SKA Hotels — Formspree email notifications (GitHub Pages)
- * Naguru  → https://formspree.io/f/myegbgjy  → naguru.booking@
- * Munyonyo → https://formspree.io/f/xzezenyo → munyonyo.booking@
- * (Munyonyo falls back to myegbgjy if xzezenyo is unavailable)
+ * SKA Hotels — booking / inquiry email (no Formspree)
+ * Naguru bookings  → naguru.booking@skaboutiquebnb.com
+ * Munyonyo bookings → munyonyo.booking@skaboutiquebnb.com
+ * Inquiries         → info@skaboutiquebnb.com
  */
 (function (global) {
   'use strict';
 
   var NAGURU_BOOKING = 'naguru.booking@skaboutiquebnb.com';
   var MUNYONYO_BOOKING = 'munyonyo.booking@skaboutiquebnb.com';
-  var NAGURU_FORM = 'myegbgjy';
-  var MUNYONYO_FORM = 'xzezenyo';
-  var SHARED_FORM = NAGURU_FORM;
+  var INFO_INBOX = 'info@skaboutiquebnb.com';
 
   function cfgNow() {
     return global.SKA_CONFIG || {};
@@ -21,165 +19,134 @@
     return /muny/i.test(String(branch || ''));
   }
 
-  function adminInbox(branch) {
-    if (isMunyonyo(branch)) return MUNYONYO_BOOKING;
-    return NAGURU_BOOKING;
-  }
-
-  /** Only accept real Formspree legacy hashes (6–10 chars). Rejects skaMunyonyoBooking etc. */
-  function validFormId(id) {
-    return /^[a-z0-9]{6,10}$/i.test(String(id || '').trim());
-  }
-
-  function formIdForBranch(branch) {
-    var f = cfgNow().formspree || {};
+  function adminInbox(type, branch) {
+    if (type === 'inquiry' || type === 'inquiry_reply') {
+      return (cfgNow().siteEmail && /@/.test(cfgNow().siteEmail))
+        ? cfgNow().siteEmail
+        : INFO_INBOX;
+    }
+    var emails = cfgNow().branchEmails || {};
     if (isMunyonyo(branch)) {
-      var m = String(f.bookingMunyonyo || '').trim();
-      return validFormId(m) ? m : MUNYONYO_FORM;
+      return emails.Munyonyo || MUNYONYO_BOOKING;
     }
-    var n = String(f.booking || f.endpoint || '').trim();
-    return validFormId(n) ? n : NAGURU_FORM;
+    return emails.Naguru || NAGURU_BOOKING;
   }
 
-  function formUrl(id) {
-    if (!id) return '';
-    if (id.indexOf('http') === 0) return id;
-    return 'https://formspree.io/f/' + id;
+  function subjectFor(type, data) {
+    var branch = data.branch || 'Property';
+    if (type === 'booking_confirmed') return 'SKA Booking Confirmed — ' + branch;
+    if (type === 'booking_cancelled') return 'SKA Booking Cancelled — ' + branch;
+    if (type === 'booking') return 'SKA Booking Request — ' + branch;
+    if (type === 'inquiry_reply') return 'Re: ' + (data.subject || 'Your SKA inquiry');
+    return 'SKA Contact: ' + (data.subject || 'General Inquiry');
   }
 
-  function formspreeUrlForBranch(branch) {
-    return formUrl(formIdForBranch(branch));
-  }
-
-  function formspreeUrl(key) {
-    var f = cfgNow().formspree || {};
-    var id = f[key] || f.endpoint || '';
-    if (!validFormId(id)) id = NAGURU_FORM;
-    return formUrl(id);
-  }
-
-  async function postJson(url, payload) {
-    var res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) {
-      var text = await res.text().catch(function () { return ''; });
-      throw new Error('Formspree ' + res.status + ': ' + text.slice(0, 180));
-    }
-    return true;
-  }
-
-  function bookingFormspreePayload(type, data) {
-    var branch = String(data.branch || 'Property');
-    var bookingSubject = type === 'booking_confirmed'
-      ? 'SKA Booking Confirmed — '
-      : type === 'booking_cancelled'
-        ? 'SKA Booking Cancelled — '
-        : 'SKA Booking Request — ';
+  function payloadFor(type, data, to) {
     var guest = String(data.email || '').trim();
-    var muny = isMunyonyo(branch);
-    var ccList = muny
-      ? [guest].filter(Boolean)
-      : [adminInbox(branch), guest].filter(Boolean);
     return {
-      _subject: bookingSubject + branch,
-      _replyto: guest,
-      _cc: ccList.join(','),
-      type: 'booking',
+      _subject: subjectFor(type, data),
+      _captcha: 'false',
+      _template: 'table',
+      _replyto: guest || to,
+      _cc: guest || '',
+      type: type,
       name: data.name,
-      email: data.email,
+      email: guest,
       phone: data.phone || '',
       whatsapp: data.whatsapp || '',
-      branch: branch,
+      branch: data.branch || '',
       room_type: data.room_type || '',
       package_option: data.package_option || '',
       guests: data.guests || '',
-      currency: data.currency || '',
+      currency: data.currency || 'USD',
       checkin: data.checkin || '',
       checkout: data.checkout || '',
       price: data.price || '',
       total: data.total || '',
       season: data.season || '',
-      message: data.message || '',
-      notify_email: adminInbox(branch),
+      message: data.reply || data.reply_message || data.message || '',
+      notify_inbox: to,
       site: cfgNow().siteName || 'SKA The Boutique'
     };
   }
 
-  async function sendBookingFormspree(type, data) {
-    var branch = data.branch || '';
-    var payload = bookingFormspreePayload(type, data);
-    var primaryId = formIdForBranch(branch);
-    var primaryUrl = formUrl(primaryId);
-
-    try {
-      await postJson(primaryUrl, payload);
-      return true;
-    } catch (primaryErr) {
-      if (!isMunyonyo(branch) || primaryId === SHARED_FORM) {
-        throw primaryErr;
-      }
-      console.warn('[SKA Notify] Munyonyo form unavailable, using Naguru form fallback:', primaryErr.message || primaryErr);
-      await postJson(formUrl(SHARED_FORM), payload);
-      return true;
+  async function postJson(url, body, extraHeaders) {
+    var headers = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    };
+    if (extraHeaders) {
+      Object.keys(extraHeaders).forEach(function (k) { headers[k] = extraHeaders[k]; });
     }
+    var res = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(body)
+    });
+    var text = await res.text().catch(function () { return ''; });
+    var parsed = null;
+    try { parsed = JSON.parse(text); } catch (e) { /* not json */ }
+    if (!res.ok) {
+      throw new Error('Notify failed (' + res.status + '): ' + text.slice(0, 180));
+    }
+    if (parsed && String(parsed.success) === 'false') {
+      throw new Error(parsed.message || 'Mailer needs inbox activation');
+    }
+    if (parsed && parsed.ok === false) {
+      throw new Error(parsed.error || 'Notify failed');
+    }
+    return true;
   }
 
-  async function sendFormspree(type, data) {
-    if (type === 'booking' || type === 'booking_confirmed' || type === 'booking_cancelled') {
-      return sendBookingFormspree(type, data);
-    }
+  async function sendDirect(type, data) {
+    var to = adminInbox(type, data.branch || '');
+    var url = 'https://formsubmit.co/ajax/' + encodeURIComponent(to);
+    await postJson(url, payloadFor(type, data, to));
+    return true;
+  }
 
-    var url = formspreeUrl(type) || formspreeUrl('inquiry');
-    if (!url) return false;
+  async function sendWebhook(type, data) {
     var cfg = cfgNow();
-    var payload;
-
-    if (type === 'inquiry_reply') {
-      var info = (cfg.siteEmail || (cfg.notify && cfg.notify.info) || 'info@skaboutiquebnb.com');
-      payload = {
-        _subject: 'Re: ' + (data.subject || 'Your SKA inquiry'),
-        _replyto: info,
-        _cc: data.email || '',
-        type: 'inquiry_reply',
-        name: data.name,
-        email: data.email,
-        message: data.reply || data.reply_message || data.message || '',
-        site: cfg.siteName || 'SKA The Boutique'
-      };
-    } else {
-      payload = {
-        _subject: 'SKA Contact: ' + (data.subject || 'General Inquiry'),
-        _replyto: data.email,
-        _cc: [cfg.siteEmail || 'info@skaboutiquebnb.com', data.email].filter(Boolean).join(','),
-        type: 'inquiry',
-        name: data.name,
-        email: data.email,
-        phone: data.phone || '',
-        subject: data.subject || 'General Inquiry',
-        message: data.message || '',
-        site: cfg.siteName || 'SKA The Boutique'
-      };
+    var url = (cfg.notify && cfg.notify.webhookUrl) || '';
+    if (!url && cfg.supabaseUrl) {
+      url = String(cfg.supabaseUrl).replace(/\/$/, '') + '/functions/v1/notify-email';
     }
-
-    await postJson(url, payload);
+    if (!url) return false;
+    var headers = {};
+    if (cfg.supabaseAnonKey) {
+      headers.Authorization = 'Bearer ' + cfg.supabaseAnonKey;
+      headers.apikey = cfg.supabaseAnonKey;
+    }
+    await postJson(url, {
+      type: type,
+      to: adminInbox(type, data.branch || ''),
+      data: data,
+      site: cfg.siteName || 'SKA The Boutique'
+    }, headers);
     return true;
   }
 
   async function notify(type, data) {
-    await sendFormspree(type, data);
-    return { formspree: true };
+    var results = { inbox: false, webhook: false };
+    var errors = [];
+    try {
+      results.inbox = await sendDirect(type, data);
+    } catch (e) {
+      errors.push(e.message || String(e));
+    }
+    try {
+      results.webhook = await sendWebhook(type, data);
+    } catch (e) {
+      errors.push(e.message || String(e));
+    }
+    if (!results.inbox && !results.webhook) {
+      throw new Error(errors[0] || 'Could not send notification email');
+    }
+    return results;
   }
 
   global.SkaNotify = {
     notify: notify,
-    sendFormspree: sendFormspree,
-    adminInbox: adminInbox,
-    validFormId: validFormId
+    adminInbox: function (branch) { return adminInbox('booking', branch); }
   };
 })(window);

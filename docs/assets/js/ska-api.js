@@ -283,11 +283,15 @@
       var res = await sb.from('bookings').insert([payload]);
       if (res.error) throw new Error(apiError(res.error));
       if (global.SkaNotify) {
-        await SkaNotify.notify('booking', Object.assign({}, data, {
-          total: total,
-          price: price,
-          branch: branchName || data.branch || payload.branch
-        }));
+        try {
+          await SkaNotify.notify('booking', Object.assign({}, data, {
+            total: total,
+            price: price,
+            branch: branchName || data.branch || payload.branch
+          }));
+        } catch (e) {
+          console.error('[SKA] booking notify:', e.message || e);
+        }
       }
       return true;
     },
@@ -390,19 +394,6 @@
       }
       if (map.munyonyo_notify_email && /@/.test(map.munyonyo_notify_email)) {
         cfg.branchEmails.Munyonyo = map.munyonyo_notify_email;
-      }
-      cfg.formspree = cfg.formspree || {};
-      var validId = global.SkaNotify && SkaNotify.validFormId
-        ? SkaNotify.validFormId.bind(SkaNotify)
-        : function (v) { return /^[a-z0-9]{6,10}$/i.test(String(v || '').trim()); };
-      if (map.naguru_formspree && validId(map.naguru_formspree)) {
-        cfg.formspree.booking = String(map.naguru_formspree).trim();
-      }
-      if (map.munyonyo_formspree && validId(map.munyonyo_formspree)) {
-        cfg.formspree.bookingMunyonyo = String(map.munyonyo_formspree).trim();
-      }
-      if (cfg.notify && (map.naguru_notify_email || map.site_email)) {
-        cfg.notify.to = map.naguru_notify_email || map.site_email;
       }
       return map;
     },
