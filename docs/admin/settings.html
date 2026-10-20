@@ -74,6 +74,26 @@
       </div>
 
       <div class="ska-card" style="margin-bottom:20px">
+        <div class="ska-card__header"><h2 class="ska-card__title">Branding &amp; <span>media</span></h2></div>
+        <div class="ska-card__body">
+          <p class="ska-hint">Choose a file and it uploads straight away; press <strong>Save settings</strong> to publish it. Images and videos up to 200 MB (large photos are resized automatically). Leave empty to keep the default.</p>
+          <div class="ska-form-grid">
+            <div class="ska-form-field ska-form-field--full"><label>Logo (navigation bar)</label>
+              <input class="ska-input" name="brand_logo" data-group="branding" placeholder="https://… or upload below">
+              <input type="file" class="ska-input" data-upload-for="brand_logo" data-folder="branding" accept="image/jpeg,image/png,image/webp">
+              <img data-preview-for="brand_logo" alt="" style="display:none;max-height:60px;margin-top:8px"></div>
+            <div class="ska-form-field ska-form-field--full"><label>Naguru hero video</label>
+              <input class="ska-input" name="naguru_hero_video" data-group="branding" placeholder="https://… or upload below">
+              <input type="file" class="ska-input" data-upload-for="naguru_hero_video" data-folder="branding" accept="video/mp4,video/webm"></div>
+            <div class="ska-form-field ska-form-field--full"><label>Munyonyo hero video</label>
+              <input class="ska-input" name="munyonyo_hero_video" data-group="branding" placeholder="https://… or upload below">
+              <input type="file" class="ska-input" data-upload-for="munyonyo_hero_video" data-folder="branding" accept="video/mp4,video/webm"></div>
+          </div>
+          <div id="brandUploadStatus" class="ska-hint" style="margin-top:8px"></div>
+        </div>
+      </div>
+
+      <div class="ska-card" style="margin-bottom:20px">
         <div class="ska-card__header"><h2 class="ska-card__title">Follow <span>us</span></h2></div>
         <div class="ska-card__body">
           <div class="ska-form-grid">

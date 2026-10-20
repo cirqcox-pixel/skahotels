@@ -538,6 +538,28 @@
     var form = document.getElementById('settingsForm');
     if (!form || form.dataset.bound === '1') return;
     form.dataset.bound = '1';
+    form.querySelectorAll('input[type=file][data-upload-for]').forEach(function (inp) {
+      inp.addEventListener('change', async function () {
+        var file = inp.files && inp.files[0];
+        if (!file) return;
+        var name = inp.getAttribute('data-upload-for');
+        var status = document.getElementById('brandUploadStatus');
+        hideError();
+        if (status) status.textContent = 'Uploading ' + file.name + '…';
+        try {
+          var url = await SkaApi.adminUploadPublicFile(inp.getAttribute('data-folder') || 'branding', file);
+          var field = form.elements[name];
+          if (field) field.value = url;
+          var prev = form.querySelector('[data-preview-for="' + name + '"]');
+          if (prev) { prev.src = url; prev.style.display = ''; }
+          if (status) status.textContent = 'Uploaded. Press “Save settings” to publish.';
+        } catch (err) {
+          if (status) status.textContent = '';
+          showError(err.message || 'Upload failed');
+        }
+        inp.value = '';
+      });
+    });
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
       var rows = [];
@@ -704,9 +726,6 @@
         loadPromotionsPage();
       } catch (err) {
         var msg = err.message || 'Save failed';
-        if (/bucket|not found|row-level security/i.test(msg)) {
-          msg = 'Image upload needs the ska-uploads bucket. In Supabase SQL Editor run supabase/migrations/010_storage_uploads.sql, then try again.';
-        }
         showError(msg);
       }
     });
@@ -888,9 +907,6 @@
         loadPackagesPage();
       } catch (err) {
         var msg = err.message || 'Save failed';
-        if (/bucket|not found|row-level security/i.test(msg)) {
-          msg = 'Image upload needs the ska-uploads bucket. In Supabase SQL Editor run supabase/migrations/010_storage_uploads.sql, then try again.';
-        }
         showError(msg);
       }
     });

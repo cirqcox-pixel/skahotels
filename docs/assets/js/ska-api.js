@@ -42,6 +42,22 @@
     return msg.indexOf('jwt') >= 0 || msg.indexOf('expired') >= 0 || msg.indexOf('invalid') >= 0;
   }
 
+  // Resize large photos in the browser (max 2000px, JPEG ~85%). Returns null to upload the original.
+  function shrinkImage(file) {
+    return new Promise(function (resolve) {
+      if (file.size < 800 * 1024 || !global.createImageBitmap || !document.createElement) { resolve(null); return; }
+      global.createImageBitmap(file).then(function (bmp) {
+        var max = 2000;
+        var scale = Math.min(1, max / Math.max(bmp.width, bmp.height));
+        var c = document.createElement('canvas');
+        c.width = Math.round(bmp.width * scale);
+        c.height = Math.round(bmp.height * scale);
+        c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+        c.toBlob(function (blob) { resolve(blob && blob.size < file.size ? blob : null); }, 'image/jpeg', 0.85);
+      }).catch(function () { resolve(null); });
+    });
+  }
+
   async function adminRequest(queryFn) {
     var sb = getClient();
     var res = await queryFn(sb);
@@ -583,21 +599,51 @@
     },
 
     adminUploadPublicFile: async function (folder, file) {
-      if (!file) throw new Error('Choose an image first.');
+      if (!file) throw new Error('Choose a file first.');
       var ext = String(file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (['jpg', 'jpeg', 'png', 'webp', 'gif'].indexOf(ext) < 0) {
-        throw new Error('Use a JPG, PNG, or WebP image.');
+      var imageExts = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+      var videoExts = ['mp4', 'webm', 'mov'];
+      var isVideo = videoExts.indexOf(ext) >= 0 || /^video\//.test(file.type || '');
+      if (!isVideo && imageExts.indexOf(ext) < 0) {
+        throw new Error('Use a JPG, PNG or WebP image, or an MP4/WebM video.');
       }
-      if (file.size > 2.5 * 1024 * 1024) {
-        throw new Error('Image must be under 2.5 MB.');
+      var body = file;
+      var contentType = file.type || (isVideo ? 'video/mp4' : 'image/jpeg');
+      if (!isVideo && ext !== 'gif') {
+        // Phone photos are often 5-10 MB: shrink to web size before uploading.
+        var small = await shrinkImage(file);
+        if (small) { body = small; ext = 'jpg'; contentType = 'image/jpeg'; }
+      }
+      var limit = 200;
+      if (body.size > limit * 1024 * 1024) {
+        throw new Error((isVideo ? 'Video' : 'Image') + ' must be under ' + limit + ' MB (this one is ' + (body.size / 1048576).toFixed(1) + ' MB).');
       }
       var path = (folder || 'misc') + '/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
-      var data = await adminRequest(function (sb) {
-        return sb.storage.from('ska-uploads').upload(path, file, {
-          upsert: true,
-          contentType: file.type || 'image/jpeg'
+      var data;
+      try {
+        data = await adminRequest(function (sb) {
+          return sb.storage.from('ska-uploads').upload(path, body, {
+            upsert: true,
+            cacheControl: '31536000',
+            contentType: contentType
+          });
         });
-      });
+      } catch (e) {
+        var m = String((e && e.message) || e);
+        if (/bucket not found|not found/i.test(m)) {
+          throw new Error('Upload storage is not set up. In Supabase SQL Editor run supabase/migrations/011_storage_media_limits.sql, then try again.');
+        }
+        if (/row-level security|policy|unauthorized|not allowed/i.test(m)) {
+          throw new Error('Upload was refused: your account is not an allowed admin, or the storage policies are missing. Run supabase/migrations/011_storage_media_limits.sql and sign in again.');
+        }
+        if (/exceeded|too large|payload|size/i.test(m)) {
+          throw new Error('File is too large for the storage limit. Try a smaller file.');
+        }
+        if (/mime|type/i.test(m)) {
+          throw new Error('That file type is not allowed. Use JPG, PNG, WebP, MP4 or WebM.');
+        }
+        throw e;
+      }
       var sb = getClient();
       var pub = sb.storage.from('ska-uploads').getPublicUrl((data && data.path) || path);
       return (pub.data && pub.data.publicUrl) || path;

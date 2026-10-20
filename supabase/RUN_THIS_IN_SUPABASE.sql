@@ -162,9 +162,8 @@ CREATE TABLE IF NOT EXISTS admins (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- ── Storage bucket for uploads (run separately if needed) ──────────────────
--- INSERT INTO storage.buckets (id, name, public) VALUES ('ska-uploads', 'ska-uploads', true)
--- ON CONFLICT DO NOTHING;
+-- ── Storage bucket for uploads ─────────────────────────────────────────────
+-- Bucket + policies live in migrations/011_storage_media_limits.sql (run it after this file).
 
 -- ── Updated_at trigger ───────────────────────────────────────────────────
 CREATE OR REPLACE FUNCTION ska_set_updated_at()

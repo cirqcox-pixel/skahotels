@@ -79,12 +79,30 @@
     }
   }
 
+  function applyBranding(map) {
+    if (map.brand_logo) {
+      document.querySelectorAll('.ska-logo img').forEach(function (img) { img.setAttribute('src', map.brand_logo); });
+    }
+    var page = (location.pathname.split('/').pop() || '').replace(/\.(html|php)$/, '').toLowerCase();
+    var vid = page === 'naguru' ? map.naguru_hero_video : page === 'munyonyo' ? map.munyonyo_hero_video : '';
+    if (vid) {
+      var video = document.querySelector('header.hero video, .hero video');
+      if (video) {
+        var src = video.querySelector('source');
+        if (src) src.setAttribute('src', vid); else video.setAttribute('src', vid);
+        video.load();
+        var p = video.play(); if (p && p.catch) p.catch(function () {});
+      }
+    }
+  }
+
   async function init() {
     if (!global.SkaApi || !SkaApi.isAvailable()) return;
     try {
       var map = await SkaApi.fetchSettings();
       SkaApi.applyPublicSettings(map);
       applyFooter(map);
+      applyBranding(map);
       applyLocation(map);
     } catch (e) {
       console.warn('[SKA Site] settings skipped', e);
