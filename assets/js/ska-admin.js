@@ -537,6 +537,7 @@
         home_naguru_card_image: 'assets/images/ska_naguru_home.jpeg', home_munyonyo_card_image: 'assets/images/ska_munyonyo_home2.jpg',
         home_careers_image: 'assets/images/ska_art_home.jpg', about_hero_image: 'assets/images/dube_munyonyo.jpg',
         offers_hero_image: 'assets/images/ska_naguru_home.jpeg', meetings_events_hero_image: 'assets/images/ska_munyonyo_home2.jpg',
+        meetings_business_image: 'assets/images/ska_furniture_home.jpg', meetings_weddings_image: 'assets/images/ska_art_home.jpg', meetings_social_image: 'assets/images/ska_naguru_home.jpeg',
         contact_hero_image: 'assets/images/ska_naguru_home.jpeg', packages_hero_image: 'assets/images/ska_naguru_home.jpeg',
         naguru_overview_image: 'assets/images/ska_naguru_home.jpeg', munyonyo_overview_image: 'assets/images/ska_munyonyo_home.jpg'
       };

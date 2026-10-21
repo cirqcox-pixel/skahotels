@@ -107,6 +107,11 @@
     }
     if (page === 'naguru') setSrc('.marketplace-image img', map.naguru_overview_image);
     if (page === 'munyonyo') setSrc('.marketplace-image img', map.munyonyo_overview_image);
+    if (page === 'meetings-events') {
+      setBackground('#meetings .ska-feature-card__img', map.meetings_business_image);
+      setBackground('#weddings .ska-feature-card__img', map.meetings_weddings_image);
+      setBackground('#social .ska-feature-card__img', map.meetings_social_image);
+    }
     var vid = page === 'naguru' ? map.naguru_hero_video : page === 'munyonyo' ? map.munyonyo_hero_video : '';
     if (vid) {
       var video = document.querySelector('header.hero video, .hero video');
