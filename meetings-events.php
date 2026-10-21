@@ -35,7 +35,8 @@ include 'includes/page-start.php';
     <div class="ska-grid-3">
       <?php foreach ($blocks as $block): ?>
       <article class="ska-feature-card" id="<?= htmlspecialchars($block['block_key']) ?>">
-        <div class="ska-feature-card__img" style="background-image:url('<?= htmlspecialchars($block['image'] ?: 'assets/images/ska_naguru_home.jpeg') ?>')"></div>
+        <?php $imageKey = 'meetings_' . preg_replace('/[^a-z0-9_]/', '_', $block['block_key']) . '_image'; ?>
+        <div class="ska-feature-card__img" style="background-image:url('<?= htmlspecialchars(cms_setting($imageKey, $block['image'] ?: 'assets/images/ska_naguru_home.jpeg')) ?>')"></div>
         <div class="ska-feature-card__body">
           <?php if ($block['tag']): ?><p class="ska-feature-card__tag"><?= htmlspecialchars($block['tag']) ?></p><?php endif; ?>
           <h2 class="ska-feature-card__title"><?= htmlspecialchars($block['title']) ?></h2>

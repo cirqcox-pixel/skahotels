@@ -11,7 +11,7 @@ $pageMeta = [
     'description' => 'Book SKA Naguru — an elegant boutique B&B in Naguru, Kampala. Seasonal rates, direct booking benefits, free breakfast and Wi-Fi. Reserve your room today.',
     'path'        => 'naguru',
     'type'        => 'hotel',
-    'image'       => $branch['image'],
+    'image'       => cms_setting('naguru_overview_image', $branch['image']),
     'schema'      => [
         '@context'  => 'https://schema.org',
         '@type'     => 'Hotel',
@@ -516,7 +516,7 @@ $roomsJson = json_encode($allRooms, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT
       </div>
     </div>
     <div class="marketplace-image">
-      <img src="assets/images/ska_naguru_home.jpeg" alt="Ska Naguru"
+      <img src="<?= htmlspecialchars(cms_setting('naguru_overview_image', 'assets/images/ska_naguru_home.jpeg')) ?>" alt="Ska Naguru"
            onerror="this.parentElement.style.background='#2a2a2a';this.remove()">
     </div>
   </div>
@@ -531,7 +531,7 @@ $roomsJson = json_encode($allRooms, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT
     <div class="more-ways-grid">
       <div class="mw-card">
         <div class="mw-img-side">
-          <img src="<?= htmlspecialchars($naguruDining['image'] ?: 'assets/images/naguru/restaurant.jpg') ?>" alt="<?= htmlspecialchars($naguruDining['title'] ?: 'Restaurant') ?>"
+          <img src="<?= htmlspecialchars(cms_setting('naguru_dining_image', $naguruDining['image'] ?: 'assets/images/naguru/restaurant.jpg')) ?>" alt="<?= htmlspecialchars($naguruDining['title'] ?: 'Restaurant') ?>"
                onerror="this.parentElement.style.background='#c8c4bc';this.remove()">
         </div>
         <div class="mw-text-side">
@@ -549,7 +549,7 @@ $roomsJson = json_encode($allRooms, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT
           <?php if ($naguruGarden['link_url']): ?><a href="<?= htmlspecialchars($naguruGarden['link_url']) ?>" class="mw-link"><?= htmlspecialchars($naguruGarden['link_label'] ?: 'Learn More') ?> →</a><?php endif; ?>
         </div>
         <div class="mw-img-side">
-          <img src="<?= htmlspecialchars($naguruGarden['image'] ?: 'assets/images/naguru/garden.jpg') ?>" alt="<?= htmlspecialchars($naguruGarden['title'] ?: 'Gardens') ?>"
+          <img src="<?= htmlspecialchars(cms_setting('naguru_garden_image', $naguruGarden['image'] ?: 'assets/images/naguru/garden.jpg')) ?>" alt="<?= htmlspecialchars($naguruGarden['title'] ?: 'Gardens') ?>"
                onerror="this.parentElement.style.background='#d5d0c8';this.remove()">
         </div>
       </div>

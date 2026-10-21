@@ -19,12 +19,13 @@
 function ska_render_seo(array $meta = []): void
 {
     require_once __DIR__ . '/../config/site.php';
+    require_once __DIR__ . '/../config/cms.php';
 
     $title       = htmlspecialchars($meta['title'] ?? SITE_NAME . ' | ' . SITE_TAGLINE, ENT_QUOTES, 'UTF-8');
     $description = htmlspecialchars($meta['description'] ?? 'Book direct at SKA The Boutique — refined boutique bed & breakfast in Naguru and Munyonyo, Kampala. Best rates, free breakfast, Wi-Fi and flexible check-in.', ENT_QUOTES, 'UTF-8');
     $path        = trim($meta['path'] ?? '', '/');
     $canonical   = ska_url($path);
-    $image       = $meta['image'] ?? 'assets/images/ska_naguru_home.jpeg';
+    $image       = $meta['image'] ?? cms_setting('brand_social_share_image', 'assets/images/ska_naguru_home.jpeg');
     $imageAbs    = str_starts_with($image, 'http') ? $image : ska_url($image);
     $ogType      = ($meta['type'] ?? 'website') === 'article' ? 'article' : 'website';
     $robots      = !empty($meta['noindex']) ? 'noindex, nofollow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
@@ -85,8 +86,9 @@ function ska_render_seo(array $meta = []): void
     echo "<meta name=\"twitter:image\" content=\"{$imageAbs}\">\n";
     echo "<meta name=\"twitter:image:alt\" content=\"" . htmlspecialchars(SITE_NAME . ' boutique hotel in Kampala', ENT_QUOTES, 'UTF-8') . "\">\n";
 
-    echo "<link rel=\"icon\" href=\"assets/images/favicon.png\" type=\"image/png\">\n";
-    echo "<link rel=\"apple-touch-icon\" href=\"assets/images/favicon.png\">\n";
+    $favicon = htmlspecialchars(cms_setting('brand_favicon_image', 'assets/images/favicon.png'), ENT_QUOTES, 'UTF-8');
+    echo "<link rel=\"icon\" href=\"{$favicon}\" type=\"image/png\">\n";
+    echo "<link rel=\"apple-touch-icon\" href=\"{$favicon}\">\n";
     echo "<link rel=\"manifest\" href=\"" . ska_url('site.webmanifest') . "\">\n";
 
     $graph = [
@@ -119,8 +121,8 @@ function ska_render_seo(array $meta = []): void
             'name'       => SITE_NAME,
             'alternateName' => 'SKA The Boutique B&B',
             'url'        => SITE_URL,
-            'logo'       => ska_url('assets/images/ska_logo1.png'),
-            'image'      => ska_url('assets/images/ska_naguru_home.jpeg'),
+            'logo'       => ska_url(cms_setting('brand_logo_image', 'assets/images/ska_logo1.png')),
+            'image'      => ska_url(cms_setting('brand_social_share_image', 'assets/images/ska_naguru_home.jpeg')),
             'email'      => SITE_EMAIL,
             'telephone'  => ['+256200987770', '+256741186891'],
             'description'=> 'Boutique bed and breakfast with properties in Naguru and Munyonyo, Kampala, Uganda.',

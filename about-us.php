@@ -60,7 +60,7 @@ include 'includes/page-start.php';
     .ska-hero__bg {
       position: absolute;
       inset: 0;
-      background-image: url('assets/images/dube_munyonyo.jpg');
+      background-image: url('<?= htmlspecialchars(cms_setting('about_hero_image', $cmsAbout['hero_image'] ?? 'assets/images/dube_munyonyo.jpg')) ?>');
       background-size: cover;
       background-position: center 30%;
       transform: scale(1.06);
@@ -854,8 +854,8 @@ include 'includes/page-start.php';
 
       <!-- Image -->
       <div class="ska-intro__img-col ska-reveal ska-reveal-delay-2">
-        <img src="assets/images/ska_naguru_home.jpeg" alt="SKA Naguru — Hillside Escape" class="ska-intro__img-main">
-        <img src="assets/images/ska_munyonyo_home2.jpg" alt="SKA Munyonyo" class="ska-intro__img-accent">
+        <img src="<?= htmlspecialchars(cms_setting('about_intro_main_image', 'assets/images/ska_naguru_home.jpeg')) ?>" alt="SKA Naguru — Hillside Escape" class="ska-intro__img-main">
+        <img src="<?= htmlspecialchars(cms_setting('about_intro_accent_image', 'assets/images/ska_munyonyo_home2.jpg')) ?>" alt="SKA Munyonyo" class="ska-intro__img-accent">
         <div class="ska-intro__badge">
           <strong>4★</strong>
           <span>Rated<br>Boutique</span>
@@ -885,7 +885,7 @@ include 'includes/page-start.php';
 
       <!-- Image first on desktop -->
       <div class="ska-story__img-col ska-reveal">
-        <img src="assets/images/ska_munyonyo_home2.jpg" alt="SKA Munyonyo Lakeside" class="ska-story__img-main">
+        <img src="<?= htmlspecialchars(cms_setting('about_story_image', 'assets/images/ska_munyonyo_home2.jpg')) ?>" alt="SKA Munyonyo Lakeside" class="ska-story__img-main">
       </div>
 
       <!-- Text -->

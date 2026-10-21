@@ -8,13 +8,14 @@ $propertyBranch = $propertyBranch ?? 'naguru';
 $propertyTab    = $propertyTab ?? 'overview';
 $branch         = ska_branch($propertyBranch);
 $base           = $branch['page'];
+$brandFavicon   = cms_setting('brand_favicon_image', 'assets/images/favicon.png');
 ?>
 <div class="ska-property-header" id="skaPropertyHeader">
   <div class="container">
     <div class="ska-tabs">
       <div class="ska-brand">
         <a href="index.php" aria-label="Back to SKA home">
-          <img src="assets/images/favicon.png" alt="SKA The Boutique">
+          <img src="<?= htmlspecialchars($brandFavicon) ?>" alt="SKA The Boutique">
         </a>
       </div>
       <nav class="ska-tab-links" id="skaTabLinks" aria-label="Property sections">

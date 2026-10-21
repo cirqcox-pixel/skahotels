@@ -134,7 +134,7 @@ if (empty($heroSlides)) {
     <div class="lp-disc-cards" id="discCards">
 
       <a href="naguru.php" class="lp-disc-card" data-branch="naguru">
-        <img src="assets/images/ska_naguru_home.jpeg" alt="SKA Naguru — boutique hotel Naguru Kampala" class="lp-disc-img" loading="lazy">
+        <img src="<?= htmlspecialchars(cms_setting('home_naguru_card_image', 'assets/images/ska_naguru_home.jpeg')) ?>" alt="SKA Naguru — boutique hotel Naguru Kampala" class="lp-disc-img" loading="lazy">
         <div class="lp-disc-card-body">
           <span class="lp-disc-tag"><i class="fa-solid fa-location-dot"></i> NAGURU, KAMPALA</span>
           <h3 class="lp-disc-name">SKA Naguru <i class="fa-solid fa-chevron-right"></i></h3>
@@ -144,7 +144,7 @@ if (empty($heroSlides)) {
       </a>
 
       <a href="munyonyo.php" class="lp-disc-card" data-branch="munyonyo">
-        <img src="assets/images/ska_munyonyo_home2.jpg" alt="SKA Munyonyo — lakeside boutique hotel Kampala" class="lp-disc-img" loading="lazy">
+        <img src="<?= htmlspecialchars(cms_setting('home_munyonyo_card_image', 'assets/images/ska_munyonyo_home2.jpg')) ?>" alt="SKA Munyonyo — lakeside boutique hotel Kampala" class="lp-disc-img" loading="lazy">
         <div class="lp-disc-card-body">
           <span class="lp-disc-tag"><i class="fa-solid fa-location-dot"></i> MUNYONYO, KAMPALA</span>
           <h3 class="lp-disc-name">SKA Munyonyo <i class="fa-solid fa-chevron-right"></i></h3>
@@ -181,7 +181,7 @@ if (empty($heroSlides)) {
         <?php endforeach; ?>
         <?php if (empty($promotions)): ?>
         <a href="offers.php" class="lp-promo-card">
-          <img src="assets/images/ska_naguru_home.jpeg" alt="Book direct for the best rate" class="lp-promo-img">
+          <img src="<?= htmlspecialchars(cms_setting('home_direct_booking_image', 'assets/images/ska_naguru_home.jpeg')) ?>" alt="Book direct for the best rate" class="lp-promo-img">
           <div class="lp-promo-card-label">
             <span>Book Direct for the Best Rate</span>
             <i class="fa-solid fa-chevron-right"></i>
@@ -235,7 +235,7 @@ if (empty($heroSlides)) {
     </a>
     <a href="careers.php" class="lp-banner-row">
       <div class="lp-banner-thumb">
-        <img src="assets/images/ska_art_home.jpg" alt="Careers at SKA The Boutique" loading="lazy">
+        <img src="<?= htmlspecialchars(cms_setting('home_careers_image', 'assets/images/ska_art_home.jpg')) ?>" alt="Careers at SKA The Boutique" loading="lazy">
       </div>
       <div class="lp-banner-text">
         <strong>Discover Career Opportunities at SKA</strong>

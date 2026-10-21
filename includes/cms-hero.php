@@ -6,10 +6,12 @@ $cmsSlug = $cmsSlug ?? '';
 require_once __DIR__ . '/../config/cms.php';
 $pg = cms_page($cmsSlug);
 if (!$pg) return;
+$heroSettingKey = str_replace('-', '_', $cmsSlug) . '_hero_image';
+$heroImage = cms_setting($heroSettingKey, $pg['hero_image'] ?? '');
 ?>
-<section class="ska-page-hero" <?= !empty($pg['hero_image']) ? 'style="padding-top:0"' : '' ?>>
-  <?php if (!empty($pg['hero_image'])): ?>
-  <div class="ska-page-hero__bg" style="background-image:url('<?= htmlspecialchars($pg['hero_image']) ?>')"></div>
+<section class="ska-page-hero" <?= !empty($heroImage) ? 'style="padding-top:0"' : '' ?>>
+  <?php if (!empty($heroImage)): ?>
+  <div class="ska-page-hero__bg" style="background-image:url('<?= htmlspecialchars($heroImage) ?>')"></div>
   <?php endif; ?>
   <div class="container">
     <?php if ($pg['hero_eyebrow']): ?><p class="ska-page-hero__eyebrow"><?= htmlspecialchars($pg['hero_eyebrow']) ?></p><?php endif; ?>

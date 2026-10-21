@@ -203,6 +203,9 @@ function cms_seed_defaults(mysqli $c): void
     if ($check && (int)$check->fetch_assoc()['n'] === 0) {
         cms_seed_settings($c);
     }
+    // Add newly introduced settings on established installations without
+    // replacing an administrator's existing choices.
+    cms_ensure_settings($c);
 
     $pc = $c->query("SELECT COUNT(*) AS n FROM cms_pages");
     if ($pc && (int)$pc->fetch_assoc()['n'] === 0) {
@@ -234,8 +237,73 @@ function cms_seed_settings(mysqli $c): void
         ['hero_slide_1_alt', 'SKA Naguru boutique hotel in Kampala', 'homepage'],
         ['hero_slide_2_image', 'assets/images/ska_munyonyo_home2.jpg', 'homepage'],
         ['hero_slide_2_alt', 'SKA Munyonyo lakeside boutique retreat', 'homepage'],
+        ['brand_logo_image', 'assets/images/ska_logo1.png', 'branding'],
+        ['brand_favicon_image', 'assets/images/favicon.png', 'branding'],
+        ['brand_social_share_image', 'assets/images/ska_naguru_home.jpeg', 'branding'],
+        ['home_naguru_card_image', 'assets/images/ska_naguru_home.jpeg', 'homepage_images'],
+        ['home_munyonyo_card_image', 'assets/images/ska_munyonyo_home2.jpg', 'homepage_images'],
+        ['home_direct_booking_image', 'assets/images/ska_naguru_home.jpeg', 'homepage_images'],
+        ['home_careers_image', 'assets/images/ska_art_home.jpg', 'homepage_images'],
+        ['about_intro_main_image', 'assets/images/ska_naguru_home.jpeg', 'page_images'],
+        ['about_hero_image', 'assets/images/dube_munyonyo.jpg', 'page_images'],
+        ['offers_hero_image', 'assets/images/ska_naguru_home.jpeg', 'page_images'],
+        ['meetings_events_hero_image', 'assets/images/ska_munyonyo_home2.jpg', 'page_images'],
+        ['careers_hero_image', 'assets/images/ska_art_home.jpg', 'page_images'],
+        ['loyalty_hero_image', 'assets/images/ska_art_home.jpg', 'page_images'],
+        ['about_intro_accent_image', 'assets/images/ska_munyonyo_home2.jpg', 'page_images'],
+        ['about_story_image', 'assets/images/ska_munyonyo_home2.jpg', 'page_images'],
+        ['contact_hero_image', 'assets/images/ska_naguru_home.jpeg', 'page_images'],
+        ['packages_hero_image', 'assets/images/ska_naguru_home.jpeg', 'page_images'],
+        ['naguru_overview_image', 'assets/images/ska_naguru_home.jpeg', 'property_images'],
+        ['munyonyo_overview_image', 'assets/images/ska_munyonyo_home.jpg', 'property_images'],
+        ['meetings_business_image', 'assets/images/ska_naguru_home.jpeg', 'page_images'],
+        ['meetings_weddings_image', 'assets/images/ska_munyonyo_home2.jpg', 'page_images'],
+        ['meetings_social_image', 'assets/images/ska_art_home.jpg', 'page_images'],
+        ['naguru_dining_image', 'assets/images/naguru/restaurant.jpg', 'property_images'],
+        ['naguru_garden_image', 'assets/images/naguru/garden.jpg', 'property_images'],
+        ['munyonyo_dining_image', 'assets/images/munyonyo/ska_about.jpg', 'property_images'],
+        ['munyonyo_garden_image', 'assets/images/munyonyo/Armenities-4.jpg', 'property_images'],
     ];
     $stmt = $c->prepare("INSERT INTO site_settings (setting_key, setting_value, setting_group) VALUES (?, ?, ?)");
+    foreach ($settings as $s) {
+        $stmt->bind_param('sss', $s[0], $s[1], $s[2]);
+        $stmt->execute();
+    }
+    $stmt->close();
+}
+
+/** Insert missing defaults only, so updates never overwrite live content. */
+function cms_ensure_settings(mysqli $c): void
+{
+    $settings = [
+        ['brand_logo_image', 'assets/images/ska_logo1.png', 'branding'],
+        ['brand_favicon_image', 'assets/images/favicon.png', 'branding'],
+        ['brand_social_share_image', 'assets/images/ska_naguru_home.jpeg', 'branding'],
+        ['home_naguru_card_image', 'assets/images/ska_naguru_home.jpeg', 'homepage_images'],
+        ['home_munyonyo_card_image', 'assets/images/ska_munyonyo_home2.jpg', 'homepage_images'],
+        ['home_direct_booking_image', 'assets/images/ska_naguru_home.jpeg', 'homepage_images'],
+        ['home_careers_image', 'assets/images/ska_art_home.jpg', 'homepage_images'],
+        ['about_intro_main_image', 'assets/images/ska_naguru_home.jpeg', 'page_images'],
+        ['about_hero_image', 'assets/images/dube_munyonyo.jpg', 'page_images'],
+        ['offers_hero_image', 'assets/images/ska_naguru_home.jpeg', 'page_images'],
+        ['meetings_events_hero_image', 'assets/images/ska_munyonyo_home2.jpg', 'page_images'],
+        ['careers_hero_image', 'assets/images/ska_art_home.jpg', 'page_images'],
+        ['loyalty_hero_image', 'assets/images/ska_art_home.jpg', 'page_images'],
+        ['about_intro_accent_image', 'assets/images/ska_munyonyo_home2.jpg', 'page_images'],
+        ['about_story_image', 'assets/images/ska_munyonyo_home2.jpg', 'page_images'],
+        ['contact_hero_image', 'assets/images/ska_naguru_home.jpeg', 'page_images'],
+        ['packages_hero_image', 'assets/images/ska_naguru_home.jpeg', 'page_images'],
+        ['naguru_overview_image', 'assets/images/ska_naguru_home.jpeg', 'property_images'],
+        ['munyonyo_overview_image', 'assets/images/ska_munyonyo_home.jpg', 'property_images'],
+        ['meetings_business_image', 'assets/images/ska_naguru_home.jpeg', 'page_images'],
+        ['meetings_weddings_image', 'assets/images/ska_munyonyo_home2.jpg', 'page_images'],
+        ['meetings_social_image', 'assets/images/ska_art_home.jpg', 'page_images'],
+        ['naguru_dining_image', 'assets/images/naguru/restaurant.jpg', 'property_images'],
+        ['naguru_garden_image', 'assets/images/naguru/garden.jpg', 'property_images'],
+        ['munyonyo_dining_image', 'assets/images/munyonyo/ska_about.jpg', 'property_images'],
+        ['munyonyo_garden_image', 'assets/images/munyonyo/Armenities-4.jpg', 'property_images'],
+    ];
+    $stmt = $c->prepare("INSERT IGNORE INTO site_settings (setting_key, setting_value, setting_group) VALUES (?, ?, ?)");
     foreach ($settings as $s) {
         $stmt->bind_param('sss', $s[0], $s[1], $s[2]);
         $stmt->execute();

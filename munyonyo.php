@@ -11,7 +11,7 @@ $pageMeta = [
     'description' => 'Book SKA Munyonyo — a serene boutique escape in Munyonyo, Kampala near Lake Victoria. Direct booking, free breakfast, seasonal rates and warm hospitality.',
     'path'        => 'munyonyo',
     'type'        => 'hotel',
-    'image'       => $branch['image'],
+    'image'       => cms_setting('munyonyo_overview_image', $branch['image']),
     'schema'      => [
         '@context'  => 'https://schema.org',
         '@type'     => 'Hotel',
@@ -518,7 +518,7 @@ $roomsJson = json_encode($allRooms, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT
       </div>
     </div>
     <div class="marketplace-image">
-      <img src="assets/images/ska_munyonyo_home.jpg" alt="Ska Munyonyo"
+      <img src="<?= htmlspecialchars(cms_setting('munyonyo_overview_image', 'assets/images/ska_munyonyo_home.jpg')) ?>" alt="Ska Munyonyo"
            onerror="this.parentElement.style.background='#2a2a2a';this.remove()">
     </div>
   </div>
@@ -533,7 +533,7 @@ $roomsJson = json_encode($allRooms, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT
     <div class="more-ways-grid">
       <div class="mw-card">
         <div class="mw-img-side">
-          <img src="<?= htmlspecialchars($munyonyoDining['image'] ?: 'assets/images/munyonyo/ska_about.jpg') ?>" alt="<?= htmlspecialchars($munyonyoDining['title'] ?: 'Restaurant') ?>"
+          <img src="<?= htmlspecialchars(cms_setting('munyonyo_dining_image', $munyonyoDining['image'] ?: 'assets/images/munyonyo/ska_about.jpg')) ?>" alt="<?= htmlspecialchars($munyonyoDining['title'] ?: 'Restaurant') ?>"
                onerror="this.parentElement.style.background='#c8c4bc';this.remove()">
         </div>
         <div class="mw-text-side">
@@ -551,7 +551,7 @@ $roomsJson = json_encode($allRooms, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT
           <?php if ($munyonyoGarden['link_url']): ?><a href="<?= htmlspecialchars($munyonyoGarden['link_url']) ?>" class="mw-link"><?= htmlspecialchars($munyonyoGarden['link_label'] ?: 'Learn More') ?> →</a><?php endif; ?>
         </div>
         <div class="mw-img-side">
-          <img src="<?= htmlspecialchars($munyonyoGarden['image'] ?: 'assets/images/munyonyo/Armenities-4.jpg') ?>" alt="<?= htmlspecialchars($munyonyoGarden['title'] ?: 'Gardens') ?>"
+          <img src="<?= htmlspecialchars(cms_setting('munyonyo_garden_image', $munyonyoGarden['image'] ?: 'assets/images/munyonyo/Armenities-4.jpg')) ?>" alt="<?= htmlspecialchars($munyonyoGarden['title'] ?: 'Gardens') ?>"
                onerror="this.parentElement.style.background='#d5d0c8';this.remove()">
         </div>
       </div>

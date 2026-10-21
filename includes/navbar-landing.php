@@ -3,13 +3,14 @@
  * Landing page navigation — include after page-start.php opens <body>
  */
 $navActive = $navActive ?? '';
+$brandLogo = cms_setting('brand_logo_image', 'assets/images/ska_logo1.png');
 ?>
 <nav class="ska-navbar" id="skaNavbar" aria-label="Main navigation">
   <div class="ska-nav-inner">
 
     <div class="ska-nav-left">
       <a href="index.php" class="ska-logo" aria-label="SKA The Boutique — Home">
-        <img src="assets/images/ska_logo1.png" alt="SKA The Boutique">
+        <img src="<?= htmlspecialchars($brandLogo) ?>" alt="SKA The Boutique">
       </a>
     </div>
 

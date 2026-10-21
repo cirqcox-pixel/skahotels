@@ -1,4 +1,5 @@
 <?php
+$contactHeroImage = cms_setting('contact_hero_image', 'assets/images/ska_naguru_home.jpeg');
 $pageMeta = [
     'title'       => 'Contact Us | SKA The Boutique Kampala',
     'description' => 'Contact SKA The Boutique for reservations, events, and enquiries. Naguru +256 741 186 891 · Munyonyo +256 200 904 877 · info@skaboutiquebnb.com',
@@ -19,7 +20,7 @@ include 'includes/page-start.php';
 ?>
 
 <section class="ska-page-hero">
-  <div class="ska-page-hero__bg" style="background-image:url('assets/images/ska_naguru_home.jpeg')"></div>
+  <div class="ska-page-hero__bg" style="background-image:url('<?= htmlspecialchars($contactHeroImage) ?>')"></div>
   <div class="container">
     <p class="ska-page-hero__eyebrow">Get in Touch</p>
     <h1 class="ska-page-hero__title">We'd Love to Hear From You</h1>

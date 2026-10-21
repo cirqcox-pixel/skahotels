@@ -2,12 +2,13 @@
 require_once 'config/cms.php';
 
 $packages = cms_packages();
+$packagesHeroImage = cms_setting('packages_hero_image', 'assets/images/ska_naguru_home.jpeg');
 
 $pageMeta = [
     'title'       => 'Packages | SKA The Boutique',
     'description' => 'Wedding, conference and group packages at SKA Naguru and Munyonyo. Book a package and our team will confirm by email.',
     'path'        => 'packages',
-    'image'       => 'assets/images/ska_naguru_home.jpeg',
+    'image'       => $packagesHeroImage,
 ];
 $pageStyles = ['assets/css/pages.css'];
 $navActive  = 'packages';
@@ -15,7 +16,7 @@ include 'includes/page-start.php';
 ?>
 
 <section class="ska-page-hero">
-  <div class="ska-page-hero__bg" style="background-image:url('assets/images/ska_naguru_home.jpeg');opacity:.45"></div>
+  <div class="ska-page-hero__bg" style="background-image:url('<?= htmlspecialchars($packagesHeroImage) ?>');opacity:.45"></div>
   <div class="container">
     <p class="ska-page-hero__eyebrow">Weddings &amp; Conferences</p>
     <h1 class="ska-page-hero__title">Packages, not just rooms</h1>
