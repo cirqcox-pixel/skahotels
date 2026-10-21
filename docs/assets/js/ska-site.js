@@ -100,10 +100,15 @@
     };
     var page = (location.pathname.split('/').pop() || '').replace(/\.(html|php)$/, '').toLowerCase();
     if (pageImages[page]) setBackground('.ska-page-hero__bg, .ska-hero__bg', map[pageImages[page]]);
+    if (page === 'about-us') {
+      setSrc('.ska-intro__img-main', map.about_intro_main_image || 'assets/images/ska_naguru_home.jpeg');
+      setSrc('.ska-intro__img-accent', map.about_intro_accent_image || 'assets/images/ska_munyonyo_home2.jpg');
+      setSrc('.ska-story__img-main', map.about_story_image || 'assets/images/ska_munyonyo_home2.jpg');
+    }
     if (page === 'index' || page === '') {
       setSrc('.lp-disc-card[data-branch="naguru"] img', map.home_naguru_card_image);
       setSrc('.lp-disc-card[data-branch="munyonyo"] img', map.home_munyonyo_card_image);
-      setSrc('.lp-careers img', map.home_careers_image);
+      setSrc('.lp-banner-thumb img', map.home_careers_image || 'assets/images/ska_art_home.jpg');
     }
     if (page === 'naguru') setSrc('.marketplace-image img', map.naguru_overview_image);
     if (page === 'munyonyo') setSrc('.marketplace-image img', map.munyonyo_overview_image);
