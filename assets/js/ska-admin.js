@@ -12,6 +12,13 @@
     return d.innerHTML;
   }
 
+  function previewUrl(value) {
+    value = String(value || '').trim();
+    if (!value || /^(https?:|data:|blob:|\/)/i.test(value)) return value;
+    // The settings screen is /admin/ while site assets are at the site root.
+    return '../' + value.replace(/^\.\//, '');
+  }
+
   function fmtDate(a, b) {
     if (!a || !b) return '—';
     return esc(a) + ' → ' + esc(b);
@@ -542,7 +549,7 @@
       });
       form.querySelectorAll('[data-preview-for]').forEach(function (preview) {
         var input = form.elements[preview.getAttribute('data-preview-for')];
-        if (input && input.value) { preview.src = input.value; preview.style.display = ''; preview.style.visibility = 'visible'; }
+        if (input && input.value) { preview.src = previewUrl(input.value); preview.style.display = ''; preview.style.visibility = 'visible'; }
       });
     } catch (e) {
       showError('Could not load settings: ' + (e.message || e));
@@ -566,7 +573,7 @@
           var field = form.elements[name];
           if (field) field.value = url;
           var prev = form.querySelector('[data-preview-for="' + name + '"]');
-          if (prev) { prev.src = url; prev.style.display = ''; prev.style.visibility = 'visible'; }
+          if (prev) { prev.src = previewUrl(url); prev.style.display = ''; prev.style.visibility = 'visible'; }
           if (status) status.textContent = 'Uploaded. Press “Save settings” to publish.';
         } catch (err) {
           if (status) status.textContent = '';
