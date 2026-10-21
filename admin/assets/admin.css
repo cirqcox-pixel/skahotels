@@ -50,6 +50,7 @@ body {
 .ska-image-setting__preview.is-missing { opacity: .25; }
 .ska-image-setting__body { padding: 14px; }
 .ska-input--file { padding: 7px 10px; font-size: 12px; }
+.ska-setting-preview { display: none; width: 100%; height: 120px; margin-top: 8px; object-fit: cover; border: 1px solid var(--border); border-radius: 6px; background: var(--ivory); }
 
 /* ── SIDEBAR ────────────────────────────────────────────────── */
 .ska-sidebar {

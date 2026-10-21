@@ -529,6 +529,10 @@
           el.value = map[el.name];
         }
       });
+      form.querySelectorAll('[data-preview-for]').forEach(function (preview) {
+        var input = form.elements[preview.getAttribute('data-preview-for')];
+        if (input && input.value) { preview.src = input.value; preview.style.display = ''; }
+      });
     } catch (e) {
       showError('Could not load settings: ' + (e.message || e));
     }

@@ -83,7 +83,30 @@
     if (map.brand_logo) {
       document.querySelectorAll('.ska-logo img').forEach(function (img) { img.setAttribute('src', map.brand_logo); });
     }
+    if (map.brand_favicon) {
+      document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]').forEach(function (link) { link.setAttribute('href', map.brand_favicon); });
+    }
+    function setSrc(selector, value) {
+      if (!value) return;
+      document.querySelectorAll(selector).forEach(function (el) { el.setAttribute('src', value); });
+    }
+    function setBackground(selector, value) {
+      if (!value) return;
+      document.querySelectorAll(selector).forEach(function (el) { el.style.backgroundImage = 'url("' + value.replace(/"/g, '%22') + '")'; });
+    }
+    var pageImages = {
+      'about-us': 'about_hero_image', 'offers': 'offers_hero_image', 'meetings-events': 'meetings_events_hero_image',
+      'contact': 'contact_hero_image', 'packages': 'packages_hero_image'
+    };
     var page = (location.pathname.split('/').pop() || '').replace(/\.(html|php)$/, '').toLowerCase();
+    if (pageImages[page]) setBackground('.ska-page-hero__bg, .ska-hero__bg', map[pageImages[page]]);
+    if (page === 'index' || page === '') {
+      setSrc('.lp-disc-card[data-branch="naguru"] img', map.home_naguru_card_image);
+      setSrc('.lp-disc-card[data-branch="munyonyo"] img', map.home_munyonyo_card_image);
+      setSrc('.lp-careers img', map.home_careers_image);
+    }
+    if (page === 'naguru') setSrc('.marketplace-image img', map.naguru_overview_image);
+    if (page === 'munyonyo') setSrc('.marketplace-image img', map.munyonyo_overview_image);
     var vid = page === 'naguru' ? map.naguru_hero_video : page === 'munyonyo' ? map.munyonyo_hero_video : '';
     if (vid) {
       var video = document.querySelector('header.hero video, .hero video');
