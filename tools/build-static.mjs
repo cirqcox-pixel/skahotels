@@ -281,6 +281,7 @@ const PAGES = {
     image: 'assets/images/ska_art_home.jpg',
     css: ['assets/css/pages.css'],
     nav: 'landing',
+    staticBody: 'careers',
   },
   loyalty: {
     title: 'SKA Rewards | Loyalty Programme',

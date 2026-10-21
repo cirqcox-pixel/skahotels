@@ -589,6 +589,10 @@
     });
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
+      var submit = form.querySelector('button[type="submit"]');
+      var original = submit ? submit.innerHTML : '';
+      if (submit) { submit.disabled = true; submit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…'; }
+      showToast('Saving changes…');
       var rows = [];
       Array.prototype.forEach.call(form.elements, function (el) {
         if (!el.name) return;
@@ -600,9 +604,11 @@
       });
       try {
         await SkaApi.adminSaveSettings(rows);
-        showToast('Settings saved. The website will use these contacts and inboxes.');
+        showToast('Saved successfully. Your website settings are now published.');
       } catch (err) {
         showError(err.message || 'Could not save settings');
+      } finally {
+        if (submit) { submit.disabled = false; submit.innerHTML = original; }
       }
     });
   }
