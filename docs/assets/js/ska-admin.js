@@ -86,8 +86,8 @@
     marketing: 'Marketing'
   };
   var ROLE_PAGES = {
-    super_admin: ['dashboard', 'rooms', 'promotions', 'packages', 'bookings', 'inquiries', 'users', 'settings'],
-    manager: ['dashboard', 'rooms', 'promotions', 'packages', 'bookings', 'inquiries', 'settings'],
+    super_admin: ['dashboard', 'rooms', 'promotions', 'packages', 'bookings', 'inquiries', 'users', 'settings', 'jobs'],
+    manager: ['dashboard', 'rooms', 'promotions', 'packages', 'bookings', 'inquiries', 'settings', 'jobs'],
     reservations: ['dashboard', 'bookings', 'inquiries'],
     marketing: ['dashboard', 'promotions', 'packages']
   };
@@ -1222,6 +1222,10 @@
   }
 
   /* ── Init ── */
+  var jobsCache = [];
+  async function loadJobsPage() { var body = document.getElementById('jobsTableBody'); if (!body) return; var session = await ensureAuth('jobsTableBody', 4); if (!session) return; try { jobsCache = await SkaApi.adminFetchJobs(); body.innerHTML = jobsCache.length ? jobsCache.map(function (j) { return '<tr><td><strong>' + esc(j.title) + '</strong></td><td>' + esc(j.tag || '') + '</td><td>' + (j.active ? 'Published' : 'Draft') + '</td><td><button class="ska-btn ska-btn--outline ska-btn--sm" data-job-edit="' + j.id + '">Edit</button> <button class="ska-btn ska-btn--primary ska-btn--sm" data-job-toggle="' + j.id + '">' + (j.active ? 'Unpublish' : 'Publish') + '</button></td></tr>'; }).join('') : '<tr><td colspan="4" class="ska-table-empty">No jobs posted yet.</td></tr>'; } catch(e) { showError(e.message || 'Could not load jobs'); } }
+  function initJobsPage() { var form = document.getElementById('jobForm'), table = document.getElementById('jobsTableBody'); if (!form || !table) return; form.addEventListener('submit', async function(e) { e.preventDefault(); var d = Object.fromEntries(new FormData(form)); var old = jobsCache.find(function(j){return String(j.id)===String(d.id);}); d.id = d.id || null; d.block_key = old ? old.block_key : 'job_' + Date.now(); d.active = d.active === 'true'; try { await SkaApi.adminSaveJob(d); showToast(d.active ? 'Job published.' : 'Job saved as draft.'); form.reset(); loadJobsPage(); } catch(err) { showError(err.message || 'Could not save job'); } }); table.addEventListener('click', async function(e) { var b=e.target.closest('[data-job-edit],[data-job-toggle]'); if(!b)return; var j=jobsCache.find(function(x){return String(x.id)===b.getAttribute(b.hasAttribute('data-job-edit')?'data-job-edit':'data-job-toggle');}); if(!j)return; if(b.hasAttribute('data-job-edit')) { ['id','title','tag','body','sort_order'].forEach(function(k){form.elements[k].value=j[k]||'';}); form.elements.active.value=j.active?'true':'false'; form.scrollIntoView({behavior:'smooth'}); } else { j.active=!j.active; try { await SkaApi.adminSaveJob(j); showToast(j.active?'Job published.':'Job unpublished.'); loadJobsPage(); } catch(err){showError(err.message||'Could not update job');} } }); }
+
   document.getElementById('adminLogout')?.addEventListener('click', async function () {
     await SkaApi.adminSignOut();
     location.href = 'login.html';
@@ -1236,6 +1240,7 @@
   initPackagesPage();
   initSettingsPage();
   initInquiriesPage();
+  initJobsPage();
 
   function boot() {
     if (page === 'bookings') loadBookingsPage();
@@ -1245,6 +1250,7 @@
     else if (page === 'inquiries') loadInquiriesPage();
     else if (page === 'users') loadUsersPage();
     else if (page === 'settings') loadSettingsPage();
+    else if (page === 'jobs') loadJobsPage();
     else loadDashboard();
   }
 

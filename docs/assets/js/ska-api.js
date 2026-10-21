@@ -412,6 +412,14 @@
       });
     },
 
+    adminFetchJobs: async function () {
+      return adminRequest(function (sb) { return sb.from('cms_blocks').select('*').eq('page_slug', 'careers').like('block_key', 'job_%').order('sort_order').order('id'); });
+    },
+    adminSaveJob: async function (job) {
+      var payload = { page_slug: 'careers', block_key: job.block_key, title: job.title, tag: job.tag || 'Kampala, Uganda', body: job.body, sort_order: parseInt(job.sort_order || 10, 10), active: !!job.active };
+      return adminRequest(function (sb) { return job.id ? sb.from('cms_blocks').update(payload).eq('id', job.id).select().single() : sb.from('cms_blocks').insert([payload]).select().single(); });
+    },
+
     adminSaveRoom: async function (room) {
       var payload = {
         name: room.name,

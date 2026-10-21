@@ -125,6 +125,14 @@
       setBackground('#weddings .ska-feature-card__img', map.meetings_weddings_image);
       setBackground('#social .ska-feature-card__img', map.meetings_social_image);
     }
+    if (page === 'careers') {
+      SkaApi.fetchBlocks('careers').then(function (jobs) {
+        var wrap = document.getElementById('careersJobs'); if (!wrap) return;
+        jobs = jobs.filter(function (j) { return String(j.block_key || '').indexOf('job_') === 0; });
+        if (!jobs.length) { wrap.innerHTML = '<p>We are always pleased to hear from talented hospitality professionals. Send us your application below.</p>'; return; }
+        wrap.innerHTML = jobs.map(function (j) { var u = location.href.split('#')[0] + '#apply'; var share = encodeURIComponent((j.title || 'Career opportunity') + ' at SKA The Boutique — ' + u); return '<article style="padding:18px 0;border-bottom:1px solid #e8e4dc"><p class="ska-feature-card__tag">' + (j.tag || 'Kampala, Uganda') + '</p><h3>' + (j.title || '') + '</h3><p>' + String(j.body || '').replace(/\n/g, '<br>') + '</p><a class="ska-btn-gold" href="#apply">Apply now</a> <a href="https://wa.me/?text=' + share + '" target="_blank" rel="noopener">Share on WhatsApp</a> · <a target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(u) + '">Facebook</a> · <a target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=' + share + '">X</a></article>'; }).join('');
+      }).catch(function () {});
+    }
     var vid = page === 'naguru' ? (map.naguru_hero_video || 'assets/video/ska_naguru.mp4') : page === 'munyonyo' ? (map.munyonyo_hero_video || 'assets/video/ska_munyonyo.mp4') : '';
     if (vid) {
       var video = document.querySelector('header.hero video, .hero video');

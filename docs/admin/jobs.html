@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" data-ska-static="true">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Jobs | SKA Admin</title>
+  <link rel="icon" href="../assets/images/favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+</head>
+<body data-admin-page="jobs">
+
+<aside class="ska-sidebar" id="skaSidebar">
+  <div class="ska-sidebar__brand">
+    <div class="ska-sidebar__brand-name">SKA <span>Admin</span></div>
+    <div class="ska-sidebar__brand-sub">GitHub Pages CMS</div>
+  </div>
+  <nav class="ska-sidebar__nav">
+    <div class="ska-nav-label">Main</div>
+    <a href="dashboard.html" class="ska-nav-link" data-nav-page="dashboard"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    <a href="../index.html" class="ska-nav-link" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Website</a>
+
+    <div class="ska-nav-label">Property</div>
+    <a href="rooms.html" class="ska-nav-link" data-nav-page="rooms"><i class="fa-solid fa-bed"></i> Rooms</a>
+    <a href="promotions.html" class="ska-nav-link" data-nav-page="promotions"><i class="fa-solid fa-tag"></i> Promotions</a>
+    <a href="packages.html" class="ska-nav-link" data-nav-page="packages"><i class="fa-solid fa-gift"></i> Packages</a>
+    <a href="bookings.html" class="ska-nav-link" data-nav-page="bookings"><i class="fa-solid fa-calendar-days"></i> Bookings</a>
+    <a href="settings.html" class="ska-nav-link" data-nav-page="settings"><i class="fa-solid fa-gear"></i> Property settings</a>
+
+    <div class="ska-nav-label">Content</div>
+    <a href="jobs.html" class="ska-nav-link active" data-nav-page="jobs"><i class="fa-solid fa-briefcase"></i> Jobs</a>
+    <a href="inquiries.html" class="ska-nav-link" data-nav-page="inquiries"><i class="fa-solid fa-envelope"></i> Inquiries</a>
+    <a href="users.html" class="ska-nav-link" data-nav-page="users"><i class="fa-solid fa-users"></i> Users &amp; Roles</a>
+  </nav>
+  <div class="ska-sidebar__footer">
+    <div class="ska-sidebar__avatar"><i class="fa-solid fa-user"></i></div>
+    <div>
+      <div class="ska-sidebar__user-name" id="adminUserEmail">Admin</div>
+      <div class="ska-sidebar__user-role" id="adminUserRole">Staff</div>
+    </div>
+    <button type="button" class="ska-sidebar__logout" id="adminLogout" title="Sign out">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i>
+    </button>
+  </div>
+</aside>
+
+<div class="ska-main"><header class="ska-topbar"><div class="ska-topbar__left"><div class="ska-topbar__title">Jobs</div><div class="ska-topbar__breadcrumb">Create, publish, and unpublish vacancies</div></div></header><main class="ska-content"><div id="adminError" class="ska-alert ska-alert--danger" style="display:none;margin-bottom:20px"></div><div id="adminToast" class="ska-alert ska-alert--success" style="display:none;margin-bottom:20px"></div><div class="ska-card" style="margin-bottom:20px"><div class="ska-card__header"><h2 class="ska-card__title">Post a <span>job</span></h2></div><div class="ska-card__body ska-card__body--padded"><form id="jobForm"><input type="hidden" name="id"><div class="ska-form-grid"><div class="ska-form-field"><label>Job title</label><input class="ska-input" name="title" required></div><div class="ska-form-field"><label>Location</label><input class="ska-input" name="tag" value="Kampala, Uganda"></div><div class="ska-form-field ska-form-field--full"><label>Job description</label><textarea class="ska-input" name="body" rows="6" required></textarea></div><div class="ska-form-field"><label>Status</label><select class="ska-input" name="active"><option value="true">Published</option><option value="false">Draft / Unpublished</option></select></div><div class="ska-form-field"><label>Display order</label><input class="ska-input" name="sort_order" type="number" value="10"></div></div><button class="ska-btn ska-btn--primary" type="submit">Save job</button></form></div></div><div class="ska-card"><div class="ska-card__header"><h2 class="ska-card__title">Posted <span>jobs</span></h2></div><div class="ska-card__body"><table class="ska-table"><thead><tr><th>Job</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead><tbody id="jobsTableBody"><tr><td colspan="4" class="ska-table-empty">Loading…</td></tr></tbody></table></div></div></main></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/ska-config.js?v=20260921n"></script>
+<script src="../assets/js/ska-notify.js?v=20260921n"></script>
+<script src="../assets/js/ska-api.js?v=20260921n"></script>
+<script src="../assets/js/ska-admin.js?v=20261021-images"></script>
+</body>
+</html>
