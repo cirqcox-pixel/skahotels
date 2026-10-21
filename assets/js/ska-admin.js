@@ -523,6 +523,17 @@
     hideError();
     try {
       var map = await withTimeout(SkaApi.fetchSettings());
+      // Show the site's current artwork for new slots until an admin replaces it.
+      var imageDefaults = {
+        brand_logo: 'assets/images/ska_logo1.png', brand_favicon: 'assets/images/favicon.png', brand_social_share_image: 'assets/images/ska_naguru_home.jpeg',
+        hero_slide_1_image: 'assets/images/ska_naguru_home.jpeg', hero_slide_2_image: 'assets/images/ska_munyonyo_home2.jpg',
+        home_naguru_card_image: 'assets/images/ska_naguru_home.jpeg', home_munyonyo_card_image: 'assets/images/ska_munyonyo_home2.jpg',
+        home_careers_image: 'assets/images/ska_art_home.jpg', about_hero_image: 'assets/images/dube_munyonyo.jpg',
+        offers_hero_image: 'assets/images/ska_naguru_home.jpeg', meetings_events_hero_image: 'assets/images/ska_munyonyo_home2.jpg',
+        contact_hero_image: 'assets/images/ska_naguru_home.jpeg', packages_hero_image: 'assets/images/ska_naguru_home.jpeg',
+        naguru_overview_image: 'assets/images/ska_naguru_home.jpeg', munyonyo_overview_image: 'assets/images/ska_munyonyo_home.jpg'
+      };
+      Object.keys(imageDefaults).forEach(function (key) { if (!map[key]) map[key] = imageDefaults[key]; });
       Array.prototype.forEach.call(form.elements, function (el) {
         if (!el.name) return;
         if (map[el.name] != null && String(map[el.name]).trim() !== '') {
@@ -531,7 +542,7 @@
       });
       form.querySelectorAll('[data-preview-for]').forEach(function (preview) {
         var input = form.elements[preview.getAttribute('data-preview-for')];
-        if (input && input.value) { preview.src = input.value; preview.style.display = ''; }
+        if (input && input.value) { preview.src = input.value; preview.style.display = ''; preview.style.visibility = 'visible'; }
       });
     } catch (e) {
       showError('Could not load settings: ' + (e.message || e));
@@ -555,7 +566,7 @@
           var field = form.elements[name];
           if (field) field.value = url;
           var prev = form.querySelector('[data-preview-for="' + name + '"]');
-          if (prev) { prev.src = url; prev.style.display = ''; }
+          if (prev) { prev.src = url; prev.style.display = ''; prev.style.visibility = 'visible'; }
           if (status) status.textContent = 'Uploaded. Press “Save settings” to publish.';
         } catch (err) {
           if (status) status.textContent = '';

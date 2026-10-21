@@ -50,7 +50,7 @@ body {
 .ska-image-setting__preview.is-missing { opacity: .25; }
 .ska-image-setting__body { padding: 14px; }
 .ska-input--file { padding: 7px 10px; font-size: 12px; }
-.ska-setting-preview { display: none; width: 100%; height: 120px; margin-top: 8px; object-fit: cover; border: 1px solid var(--border); border-radius: 6px; background: var(--ivory); }
+.ska-setting-preview { display: block; visibility: hidden; width: 100%; height: 120px; margin-top: 8px; object-fit: cover; border: 1px solid var(--border); border-radius: 6px; background: var(--ivory); }
 
 /* ── SIDEBAR ────────────────────────────────────────────────── */
 .ska-sidebar {
@@ -1638,6 +1638,9 @@ button.ska-sidebar__logout {
 .ska-form-field--full {
   grid-column: 1 / -1;
 }
+
+.ska-image-group-title { grid-column: 1 / -1; margin-top: 12px; padding: 14px 0 8px; border-top: 1px solid var(--border); color: var(--navy); font-size: 13px; font-weight: 600; }
+.ska-image-group-title span { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; font-weight: 400; }
 
 .ska-form-field label {
   font-size: 10.5px;
