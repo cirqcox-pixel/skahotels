@@ -110,17 +110,27 @@
       setSrc('.lp-disc-card[data-branch="munyonyo"] img', map.home_munyonyo_card_image);
       setSrc('.lp-banner-thumb img', map.home_careers_image || 'assets/images/ska_art_home.jpg');
     }
-    if (page === 'naguru') setSrc('.marketplace-image img', map.naguru_overview_image);
-    if (page === 'munyonyo') setSrc('.marketplace-image img', map.munyonyo_overview_image);
+    if (page === 'naguru') {
+      setSrc('.marketplace-image img', map.naguru_overview_image || 'assets/images/ska_naguru_home.jpeg');
+      setSrc('.more-ways-grid .mw-card:nth-child(1) .mw-img-side img', map.naguru_dining_image || 'assets/images/naguru/restaurant.jpg');
+      setSrc('.more-ways-grid .mw-card:nth-child(2) .mw-img-side img', map.naguru_garden_image || 'assets/images/naguru/garden.jpg');
+    }
+    if (page === 'munyonyo') {
+      setSrc('.marketplace-image img', map.munyonyo_overview_image || 'assets/images/ska_munyonyo_home.jpg');
+      setSrc('.more-ways-grid .mw-card:nth-child(1) .mw-img-side img', map.munyonyo_dining_image || 'assets/images/naguru/restaurant.jpg');
+      setSrc('.more-ways-grid .mw-card:nth-child(2) .mw-img-side img', map.munyonyo_garden_image || 'assets/images/naguru/garden.jpg');
+    }
     if (page === 'meetings-events') {
       setBackground('#meetings .ska-feature-card__img', map.meetings_business_image);
       setBackground('#weddings .ska-feature-card__img', map.meetings_weddings_image);
       setBackground('#social .ska-feature-card__img', map.meetings_social_image);
     }
-    var vid = page === 'naguru' ? map.naguru_hero_video : page === 'munyonyo' ? map.munyonyo_hero_video : '';
+    var vid = page === 'naguru' ? (map.naguru_hero_video || 'assets/video/ska_naguru.mp4') : page === 'munyonyo' ? (map.munyonyo_hero_video || 'assets/video/ska_munyonyo.mp4') : '';
     if (vid) {
       var video = document.querySelector('header.hero video, .hero video');
       if (video) {
+        var poster = page === 'naguru' ? (map.naguru_overview_image || 'assets/images/ska_naguru_home.jpeg') : (map.munyonyo_overview_image || 'assets/images/ska_munyonyo_home.jpg');
+        video.setAttribute('poster', poster);
         var src = video.querySelector('source');
         if (src) src.setAttribute('src', vid); else video.setAttribute('src', vid);
         video.load();

@@ -540,7 +540,10 @@
         offers_hero_image: 'assets/images/ska_naguru_home.jpeg', meetings_events_hero_image: 'assets/images/ska_munyonyo_home2.jpg',
         meetings_business_image: 'assets/images/ska_furniture_home.jpg', meetings_weddings_image: 'assets/images/ska_art_home.jpg', meetings_social_image: 'assets/images/ska_naguru_home.jpeg',
         contact_hero_image: 'assets/images/ska_naguru_home.jpeg', packages_hero_image: 'assets/images/ska_naguru_home.jpeg',
-        naguru_overview_image: 'assets/images/ska_naguru_home.jpeg', munyonyo_overview_image: 'assets/images/ska_munyonyo_home.jpg'
+        naguru_overview_image: 'assets/images/ska_naguru_home.jpeg', munyonyo_overview_image: 'assets/images/ska_munyonyo_home.jpg',
+        naguru_dining_image: 'assets/images/naguru/restaurant.jpg', naguru_garden_image: 'assets/images/naguru/garden.jpg',
+        munyonyo_dining_image: 'assets/images/naguru/restaurant.jpg', munyonyo_garden_image: 'assets/images/naguru/garden.jpg',
+        naguru_hero_video: 'assets/video/ska_naguru.mp4', munyonyo_hero_video: 'assets/video/ska_munyonyo.mp4'
       };
       Object.keys(imageDefaults).forEach(function (key) { if (!map[key]) map[key] = imageDefaults[key]; });
       Array.prototype.forEach.call(form.elements, function (el) {
